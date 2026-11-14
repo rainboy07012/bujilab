@@ -132,10 +132,10 @@ tfoot td{font-weight:500;border-bottom:1px solid var(--line)}tfoot tr:first-chil
 .bset .chk{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12.5px}
 .bset .row{display:flex;gap:6px;flex-wrap:wrap}
 .baudit{border:1px solid var(--line);border-radius:2px;padding:10px 12px;font-size:12.5px;line-height:1.6;background:#fafbfc}.baudit h4{font-size:12.5px;margin:0 0 4px}.baudit li{margin-left:16px}.baudit .ok{color:var(--ok)}.baudit .bad{color:var(--bad)}.baudit .rev{color:#8a5a00}
-.bwrap{position:relative;line-height:0}.bsel{position:absolute;display:none;border:1.5px solid var(--acc);background:rgba(47,91,211,.08);pointer-events:none}.bsel::after{content:'';position:absolute;right:-5px;bottom:-5px;width:9px;height:9px;background:var(--acc)}
+.bwrap{position:relative;line-height:0}#bcv{image-rendering:auto;max-width:none}.bprev{position:relative;align-content:start}.bzoom{position:sticky;top:0;left:0;z-index:3;align-self:start;justify-self:end;margin-bottom:8px}.bprev.zoomed{place-items:start start}.bsel{position:absolute;display:none;border:1.5px solid var(--acc);background:rgba(47,91,211,.08);pointer-events:none}.bsel::after{content:'';position:absolute;right:-5px;bottom:-5px;width:9px;height:9px;background:var(--acc)}
 #bcv{cursor:default}
 .bprev{flex:1;display:grid;place-items:start center;padding:16px;overflow:auto;min-width:0;min-height:0}
-#bcv{box-shadow:0 10px 30px rgba(22,24,29,.18);background:#fff;max-width:100%;height:auto}
+#bcv{box-shadow:0 10px 30px rgba(22,24,29,.18);background:#fff;height:auto}
 .bnote{font-size:11.5px;color:var(--mut);line-height:1.5}
 @media (max-width:980px){.pcrow{flex-wrap:wrap}.pcrow input{flex:1 1 60%}.pcrow input.pd{flex:2 1 280px;color:#374151}.pcrow span{order:5;width:100%;padding-left:32px}#pcv{height:520px}
 #vboard.on{flex-direction:column;overflow:auto}.bprev{min-height:320px;flex:none;order:-1}.bset{width:auto;border-right:0;border-bottom:1px solid var(--line)}}
@@ -374,7 +374,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
    <div class="baudit" id="bAudit" aria-live="polite"></div>
    <p class="bnote">현재 작업 상태(매스, 대지, 시각, 분석 결과)가 그대로 들어갑니다. 3D 매스는 지금 3D 화면의 시점으로 찍힙니다. A1 인쇄용은 만드는 데 몇 초 걸릴 수 있습니다.</p>
   </div>
-  <div class="bprev"><div class="bwrap" id="bwrap"><canvas id="bcv" aria-label="보드 미리보기"></canvas><div class="bsel" id="bsel"></div></div></div>
+  <div class="bprev"><div class="bzoom seg" id="bzoom" role="group" aria-label="미리보기 배율"><button data-z="0" class="on">맞춤</button><button data-z="2">2배</button><button data-z="3">3배</button></div><div class="bwrap" id="bwrap"><canvas id="bcv" aria-label="보드 미리보기"></canvas><div class="bsel" id="bsel"></div></div></div>
  </div>
  <div class="pane" id="vcomp">
   <div class="cmpbar">
@@ -1422,7 +1422,7 @@ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const d=DLGS.
 document.addEventListener('pointerdown',e=>{$$('.laypop[open]').forEach(p=>{if(!p.contains(e.target))p.open=false;});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.laypop[open]').forEach(p=>{p.open=false;p.querySelector('summary').focus();});});
 function openAxo(){dlgOn('#axoDlg');drawAxoPrev();}
-function drawAxoPrev(){const cv=$('#axoCv');const w=cv.clientWidth||900,h=Math.round(w*0.66);cv.style.height=h+'px';const pr=Math.min(devicePixelRatio,2);const im=renderAxo(Math.round(w*pr),Math.round(h*pr));cv.width=im.width;cv.height=im.height;cv.getContext('2d').drawImage(im,0,0);}
+function drawAxoPrev(){const cv=$('#axoCv');const w=cv.clientWidth||900,h=Math.round(w*0.66);cv.style.height=h+'px';const pr=PREV_PR();const im=renderAxo(Math.round(w*pr),Math.round(h*pr));cv.width=im.width;cv.height=im.height;cv.getContext('2d').drawImage(im,0,0);}
 $$('#axoKind button').forEach(b=>b.onclick=()=>{AXO.kind=b.dataset.k;$$('#axoKind button').forEach(x=>x.classList.toggle('on',x===b));drawAxoPrev();});
 $$('#axoDir button').forEach(b=>b.onclick=()=>{AXO.dir=+b.dataset.d;$$('#axoDir button').forEach(x=>x.classList.toggle('on',x===b));drawAxoPrev();});
 $('#axoAnn').onchange=e=>{AXO.ann=e.target.checked;drawAxoPrev();};
@@ -1559,8 +1559,13 @@ function auditBoard(){const out=[],M=lastM||metrics(),RS=regStatus(M,parkingReq(
  return out;}
 function renderAudit(){const A=auditBoard();$('#bAudit').innerHTML='<h4>출력 전 확인</h4><ul>'+A.map(a=>`<li class="${a.c}">${a.t}</li>`).join('')+'</ul>';return A;}
 let BPV=null;
-function previewBoard(){const box=$('.bprev');const avail=Math.max(300,box.clientWidth-40);const [PW,PH]=PAPER[board.paper];const dpr=Math.min(devicePixelRatio,2);const dpi=Math.min(100,avail*dpr/(PW/25.4));
- const {cv,rects}=renderBoard(dpi);BPV={rects,PW,PH};renderAudit();const b=$('#bcv');b.width=cv.width;b.height=cv.height;b.getContext('2d').drawImage(cv,0,0);b.style.width=(cv.width/dpr)+'px';}
+const PREV_PR=()=>Math.max(2,Math.min(devicePixelRatio*2,3));// 미리보기는 최소 2배 밀도
+let BZOOM=0;
+function previewBoard(){const box=$('.bprev');const avail=Math.max(300,box.clientWidth-40);const [PW,PH]=PAPER[board.paper];const dpr=Math.max(1,Math.min(devicePixelRatio,3));
+ // 화면에 보이는 크기보다 2배 촘촘하게 그린 뒤 줄여 보여 줌(글자·선이 뭉개지지 않게). 확대 배율이면 그만큼 더 촘촘하게.
+ const cssW=BZOOM?avail*BZOOM:avail;const dpi=Math.min(BZOOM?220:150,cssW*dpr*(BZOOM?1.5:2)/(PW/25.4),6000/(PW/25.4));
+ const {cv,rects}=renderBoard(dpi);BPV={rects,PW,PH};renderAudit();const b=$('#bcv');b.width=cv.width;b.height=cv.height;const g=b.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(cv,0,0);b.style.width=Math.round(cssW)+'px';box.classList.toggle('zoomed',!!BZOOM);}
+$$('#bzoom button').forEach(x=>x.onclick=()=>{BZOOM=+x.dataset.z;$$('#bzoom button').forEach(y=>y.classList.toggle('on',y===x));previewBoard();});
 function utf16hex(s){let h='FEFF';for(const ch of s){const cp=ch.codePointAt(0);if(cp>0xFFFF){const v=cp-0x10000;h+=(0xD800+(v>>10)).toString(16).padStart(4,'0')+(0xDC00+(v&0x3FF)).toString(16).padStart(4,'0');}else h+=cp.toString(16).padStart(4,'0');}return h.toUpperCase();}
 async function pdfFromCanvas(cv,wmm,hmm,title){const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.92));const jpg=new Uint8Array(await blob.arrayBuffer());
  const W=(wmm*72/25.4).toFixed(2),H=(hmm*72/25.4).toFixed(2);const enc=new TextEncoder();const chunks=[];let len=0;const offs=[];
@@ -1773,7 +1778,7 @@ function drawTile(c,key,tx,ty,T,G0){const {c:C,E}=G0,k=T/(2*E);const X=x=>tx+(x-
  c.strokeStyle='#d5d8dc';c.lineWidth=0.6;c.strokeRect(tx,ty,T,T);c.restore();}
 function sheetClip(q,G0){const r=clipSq(q.map(p=>[p[0]-G0.c[0],p[1]-G0.c[1]]),G0.E);return r.length>=3?r.map(p=>[p[0]+G0.c[0],p[1]+G0.c[1]]):null;}
 function openSheet(){dlgOn('#shtDlg');$$('#shtKeys input').forEach(i=>i.checked=SHT.keys.includes(i.value));$('#shtGrid').checked=SHT.grid;drawSheetPrev();}
-function drawSheetPrev(){const cv=$('#shtCv');const w=cv.clientWidth||960,h=Math.round(w*0.66);cv.style.height=h+'px';drawSheet({cv,W:w,H:h,pr:Math.min(devicePixelRatio,2)});}
+function drawSheetPrev(){const cv=$('#shtCv');const w=cv.clientWidth||960,h=Math.round(w*0.66);cv.style.height=h+'px';drawSheet({cv,W:w,H:h,pr:PREV_PR()});}
 $$('#shtKeys input').forEach(i=>i.onchange=()=>{SHT.keys=$$('#shtKeys input').filter(x=>x.checked).map(x=>x.value);drawSheetPrev();});
 $('#shtGrid').onchange=e=>{SHT.grid=e.target.checked;drawSheetPrev();};
 $('#shtB').onclick=openSheet;$('#shtClose').onclick=()=>dlgOff('#shtDlg');
@@ -1902,7 +1907,7 @@ function drawPlanSheet(o){const cv=o.cv,W=o.W,H=o.H,pr=o.pr||1;cv.width=Math.rou
   c.fillStyle='#9aa0a8';c.font=`${9*u}px "IBM Plex Sans KR",sans-serif`;c.textAlign='right';c.fillText('바람: 한반도 일반 경향 · 일출·일몰: 대략의 표준시 · 진입 위치: 도로 폭 기준 추정',tx+tw*cols[0]-12*u,ty+16*u);c.textAlign='left';}
  c.restore();}
 function openPlanSheet(){dlgOn('#psDlg');drawPlanPrev();if(SITE&&VW.key)prepKeyMaps().then(drawPlanPrev);}
-function drawPlanPrev(){const cv=$('#psCv');const w=cv.clientWidth||960,h=Math.round(w/1.414);cv.style.height=h+'px';drawPlanSheet({cv,W:w,H:h,pr:Math.min(devicePixelRatio,2),mass:$('#psMass').checked});}
+function drawPlanPrev(){const cv=$('#psCv');const w=cv.clientWidth||960,h=Math.round(w/1.414);cv.style.height=h+'px';drawPlanSheet({cv,W:w,H:h,pr:PREV_PR(),mass:$('#psMass').checked});}
 $('#psB').onclick=openPlanSheet;$('#psClose').onclick=()=>dlgOff('#psDlg');
 $('#psMass').onchange=()=>drawPlanPrev();
 $('#psPng').onclick=async()=>{await prepKeyMaps();const cv=document.createElement('canvas');drawPlanSheet({cv,W:1684,H:1191,pr:2,mass:$('#psMass').checked});const blob=await new Promise(r=>cv.toBlob(r,'image/png'));offer(`부지랩_배치도주석판_${stamp()}.png`,blob);};
