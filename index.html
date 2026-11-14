@@ -77,7 +77,7 @@ label.tg{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none
 .lay{display:flex;gap:10px;flex-wrap:wrap;padding:5px 10px;border:1px solid var(--line);border-radius:6px;font-size:12px;background:var(--panel)}
 #akind{height:30px;font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:0 6px}
 #memoIn{position:absolute;display:none;font:inherit;font-size:13px;padding:5px 8px;border:1.5px solid var(--bad);border-radius:4px;width:200px;z-index:3;background:#fff}
-#vcomp,#varea{overflow:auto;padding:16px}
+#vcomp,#varea,#vreq{overflow:auto;padding:16px}
 .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .slot{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:260px}
 .slot h4{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:6px}
@@ -183,7 +183,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 </div></div>
 <div class="vwdlg" id="shtDlg" role="dialog" aria-modal="true" aria-labelledby="shtT"><div class="box axobox">
  <div class="row" style="justify-content:space-between;align-items:center"><h3 id="shtT">분석 시트</h3><label class="tg"><input type="checkbox" id="shtGrid" checked> 배경 격자</label></div>
- <div class="chk" id="shtKeys" style="display:flex;flex-wrap:wrap;gap:4px 10px"><label class="tg"><input type="checkbox" value="sun" checked>일조 궤적</label><label class="tg"><input type="checkbox" value="view" checked>조망</label><label class="tg"><input type="checkbox" value="green" checked>녹지</label><label class="tg"><input type="checkbox" value="offset" checked>건축 가능 영역</label><label class="tg"><input type="checkbox" value="drain" checked>배수</label><label class="tg"><input type="checkbox" value="dim" checked>치수</label><label class="tg"><input type="checkbox" value="wind" checked>계절풍</label><label class="tg"><input type="checkbox" value="move" checked>접근·동선</label><label class="tg"><input type="checkbox" value="height" checked>주변 높이</label><label class="tg"><input type="checkbox" value="noise">소음</label><label class="tg"><input type="checkbox" value="age">건물 노후도</label><label class="tg"><input type="checkbox" value="shade">동지 그늘</label><label class="tg"><input type="checkbox" value="zone">용도지역</label></div>
+ <div class="chk" id="shtKeys" style="display:flex;flex-wrap:wrap;gap:4px 10px"><label class="tg"><input type="checkbox" value="sun" checked>일조 궤적</label><label class="tg"><input type="checkbox" value="view" checked>조망</label><label class="tg"><input type="checkbox" value="green" checked>녹지</label><label class="tg"><input type="checkbox" value="offset" checked>건축 가능 영역</label><label class="tg"><input type="checkbox" value="drain" checked>배수</label><label class="tg"><input type="checkbox" value="dim" checked>치수</label><label class="tg"><input type="checkbox" value="wind" checked>계절풍</label><label class="tg"><input type="checkbox" value="move" checked>접근·동선</label><label class="tg"><input type="checkbox" value="height" checked>주변 높이</label><label class="tg"><input type="checkbox" value="noise">소음</label><label class="tg"><input type="checkbox" value="age" checked>건물 노후도</label><label class="tg"><input type="checkbox" value="shade">동지 그늘</label><label class="tg"><input type="checkbox" value="zone">용도지역</label></div>
  <canvas id="shtCv" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#fff"></canvas>
  <div class="row" style="justify-content:space-between;align-items:center"><span class="note">같은 대지를 칸마다 반복하고, 칸마다 주제 하나만 그립니다. SVG는 일러스트레이터에서 칸·선·글자를 따로 고칠 수 있습니다.</span><div class="row"><button class="btn line" id="shtClose">닫기</button><button class="btn line" id="shtSvg">SVG</button><button class="btn" id="shtPng">PNG 저장</button></div></div>
 </div></div>
@@ -1642,7 +1642,7 @@ function drawReqBoard(c,mm,font,x,y,w,h,s,MX){const R0=reqStatus();c.fillStyle='
   const bx=x+pad+(w-2*pad)*cols[3],bw=(w-2*pad)*0.13,bh=2.2*s;c.fillStyle='#eceef1';c.fillRect(mm(bx),mm(ty-bh),mm(bw),mm(bh));c.fillStyle=r.st==='ok'?'#1f8a4c':r.st==='rev'?'#c08a1a':'#c9cdd3';c.fillRect(mm(bx),mm(ty-bh),mm(bw*Math.min(1,r.rt)),mm(bh));
   c.fillStyle=r.st==='ok'?'#1f8a4c':r.st==='rev'?'#8a5a00':'#6b7280';c.font=font(600,3.8);c.fillText({ok:'충족',nv:'미배치',rev:'부족',na:'-'}[r.st],mm(x+pad+(w-2*pad)*cols[4]),mm(ty));yy+=rh;});}
 // ---------- 분석 시트: 같은 대지 그림을 여러 칸에 반복하고 칸마다 주제 하나(작은 다이어그램 모음) ----------
-const SHT={keys:['sun','view','green','offset','drain','dim','wind','move','height'],grid:true};
+const SHT={keys:['sun','view','green','offset','drain','dim','wind','move','height','age'],grid:true};
 const SHK={sun:['sun path','일조 궤적'],view:['views','조망'],green:['vegetation','녹지'],offset:['buildable','건축 가능 영역'],drain:['drainage','배수'],dim:['dimensions','치수'],wind:['wind','계절풍'],move:['access','접근·동선'],height:['context height','주변 높이'],age:['building age','건물 노후도'],noise:['noise','소음'],shade:['winter shade','동지 그늘'],zone:['zoning','용도지역']};
 const SY='#f0b72f',STL='#5fb3b3',SINK='#16181d',SG='#8e9a8c';
 function insetPoly(P,dfn){// 변마다 다른 거리로 안쪽 평행 이동(볼록·완만한 오목 다각형)
