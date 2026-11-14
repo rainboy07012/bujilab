@@ -84,6 +84,7 @@ label.tg{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none
 .slot img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px;background:#eee;border:1px solid var(--line)}
 .slot .empty{flex:1;display:grid;place-items:center;color:var(--mut);border:1px dashed #cfd3d9;border-radius:6px;text-align:center;padding:10px}
 .cmpbar{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.sgwrap summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:baseline;font-size:14px}.sgwrap summary::-webkit-details-marker{display:none}.sgwrap summary::before{content:'▸';color:var(--mut)}.sgwrap[open] summary::before{content:'▾'}.sgbox{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:18px;margin-top:12px}.sgcol h5{font-size:12.5px;margin:0 0 8px;color:var(--ink)}.sgcol h5 small{color:var(--mut);font-weight:400}.sgcol ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.7;color:#374151}.warn2{margin:8px 0 0;font-size:12px;color:#8a5a00;background:#fff4dc;border-radius:4px;padding:6px 8px}.uchips{display:flex;flex-wrap:wrap;gap:4px}.uchip{font-size:11.5px;border-radius:10px;padding:2px 8px;white-space:nowrap}.uchip.uo{background:#e5f3ea;color:#1f6b3d}.uchip.uc{background:#fff4dc;color:#8a5a00}.uchip.ux{background:#f3e1e0;color:#9b2c24;text-decoration:line-through}.sgcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:8px}.sgcard{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff}.sgcard.off{opacity:.45}.sgcard .h{display:flex;justify-content:space-between;gap:6px;align-items:flex-start}.sgcard .h b{font-size:13px}.sgcard p{margin:0;font-size:12px;color:#4b5563}.sgcard ul{margin:0;padding-left:14px;font-size:11.5px;color:#1f6b3d;line-height:1.55}.sgcard .f{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:auto}.sgcard .f .note{font-size:11px}.sgcard .f .btn{white-space:nowrap;flex:none}.rk{display:inline-block;font-size:10.5px;background:#2f5bd3;color:#fff;border-radius:3px;padding:0 5px;margin-right:6px;vertical-align:1px}@media(max-width:900px){.sgbox{grid-template-columns:1fr}}
 .reqt input,.reqt select{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:4px;padding:4px 6px;width:100%;background:#fff}.reqt input.ra,.reqt input.rq{text-align:right;width:84px}.reqt input.rq{width:56px}.rbar{height:8px;background:#eceef1;border-radius:4px;overflow:hidden}.rbar i{display:block;height:100%}
 .sheet{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;max-width:900px}
 .sheet h4{font-size:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
@@ -323,6 +324,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
   </div>
  </div>
  <div class="pane" id="vreq">
+  <details class="sheet sgwrap" open style="max-width:1040px;margin-bottom:14px"><summary><b>프로그램 제안 도우미</b> <span class="note">뭘 지을지 아직 안 정했다면 — 대지 조건으로 후보를 골라 보세요</span></summary><div class="sgbox" id="sgBox"></div></details>
   <div class="sheet" style="max-width:1040px">
    <h4>과제 프로그램 · 요구 실과 목표 면적 <span style="display:flex;gap:6px"><button class="btn sm" id="reqEx">예시 불러오기</button><button class="btn sm" id="reqCopy">표 복사</button></span></h4>
    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px"><label class="f" style="flex:1;min-width:240px">과제명<input id="reqTitle" placeholder="예: 연남동 근린생활시설 + 소규모 주거" style="font:inherit;border:1px solid var(--line);border-radius:4px;padding:6px 8px"></label>
@@ -367,6 +369,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
    <label class="f">설계 전략 메모<textarea id="bNote" placeholder="예: 남측 일조가 좋아 외부공간을 남쪽에 두고, 서측 도로 소음을 고려해 코어를 서쪽에 배치한다."></textarea></label>
    <div class="row"><button class="btn" id="bRefresh">미리보기 갱신</button><button class="btn pri" id="bVpdf" title="선과 글자가 벡터라 크게 인쇄해도 선명함. 글꼴을 내려받느라 처음엔 몇 초 걸림">PDF (벡터)</button></div>
    <div class="row"><button class="btn" id="bPdf" title="보드를 한 장의 이미지로 넣은 PDF">PDF (이미지)</button><button class="btn" id="bPng">PNG</button><button class="btn" id="bSvg" title="일러스트레이터에서 도면별·레이어별로 편집">SVG</button></div>
+   <div class="row"><button class="btn" id="packB2" title="보드에 넣지 않고 도면·표를 각각 파일로 받기" style="flex:1">출력 묶음 ZIP (도면·표 따로)</button></div>
    <div class="baudit" id="bAudit" aria-live="polite"></div>
    <p class="bnote">현재 작업 상태(매스, 대지, 시각, 분석 결과)가 그대로 들어갑니다. 3D 매스는 지금 3D 화면의 시점으로 찍힙니다. A1 인쇄용은 만드는 데 몇 초 걸릴 수 있습니다.</p>
   </div>
@@ -416,6 +419,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
    <button class="btn" data-xp="dxf2">배치도 DXF</button>
    <button class="btn" data-xp="dxf3">3D DXF</button>
    <button class="btn" data-xp="obj">3D OBJ</button>
+   <button class="btn pri" id="packB" title="분석도·시트·배치도·다이어그램 뷰·과정도·표·CAD를 각각 파일로 묶음" style="grid-column:1/-1">출력 묶음 ZIP (모든 도면·표 따로)</button>
   </div>
   <p class="note" style="margin-top:8px">DXF는 AutoCAD·Rhino·SketchUp Pro, OBJ는 Rhino·Blender 등에서 열 수 있습니다. 단위는 m입니다. claude.ai 화면에서는 DXF·OBJ가 ZIP으로 묶여 받아집니다. 렌더는 내보낸 파일로 이어서 작업하세요.</p>
  </div>
@@ -505,7 +509,7 @@ function sbS(){return road.s<4?(4-road.s)/2:0;}function sbW(){return road.w<4?(4
 function frontages(P){const RD=roadPolys(),out=[];if(!SITE||P.length<3)return out;const inR=(x,z)=>RD.some(r=>pip(x,z,r));
  for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<1.5)continue;let n=[(b[1]-a[1])/L,-(b[0]-a[0])/L];const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(pip(m[0]+n[0]*0.3,m[1]+n[1]*0.3,P))n=[-n[0],-n[1]];
   const ws=[];[0.25,0.5,0.75].forEach(u=>{const q=[a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u];if(!inR(q[0]+n[0]*0.8,q[1]+n[1]*0.8))return;let d=0.8;while(d<40&&inR(q[0]+n[0]*(d+0.25),q[1]+n[1]*(d+0.25)))d+=0.25;ws.push(d);});
-  if(ws.length<2)continue;ws.sort((x,y)=>x-y);out.push({a,b,n,len:L,w:Math.round(ws[1]*2)/2,side:dirName(n[0],n[1])+'측'});}
+  if(ws.length<2)continue;ws.sort((x,y)=>x-y);const wd=ws[1]>=25;out.push({a,b,n,len:L,w:wd?25:Math.round(ws[1]*2)/2,wide:wd,side:dirName(n[0],n[1])+'측'});}
  return out;}
 function effPlot(){let P=plot.map(p=>p.slice());
  if(SITE){frontages(P).forEach(f=>{if(f.w>=4||!P.length)return;const d=(4-f.w)/2,a=f.a,n=f.n;const dist=p=>-((p[0]-a[0])*n[0]+(p[1]-a[1])*n[1]);
@@ -1413,7 +1417,7 @@ function drawProcess(o={}){const cv=o.cv||$('#pcv');const W=o.W??cv.clientWidth,
  return{sc,cells,cols,rows};}
 async function exportProc(kind){if(!proc.length){toast('먼저 단계를 저장하세요.');return;}const n=proc.length;const PL=board.procLay||'auto',hasD=proc.some(q=>q.desc);const cols=PL==='col'?1:PL==='row'?n:Math.min(n,4),rows=Math.ceil(n/cols);const W=cols*(PL==='col'?560:420),H=rows*(hasD?440:380);const cv=document.createElement('canvas');drawProcess({cv,W,H,pr:2});
  const nm=`bujilab_process_${stamp()}`;if(kind==='png')offer(nm+'.png',await canvasBlob(cv));else offer(nm+'.pdf',await pdfFromCanvas(cv,cv.width*25.4/192,cv.height*25.4/192,'매스 변형 과정'));}
-$('#pcPng').onclick=()=>exportProc('png');$('#pcPdf').onclick=()=>exportProc('pdf');
+$('#pcPng').onclick=()=>exportProc('png');$('#packB').onclick=exportPack;$('#packB2').onclick=exportPack;$('#pcPdf').onclick=()=>exportProc('pdf');
 
 // ---------- board (A3/A2/A1) ----------
 const PAPER={A3:[420,297],A2:[594,420],A1:[841,594]};
@@ -1703,7 +1707,7 @@ function drawTile(c,key,tx,ty,T,G0){const {c:C,E}=G0,k=T/(2*E);const X=x=>tx+(x-
   plotL(1.6);note(`대지 경계에서 0.5m${north?', 정북 1.5m':''}${Math.abs(polyArea(P)-polyArea(plot))>0.1?', 건축선 후퇴':''} 뺀 간이 영역`);}
  else if(key==='drain'){base();plotL();let mx=0;const pts=[];const st=E/6;for(let x=C[0]-E+st/2;x<C[0]+E;x+=st)for(let z=C[1]-E+st/2;z<C[1]+E;z+=st){const gx=(G(x+0.5,z)-G(x-0.5,z)),gz=(G(x,z+0.5)-G(x,z-0.5));const s=Math.hypot(gx,gz);mx=Math.max(mx,s);pts.push([x,z,gx,gz,s]);}
   if(mx<0.005){const F=frontages(plot);const tg=F.length?F.sort((a,b)=>b.w-a.w)[0]:null;const dir=tg?tg.n:[0,1];for(let i=-2;i<=2;i++){const o=[pc[0]-dir[1]*i*2.2,pc[1]+dir[0]*i*2.2];arrow(X(o[0]-dir[0]*3),Y(o[1]-dir[1]*3),X(o[0]+dir[0]*6),Y(o[1]+dir[1]*6),SY,Math.max(2.5,T*0.016));}note('거의 평탄 · 도로 쪽 표면 배수로 가정');}
-  else{pts.forEach(([x,z,gx,gz,s])=>{if(s<mx*0.15)return;const l=st*0.45*Math.min(1,s/mx*1.6),ux=-gx/s,uz=-gz/s;const near=Math.hypot(x-pc[0],z-pc[1])<E*0.7;arrow(X(x-ux*l/2),Y(z-uz*l/2),X(x+ux*l/2),Y(z+uz*l/2),SY,near?Math.max(2.4,T*0.016):1.4);});
+  else{pts.forEach(([x,z,gx,gz,s])=>{if(s<mx*0.15||Math.hypot(x-pc[0],z-pc[1])>E*0.62)return;const l=st*0.45*Math.min(1,s/mx*1.6),ux=-gx/s,uz=-gz/s;const near=Math.hypot(x-pc[0],z-pc[1])<E*0.7;arrow(X(x-ux*l/2),Y(z-uz*l/2),X(x+ux*l/2),Y(z+uz*l/2),SY,near?Math.max(2.4,T*0.016):1.4);});
    const lo=Math.min(...plot.map(p=>G(p[0],p[1]))),hi=Math.max(...plot.map(p=>G(p[0],p[1])));note(`대지 안 높이차 ${f1(hi-lo)}m · 화살표 = 물이 흐르는 내리막 방향`);}}
  else if(key==='dim'){base();plotL(1.8);c.font=`600 ${Math.max(8.5,T*0.042)}px "IBM Plex Mono",monospace`;const sgn=polySigned(plot)>0?1:-1;
   plot.forEach((a,i)=>{const b=plot[(i+1)%plot.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<1.5)return;const nx=-(b[1]-a[1])/L*sgn*-1,nz=(b[0]-a[0])/L*sgn*-1;const off=2.4;const a2=[a[0]+nx*off,a[1]+nz*off],b2=[b[0]+nx*off,b[1]+nz*off];
@@ -1717,9 +1721,9 @@ function drawTile(c,key,tx,ty,T,G0){const {c:C,E}=G0,k=T/(2*E);const X=x=>tx+(x-
   flow(W1[0],5,STL,1,0.75);flow([0.55,0.83],3,'#8fc9c9',0.9,0.6);
   c.font=`600 ${Math.max(8.5,T*0.042)}px "IBM Plex Sans KR",sans-serif`;c.fillStyle='#3f8686';c.fillText('겨울 북서풍',tx+8,ty+16);c.textAlign='right';c.fillStyle='#5aa1a1';c.fillText('여름 남~남서풍',tx+T-8,ty+T-22);c.textAlign='left';note('한반도 일반 경향 · 현장 관측으로 보정');}
  else if(key==='move'){base({roadFill:false});const F=frontages(plot);G0.roads.forEach(q=>{c.fillStyle='rgba(240,183,47,.28)';path(q);c.fill();});
-  F.forEach(f=>{const w=Math.max(3,Math.min(10,f.w))*0.9;c.strokeStyle=SY;c.lineWidth=w*k;c.lineCap='round';const m=[(f.a[0]+f.b[0])/2,(f.a[1]+f.b[1])/2],d=[(f.b[0]-f.a[0])/f.len,(f.b[1]-f.a[1])/f.len];const ext=E*1.2,cen=[m[0]+f.n[0]*f.w/2,m[1]+f.n[1]*f.w/2];c.beginPath();c.moveTo(X(cen[0]-d[0]*ext),Y(cen[1]-d[1]*ext));c.lineTo(X(cen[0]+d[0]*ext),Y(cen[1]+d[1]*ext));c.stroke();c.lineCap='butt';});
+  F.forEach(f=>{const w=Math.max(3,Math.min(f.wide?12:10,f.w))*0.9;c.strokeStyle=SY;c.lineWidth=w*k;c.lineCap='round';const m=[(f.a[0]+f.b[0])/2,(f.a[1]+f.b[1])/2],d=[(f.b[0]-f.a[0])/f.len,(f.b[1]-f.a[1])/f.len];const ext=E*1.2,cen=[m[0]+f.n[0]*f.w/2,m[1]+f.n[1]*f.w/2];c.beginPath();c.moveTo(X(cen[0]-d[0]*ext),Y(cen[1]-d[1]*ext));c.lineTo(X(cen[0]+d[0]*ext),Y(cen[1]+d[1]*ext));c.stroke();c.lineCap='butt';});
   plotL();F.forEach((f,i)=>{const m=[(f.a[0]+f.b[0])/2,(f.a[1]+f.b[1])/2],car=f.w>=6;arrow(X(m[0]+f.n[0]*(f.w*0.5+4)),Y(m[1]+f.n[1]*(f.w*0.5+4)),X(m[0]-f.n[0]*1.5),Y(m[1]-f.n[1]*1.5),car?'#c8372d':STL,Math.max(2.4,T*0.016),true,car?null:[2,4]);});
-  note(F.length?F.map(f=>`${f.side} ${f.w}m 도로${f.w>=6?'(차량)':'(보행)'}`).join(' · '):'맞닿은 도로를 찾지 못함');}
+  note(F.length?F.map(f=>`${f.side} ${f.wide?'25m 이상':f.w+'m'} 도로${f.w>=6?'(차량)':'(보행)'}`).join(' · '):'맞닿은 도로를 찾지 못함');}
  else if(key==='height'){base({ctx:false});const cls=[[2,'#e7e9ec','1–2층'],[5,'#b9bec6','3–5층'],[99,'#6b7280','6층+']];const cnt=[0,0,0];
   G0.ctx.forEach(b=>{const f=b.fl||Math.round(b.h/FH);const i=f<=2?0:f<=5?1:2;cnt[i]++;c.fillStyle=cls[i][1];path(b.q);c.fill();c.strokeStyle='#9aa0a8';c.lineWidth=0.5;c.stroke();});plotL();
   cls.forEach((cl,i)=>{const x=tx+8+i*T*0.24,y=ty+8;c.fillStyle=cl[1];c.fillRect(x,y,10,10);c.strokeStyle='#9aa0a8';c.strokeRect(x,y,10,10);c.fillStyle='#4b5563';c.font=`${Math.max(8,T*0.038)}px "IBM Plex Sans KR",sans-serif`;c.fillText(`${cl[2]} ${cnt[i]}`,x+13,y+9);});}
@@ -1777,7 +1781,7 @@ function siteFacts(){const M=lastM||metrics();const F=frontages(plot);const pc=r
  if(SITE&&SITE.ovl){const h=SITE.ovl.filter(o=>o.st==='hit');out.push(['지구·구역',h.length?h.map(o=>o.ns.join(', ')||o.lb).join(', '):'조회 결과 없음']);}
  out.push(['대지면적',`${f1(polyArea(plot))}㎡${Math.abs(polyArea(plot)-M.A)>0.1?` (건축선 후퇴 후 ${f1(M.A)}㎡)`:''}`]);
  if(SITE&&SITE.jiga>0){const t=SITE.jiga*polyArea(plot);out.push(['공시지가',`${SITE.jiga.toLocaleString('ko-KR')}원/㎡ · 필지 약 ${t>=1e8?(t/1e8).toFixed(1)+'억':Math.round(t/1e4).toLocaleString('ko-KR')+'만'}원`]);}
- out.push(['접도',F.length?F.map(f=>`${f.side} ${f.w}m 도로 (접면 ${f1(f.len)}m)`).join(', '):SITE?'맞닿은 도로를 찾지 못함':'남측 8m · 서측 6m 도로 (데모)']);
+ out.push(['접도',F.length?F.map(f=>`${f.side} ${f.wide?'25m 이상':f.w+'m'} 도로 (접면 ${f1(f.len)}m)`).join(', '):SITE?'맞닿은 도로를 찾지 못함':'남측 8m · 서측 6m 도로 (데모)']);
  const hs=plot.map(p=>G(p[0],p[1]));const dh=Math.max(...hs)-Math.min(...hs);const TS=terrainStats('slope');const steep=TS.tot?(TS.A.slice(2).reduce((a,b)=>a+b,0)/TS.tot*100):0;
  out.push(['지형',dh<0.3?'거의 평탄':`대지 안 높이차 ${f1(dh)}m · 경사 15% 이상 ${steep.toFixed(0)}%`]);
  const near=CTXP.filter(b=>Math.hypot((b.x0+b.x1)/2-pc[0],(b.z0+b.z1)/2-pc[1])<50);if(near.length){const fl=near.map(b=>b.fl||Math.round(b.h/FH));out.push(['주변 건물',`반경 50m ${near.length}동 · 평균 ${(fl.reduce((a,b)=>a+b,0)/fl.length).toFixed(1)}층 · 최고 ${Math.max(...fl)}층`]);}
@@ -1819,10 +1823,10 @@ function drawPlanSheet(o){const cv=o.cv,W=o.W,H=o.H,pr=o.pr||1;cv.width=Math.rou
  // 진입 가능 위치·도로 폭
  const F=frontages(plot);F.forEach(f=>{const m=[(f.a[0]+f.b[0])/2,(f.a[1]+f.b[1])/2],d=[(f.b[0]-f.a[0])/f.len,(f.b[1]-f.a[1])/f.len];
   // 도로 폭 치수
-  const q0=[m[0]+d[0]*f.len*0.3,m[1]+d[1]*f.len*0.3],q1=[q0[0]+f.n[0]*f.w,q0[1]+f.n[1]*f.w];c.strokeStyle='#16181d';c.lineWidth=1*u;c.beginPath();c.moveTo(X(q0[0]),Y(q0[1]));c.lineTo(X(q1[0]),Y(q1[1]));c.stroke();[q0,q1].forEach((p,j)=>{const an=Math.atan2(f.n[1],f.n[0])+(j?0:Math.PI),h=7*u;c.fillStyle='#16181d';c.beginPath();c.moveTo(X(p[0]),Y(p[1]));c.lineTo(X(p[0])-Math.cos(an-0.4)*h,Y(p[1])-Math.sin(an-0.4)*h);c.lineTo(X(p[0])-Math.cos(an+0.4)*h,Y(p[1])-Math.sin(an+0.4)*h);c.closePath();c.fill();});
-  c.font=`700 ${12*u}px "IBM Plex Sans KR",sans-serif`;c.fillStyle='#16181d';const tp=[(q0[0]+q1[0])/2+d[0]*1.2,(q0[1]+q1[1])/2+d[1]*1.2];c.fillText(`${f.w}m 도로`,X(tp[0])+4*u,Y(tp[1])+4*u);
+  const q0=[m[0]+d[0]*f.len*0.3,m[1]+d[1]*f.len*0.3],q1=[q0[0]+f.n[0]*Math.min(f.w,10),q0[1]+f.n[1]*Math.min(f.w,10)];c.strokeStyle='#16181d';c.lineWidth=1*u;c.beginPath();c.moveTo(X(q0[0]),Y(q0[1]));c.lineTo(X(q1[0]),Y(q1[1]));c.stroke();[q0,q1].forEach((p,j)=>{const an=Math.atan2(f.n[1],f.n[0])+(j?0:Math.PI),h=7*u;c.fillStyle='#16181d';c.beginPath();c.moveTo(X(p[0]),Y(p[1]));c.lineTo(X(p[0])-Math.cos(an-0.4)*h,Y(p[1])-Math.sin(an-0.4)*h);c.lineTo(X(p[0])-Math.cos(an+0.4)*h,Y(p[1])-Math.sin(an+0.4)*h);c.closePath();c.fill();});
+  c.font=`700 ${12*u}px "IBM Plex Sans KR",sans-serif`;c.fillStyle='#16181d';const tp=[(q0[0]+q1[0])/2+d[0]*1.2,(q0[1]+q1[1])/2+d[1]*1.2];c.fillText(`${f.wide?'25m 이상':f.w+'m'} 도로`,X(tp[0])+4*u,Y(tp[1])+4*u);
   // 진입 화살표(빨강 줄무늬)
-  const s0=[m[0]+f.n[0]*(f.w*0.5+3.5),m[1]+f.n[1]*(f.w*0.5+3.5)],s1=[m[0]+f.n[0]*0.6,m[1]+f.n[1]*0.6];const an=Math.atan2(Y(s1[1])-Y(s0[1]),X(s1[0])-X(s0[0])),L=Math.hypot(X(s1[0])-X(s0[0]),Y(s1[1])-Y(s0[1])),w=Math.max(9*u,k*1.2);
+  const s0=[m[0]+f.n[0]*(Math.min(f.w,8)*0.5+3.5),m[1]+f.n[1]*(Math.min(f.w,8)*0.5+3.5)],s1=[m[0]+f.n[0]*0.6,m[1]+f.n[1]*0.6];const an=Math.atan2(Y(s1[1])-Y(s0[1]),X(s1[0])-X(s0[0])),L=Math.hypot(X(s1[0])-X(s0[0]),Y(s1[1])-Y(s0[1])),w=Math.max(9*u,k*1.2);
   c.save();c.translate(X(s0[0]),Y(s0[1]));c.rotate(an);c.beginPath();c.moveTo(0,-w*0.45);c.lineTo(L-w*1.1,-w*0.45);c.lineTo(L-w*1.1,-w);c.lineTo(L,0);c.lineTo(L-w*1.1,w);c.lineTo(L-w*1.1,w*0.45);c.lineTo(0,w*0.45);c.closePath();c.fillStyle='#fde8e8';c.fill();c.strokeStyle='#c8372d';c.lineWidth=1.4*u;c.stroke();
   c.strokeStyle='#c8372d';c.lineWidth=1.2*u;c.beginPath();for(let t=w*0.3;t<L-w*1.2;t+=w*0.35){c.moveTo(t,-w*0.45);c.lineTo(t+w*0.25,w*0.45);}c.stroke();c.restore();
   c.font=`700 ${11.5*u}px "IBM Plex Sans KR",sans-serif`;c.fillStyle='#c8372d';c.textAlign='center';c.fillText(f.w>=6?'차량·보행 진입 가능':'보행 진입 가능',X(s0[0]+f.n[0]*3.6),Y(s0[1]+f.n[1]*3.6)+4*u);c.textAlign='left';});
@@ -1863,8 +1867,88 @@ $('#psB').onclick=openPlanSheet;$('#psClose').onclick=()=>$('#psDlg').classList.
 $('#psMass').onchange=()=>drawPlanPrev();
 $('#psPng').onclick=async()=>{await prepKeyMaps();const cv=document.createElement('canvas');drawPlanSheet({cv,W:1684,H:1191,pr:2,mass:$('#psMass').checked});const blob=await new Promise(r=>cv.toBlob(r,'image/png'));offer(`부지랩_배치도주석판_${stamp()}.png`,blob);};
 $('#psSvg').onclick=async()=>{await prepKeyMaps();const W=1684,H=1191;const{rec,cv}=svgCanvas(W,H);drawPlanSheet({cv,W,H,pr:1,mass:$('#psMass').checked});offer(`부지랩_배치도주석판_${stamp()}.svg`,rec.toString(420,297,'부지랩 대지 분석 배치도'));};
+// ---------- 출력 묶음(Export Pack): 도면·표를 각각 독립 파일로 ZIP ----------
+const ST_NM={ok:'간이 충족',bad:'위반',rev:'확인 필요',nv:'미검토',na:'해당 없음'},RG_NM={bf:'건폐율·용적률',sun:'정북 일조사선',edge:'대지 경계·건축선',land:'조경면적',park:'주차대수',ord:'조례·지구단위계획'};
+const toCSV=rows=>'﻿'+rows.map(r=>r.map(v=>{v=String(v??'');return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\r\n');
+async function exportPack(){const enc=s=>typeof s==='string'?new TextEncoder().encode(s):s;const cvBytes=async cv=>new Uint8Array(await (await canvasBlob(cv)).arrayBuffer());
+ toast('출력 묶음을 만드는 중… 20초쯤 걸립니다');await new Promise(r=>setTimeout(r,40));const files=[];const st=dstyleG==='pixel'?'mono':dstyleG;const add=(name,data)=>files.push({name,data:enc(data)});
+ try{
+  [['01_대지분석','base'],['02_경사분석','slope'],['03_표고분석','elev'],['04_향분석','aspect'],['05_일조시간','sunh'],['06_분석종합','syn']].forEach(([n,m])=>add(`01_분석도/${n}.svg`,diagSVG(m,st)));
+  add('01_분석도/07_단면.svg',secSVG());drawDiag();
+  {const W=1680,H=1188;const{rec,cv}=svgCanvas(W,H);drawSheet({cv,W,H,pr:1});add('02_분석시트/분석시트.svg',rec.toString(420,297,'부지랩 분석 시트'));const c2=document.createElement('canvas');drawSheet({cv:c2,W,H,pr:2});add('02_분석시트/분석시트.png',await cvBytes(c2));
+   for(const k of SHT.keys){const{rec:r1,cv:v1}=svgCanvas(600,640);drawSheet({cv:v1,W:600,H:640,pr:1,keys:[k],noHead:true,grid:false});add(`02_분석시트/칸별/${SHK[k][1].replace(/[\/·]/g,'_')}.svg`,r1.toString(150,160,'부지랩 '+SHK[k][1]));}}
+  await prepKeyMaps();{const W=1684,H=1191;const{rec,cv}=svgCanvas(W,H);drawPlanSheet({cv,W,H,pr:1});add('03_배치도주석판/배치도주석판.svg',rec.toString(420,297,'부지랩 대지 분석 배치도'));const c2=document.createElement('canvas');drawPlanSheet({cv:c2,W,H,pr:2});add('03_배치도주석판/배치도주석판.png',await cvBytes(c2));}
+  for(const k of ['white','shadow','terrace','topo'])add(`04_다이어그램뷰/${AXKIND[k].replace(/\s/g,'')}.png`,await cvBytes(renderAxo(2400,1600,{kind:k,dir:AXO.dir})));
+  if(proc.length){const n=proc.length,PL=board.procLay||'auto',hasD=proc.some(q=>q.desc);const cols=PL==='col'?1:PL==='row'?n:Math.min(n,4),rows=Math.ceil(n/cols);const cv=document.createElement('canvas');drawProcess({cv,W:cols*(PL==='col'?560:420),H:rows*(hasD?440:380),pr:2});add('05_매스과정/매스변형과정.png',await cvBytes(cv));}
+  const M=lastM||metrics();
+  add('06_표/면적표.csv',toCSV([['층','매스','용도','바닥면적(㎡)'],...areaRows().map(r=>[r.f+'F',r.mass,r.use,f1(r.a)]),[],['대지면적',f1(M.A)],['건축면적',f1(M.ba)],['건폐율(%)',M.bcr.toFixed(1)],['연면적',f1(M.fa)],['용적률(%)',M.far.toFixed(1)],['최고높이(m)',M.hmax.toFixed(1)]]));
+  {const RS=regStatus(M,parkingReq(),pkPlan);add('06_표/법규검토.csv',toCSV([['항목','판정'],...RS.items.map(it=>[RG_NM[it.k]||it.k,ST_NM[it.st]||it.st]),[],['기준',`${zone.n} · 건폐율 ${zone.b}% · 용적률 ${zone.f}%`+(zone.ord?' ('+zone.ord+')':' (국토계획법 상한)')],['안내','간이 검토 결과이며 인허가 검토가 아님']]));}
+  if(req.list.length){const R0=reqStatus();add('06_표/과제프로그램.csv',toCSV([['실','실면적(㎡)','개수','희망층','요구(㎡)','배치(㎡)','상태'],...R0.rows.map(r=>[r.n,r.a,r.q||1,r.fl?r.fl+'층':'',f1(r.need),f1(r.got),{ok:'충족',nv:'미배치',rev:'부족',na:'-'}[r.st]]),[],['요구 실면적',f1(R0.net)],[`요구 연면적(공용 ${req.share}%)`,f1(R0.gross)],['계획 연면적',f1(R0.fa)]]));}
+  add('06_표/대지요약.csv',toCSV([['항목','내용'],...siteFacts()]));
+  {const TR=[['분석','구간','면적(㎡)','비율(%)']];['slope','aspect','elev','sunh'].forEach(m=>{const TS=terrainStats(m);TS.T.classes.forEach((c,i)=>TR.push([TS.T.title,c.n,f1(TS.A[i]),(TS.tot?TS.A[i]/TS.tot*100:0).toFixed(1)]));});add('06_표/지형일조면적.csv',toCSV(TR));}
+  add('07_CAD/배치도.dxf',sitePlanDXF());add('07_CAD/3D모델.dxf',model3DDXF());add('07_CAD/3D모델.obj',modelOBJ());
+  add('읽어보기.txt',['부지랩 출력 묶음',`대지: ${SITE?SITE.addr:'가상 대지(데모)'} · ${zone.n} · ${f1(polyArea(plot))}㎡`,`만든 날: ${new Date().toISOString().slice(0,10)}`,'',
+   '01_분석도     대지·경사·표고·향·일조·종합 분석도와 단면 (SVG, 레이어별로 나뉨)','02_분석시트   주제별 작은 다이어그램 모음 (전체 SVG·PNG + 칸별 SVG)','03_배치도주석판 해 궤적·바람·진입·위치도·대지 요약 (SVG·PNG)',
+   '04_다이어그램뷰 화이트 모델·그림자 누적·지형 단층·지형 블록 (PNG)','05_매스과정   매스 변형 과정도 (PNG, 저장한 단계가 있을 때)','06_표         면적표·법규 검토·과제 프로그램·대지 요약·지형 면적 (CSV, 엑셀에서 열기)','07_CAD        배치도 DXF, 3D DXF, 3D OBJ (단위 m)','',
+   `자료: ${SITE?'브이월드(국토교통부)'+(SITE.dem?', 표고 Mapzen/AWS Terrain Tiles':''):'부지랩 데모 데이터'}`,'법규 판정은 간이 검토이며 인허가 검토를 대신하지 않습니다. 바람은 한반도 일반 경향입니다.'].join('\r\n'));
+  offer(`부지랩_출력묶음_${stamp()}.zip`,makeZip(files));
+ }catch(e){console.error(e);toast('출력 묶음을 만들지 못했습니다: '+e.message);}}
+// ---------- 프로그램 제안 도우미: 허용 용도(개략) + 지을 수 있는 규모 + 대지에서 읽은 근거 → 후보 프로그램 ----------
+// 용도지역별 건축 가능 여부(국토계획법 시행령 별표 요약, O=가능 △=조례·규모 조건부 X=불가). 개략이며 조례·지구단위계획으로 달라짐
+const UCAT=[['house','단독주택'],['apt','공동주택'],['n1','제1종 근린생활'],['n2','제2종 근린생활'],['cult','문화·집회'],['edu','교육연구(도서관 등)'],['care','노유자(돌봄·복지)'],['office','업무'],['sale','판매'],['sport','수련·운동'],['stay','숙박']];
+const UMAT={'1j':'O△O△△△△XXXX','2j':'OOO△△△△XXXX','1':'OOO△△△O△△△X','2':'OOO△△△O△△△X','3':'OOO△△△O△△△X','jj':'OOOOOOOOOO△','gs':'OOOOOOOOOO△','sg':'OOOOOOOOOOO','js':'OOOOOOOOOOO','ys':'△△OOOOOOOO△','jg':'O△OO△△O△△△X','ig':'△XOO△△△△△XX','jn':'O△O△△△O△△△X','gg':'O△O△△△O△△△X'};
+// 1·2종 일반주거의 문화·집회는 관람장 등 제외·조례, 교육연구는 유치원·초중고만 바로 가능하고 도서관 등은 조례 → △로 둠
+const usePerm=(zk,cat)=>{const m=UMAT[zk];const i=UCAT.findIndex(c=>c[0]===cat);return m&&i>=0?m[i]:'△';};
+const PTPL=[
+ {id:'lib',n:'동네 작은 도서관 + 북카페',cat:['edu','n1'],d:'열람·어린이 책방·세미나실을 묶고 1층 북카페로 길과 연결',r:[['일반 열람실',.33,2],['어린이 열람실',.2,1],['북카페',.15,1],['세미나실',.12,2],['서고',.1,0],['사무·안내',.1,1]]},
+ {id:'kitchen',n:'공유주방 · 커뮤니티 키친',cat:['n2'],d:'요리·식사·모임을 함께 쓰는 동네 부엌. 1층을 길에 열어 활동이 보이게',r:[['공유주방',.3,1],['다이닝·라운지',.28,1],['다목적실',.2,2],['식자재 창고',.08,1],['쿠킹 클래스실',.08,2],['사무',.06,2]]},
+ {id:'cohouse',n:'청년 공유주택',cat:['apt','n1'],d:'개인실과 함께 쓰는 거실·주방, 1층에 동네와 나누는 근생',r:[['개인실(1인실)',.52,3],['공유 거실·주방',.18,2],['코워킹 라운지',.1,2],['세탁·창고',.06,1],['1층 근린생활',.14,1]]},
+ {id:'gallery',n:'갤러리 · 카페 복합',cat:['cult','n1'],d:'작은 전시와 카페를 겹쳐 머무는 시간을 늘리는 문화 거점',r:[['전시실',.42,2],['카페',.25,1],['워크숍룸',.13,2],['수장고',.1,1],['사무',.1,2]]},
+ {id:'maker',n:'공방 · 메이커스페이스',cat:['n2'],d:'만들고 팔고 배우는 공간. 소음이 큰 장비실은 길에서 먼 쪽에',r:[['공방',.38,1],['장비실',.15,1],['쇼룸·판매',.2,1],['교육실',.15,2],['재료 창고',.12,1]]},
+ {id:'care',n:'어린이 돌봄센터',cat:['care'],d:'보육·놀이·식사를 한 건물에. 일조 좋은 쪽에 보육실과 외부 놀이마당',r:[['보육실',.38,1],['놀이실',.2,1],['식당·조리실',.15,1],['상담실',.08,2],['교사실',.08,2],['다목적실',.11,2]]},
+ {id:'cowork',n:'공유오피스 + 라운지',cat:['office','n2'],d:'작은 팀과 프리랜서를 위한 업무 공간과 동네에 열린 라운지',r:[['오픈 데스크',.4,2],['개인 오피스',.2,3],['회의실',.15,2],['라운지',.15,1],['폰부스·지원',.1,2]]},
+ {id:'commu',n:'주민 커뮤니티센터',cat:['cult','care'],d:'모임·동아리·쉼터를 모은 주민 공동 시설',r:[['다목적홀',.3,1],['동아리방',.2,2],['카페·쉼터',.15,1],['어르신 쉼터',.15,1],['사무',.1,2],['창고',.1,1]]},
+ {id:'stage',n:'소규모 공연 · 연습 공간',cat:['cult','n2'],d:'동네 공연장과 대관 연습실. 로비를 길에 열어 축제 마당처럼',r:[['공연장',.4,1],['연습실',.25,2],['분장·대기실',.1,1],['로비·카페',.15,1],['기계실·창고',.1,1]]}];
+let SG_RATIO=0.7;
+function siteSignals(){const M=lastM||metrics(),A=M.A,maxFA=A*zone.f/100,maxBA=A*zone.b/100,pc=ringC(plot),R=[];const zk=zoneKey();
+ const near=CTXP.filter(b=>Math.hypot((b.x0+b.x1)/2-pc[0],(b.z0+b.z1)/2-pc[1])<60),fl=near.map(b=>b.fl||Math.round(b.h/FH)),avgF=fl.length?fl.reduce((a,b)=>a+b,0)/fl.length:0;
+ let gd=Infinity;greenPolys().forEach(q=>q.forEach(p=>gd=Math.min(gd,Math.hypot(p[0]-pc[0],p[1]-pc[1]))));
+ let sun=null;try{const S=terrainStats('sunh');if(S.tot)sun=(S.A[2]+S.A[3])/S.tot;}catch(e){}
+ const TS=terrainStats('slope'),steep=TS.tot?TS.A.slice(2).reduce((a,b)=>a+b,0)/TS.tot:0;
+ const U=near.filter(b=>b.u!=null),us=[0,0,0,0,0];U.forEach(b=>us[b.u]++);
+ const du=SITE&&SITE.ovl&&SITE.ovl.find(o=>o.st==='hit'&&o.d==='LT_C_UPISUQ161');
+ const zs=SITE&&SITE.zones?[...new Set(SITE.zones.map(z=>z.n))]:[];const nearCom=zs.some(n=>/상업/.test(n));
+ return{A,maxFA,maxBA,floors:maxBA?Math.max(1,Math.floor(maxFA/maxBA)):0,avgF,nNear:near.length,gd,sun,steep,us,nU:U.length,du,nearCom,zk};}
+function scoreTpl(t,S){let sc=1;const why=[];const P=t.cat.map(c=>usePerm(S.zk,c));if(P[0]==='X')return{sc:-99,why:['이 용도지역에서는 주용도를 지을 수 없음'],perm:'X'};
+ const perm=P[0];sc+=perm==='O'?2:0.5;const lib=['lib','care','commu','kitchen'];
+ if(S.gd>150&&lib.concat(['cohouse']).includes(t.id)){sc+=1;why.push('가까운 녹지·공원이 멀어 실내외 쉼터 수요');}
+ if(S.avgF&&S.avgF<=3.2&&/^[123]j?$/.test(S.zk)&&['cohouse','care','lib','kitchen','maker'].includes(t.id)){sc+=1;why.push(`주변이 저층 주거지(평균 ${S.avgF.toFixed(1)}층) — 생활 지원 시설이 어울림`);}
+ if((S.avgF>=5||S.nearCom||['gs','sg','js','ys','jj'].includes(S.zk))&&['cowork','gallery','stage'].includes(t.id)){sc+=1;why.push(S.nearCom?'가까이 상업지역이 있어 유동이 많음':'주변 밀도가 높아 업무·문화 수요');}
+ if(S.maxFA<450){if(['gallery','maker','kitchen'].includes(t.id)){sc+=1;why.push(`작은 규모(최대 ${Math.round(S.maxFA)}㎡)에 맞는 프로그램`);}if(['stage','commu','lib'].includes(t.id)){sc-=1;why.push('필요한 규모에 비해 대지가 작음');}}
+ if(S.maxFA>1500&&['commu','lib','cohouse','stage'].includes(t.id)){sc+=1;why.push(`최대 ${Math.round(S.maxFA).toLocaleString('ko-KR')}㎡까지 지을 수 있어 큰 공공 프로그램 가능`);}
+ if(S.sun!=null&&S.sun>0.5&&['care','lib'].includes(t.id)){sc+=0.5;why.push(`대지 ${Math.round(S.sun*100)}%가 동지 4시간 이상 일조`);}
+ if(S.sun!=null&&S.sun<0.25&&['maker','stage','cowork'].includes(t.id)){sc+=0.5;why.push('일조가 적어 실내 중심 프로그램이 유리');}
+ if(S.steep>0.3&&['cohouse','gallery'].includes(t.id)){sc+=0.5;why.push('경사지 — 층마다 다른 레벨로 진입하는 구성에 유리');}
+ if(S.nU>=5){const res=(S.us[0])/S.nU,pub=S.us[3]/S.nU;if(res>=0.6&&pub<0.05&&['commu','lib','care'].includes(t.id)){sc+=1.5;why.push(`주변 건물 ${Math.round(res*100)}%가 주거인데 공공·교육 시설이 거의 없음`);}if(S.us[1]/S.nU>0.4&&['gallery','maker'].includes(t.id)){sc+=0.5;why.push('근린생활시설이 많은 골목 — 가게형 1층과 잘 맞음');}}
+ if(perm==='△')why.push('주용도가 조례·규모 조건부 — 조례 확인');else why.push(`${zone.n}에서 주용도를 바로 지을 수 있음`);
+ return{sc,why,perm};}
+function drawSugg(){const box=$('#sgBox');if(!box)return;const S=siteSignals();const tgt=S.maxFA*SG_RATIO;
+ const sig=[`대지 ${f1(S.A)}㎡ · ${zone.n} · 건폐율 ${zone.b}% · 용적률 ${zone.f}%${zone.ord?' ('+zone.ord.replace(' 도시계획조례','')+' 조례)':''}`,`지을 수 있는 최대: 건축면적 약 ${Math.round(S.maxBA)}㎡, 연면적 약 ${Math.round(S.maxFA).toLocaleString('ko-KR')}㎡ (꽉 채우면 약 ${S.floors}층)`];
+ if(S.nNear)sig.push(`주변 60m 건물 ${S.nNear}동 · 평균 ${S.avgF.toFixed(1)}층`);sig.push(S.gd<9999?`가장 가까운 녹지·공원 약 ${Math.round(S.gd)}m`:'근처에 녹지·공원 자료 없음');if(S.sun!=null)sig.push(`동지 4시간 이상 일조 ${Math.round(S.sun*100)}% · 경사 15% 이상 ${Math.round(S.steep*100)}%`);
+ if(S.nU>=5)sig.push(`주변 건물 용도: 주거 ${S.us[0]} · 근생 ${S.us[1]} · 상업·업무 ${S.us[2]} · 공공·교육 ${S.us[3]} · 기타 ${S.us[4]}`);else sig.push('주변 건물 용도 자료 없음 → 현장 답사로 보완');
+ const perms=UCAT.map(([k,n])=>{const p=usePerm(S.zk,k);return`<span class="uchip u${p==='O'?'o':p==='X'?'x':'c'}" title="${p==='O'?'건축 가능':p==='X'?'건축 불가':'조례·규모 조건부'}">${p==='O'?'●':p==='X'?'×':'◐'} ${n}</span>`;}).join('');
+ const C=PTPL.map(t=>({t,...scoreTpl(t,S)})).sort((a,b)=>b.sc-a.sc);
+ box.innerHTML=`<div class="sgcol"><h5>이 대지에서 읽은 것</h5><ul>${sig.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${S.du?'<p class="warn2">지구단위계획구역 안 — 결정도서의 지정·권장·불허 용도를 먼저 확인하세요.</p>':''}
+  <h5 style="margin-top:12px">${esc(zone.n)}에 지을 수 있는 용도 <small>(개략)</small></h5><div class="uchips">${perms}</div><p class="note" style="margin-top:6px">● 가능 · ◐ 조례·규모 조건부 · × 불가. 국토계획법 시행령 별표 요약이라 세부 규모 제한과 지자체 조례를 꼭 확인하세요.</p></div>
+  <div class="sgcol"><div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><h5>후보 프로그램</h5><label class="tg" style="font-size:12px">목표 규모 <input type="range" id="sgR" min="0.3" max="1" step="0.05" value="${SG_RATIO}" style="width:110px"> <b class="mono" id="sgRV">${Math.round(SG_RATIO*100)}% · ${Math.round(tgt).toLocaleString('ko-KR')}㎡</b></label></div>
+  <div class="sgcards">${C.map((c,i)=>`<div class="sgcard${c.sc<0?' off':''}"><div class="h"><b>${i<3&&c.sc>=0?'<span class="rk">추천</span>':''}${esc(c.t.n)}</b><span class="uchip u${c.perm==='O'?'o':c.perm==='X'?'x':'c'}">${c.perm==='O'?'가능':c.perm==='X'?'불가':'조건부'}</span></div><p>${esc(c.t.d)}</p>${c.why.length?`<ul>${c.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>`:''}<div class="f"><span class="note">${c.t.r.map(r=>r[0]).slice(0,4).join(' · ')}…</span>${c.sc>=0?`<button class="btn sm" data-tp="${c.t.id}">이걸로 시작</button>`:''}</div></div>`).join('')}</div></div>`;
+ $('#sgR').oninput=e=>{SG_RATIO=+e.target.value;$('#sgRV').textContent=`${Math.round(SG_RATIO*100)}% · ${Math.round(S.maxFA*SG_RATIO).toLocaleString('ko-KR')}㎡`;};$('#sgR').onchange=()=>drawSugg();
+ box.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>applyTpl(b.dataset.tp));}
+function applyTpl(id){const t=PTPL.find(x=>x.id===id);if(!t)return;const S=siteSignals();const share=20,gross=S.maxFA*SG_RATIO,net=gross/(1+share/100);const had=req.list.length;
+ req={title:`${SITE?SITE.addr.split(' ').slice(-2).join(' '):'가상 대지'} ${t.n}`,share,list:t.r.map(([n,ra,fl])=>{let a=Math.max(6,Math.round(net*ra));let q=1;if(/개인실|1인실/.test(n)){q=Math.max(1,Math.round(a/16));a=Math.round(a/q*10)/10;}return{n,a,q,fl:fl&&fl<=Math.max(1,S.floors)?String(fl):''};})};
+ commit();drawReq();toast(`${t.n} 프로그램을 넣었습니다(요구 연면적 약 ${Math.round(gross).toLocaleString('ko-KR')}㎡).${had?' 이전 목록은 실행 취소로 되돌릴 수 있습니다.':''} "층별 프로그램에 자동 배치"로 매스와 비교하세요.`);}
 function switchPane(p){curPane=p;$$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===p));$$('.pane').forEach(x=>x.classList.toggle('on',x.id===p));
- if(p==='vdiag')requestAnimationFrame(()=>drawDiag());if(p==='vboard')requestAnimationFrame(previewBoard);if(p==='vproc'){renderProcList();requestAnimationFrame(()=>drawProcess());}if(p==='v3d')resize();if(p==='varea')drawArea();if(p==='vreq')drawReq();if(p==='vsec'){if(sel&&!secTouched){spos=saxis==='ns'?sel.x:sel.z;$('#spos').value=spos;}requestAnimationFrame(drawSec);}}
+ if(p==='vdiag')requestAnimationFrame(()=>drawDiag());if(p==='vboard')requestAnimationFrame(previewBoard);if(p==='vproc'){renderProcList();requestAnimationFrame(()=>drawProcess());}if(p==='v3d')resize();if(p==='varea')drawArea();if(p==='vreq'){drawSugg();drawReq();}if(p==='vsec'){if(sel&&!secTouched){spos=saxis==='ns'?sel.x:sel.z;$('#spos').value=spos;}requestAnimationFrame(drawSec);}}
 let secTouched=false;$('#spos').addEventListener('input',()=>secTouched=true);
 $$('.tab').forEach(t=>t.onclick=()=>switchPane(t.dataset.p));
 // ---------- files: save / open / export ----------
@@ -2109,7 +2193,7 @@ function syncOvlUI(){const r=!!SITE;const jg=r&&SITE.jiga>0;$('#jigaRow').style.
  else if(hit.length){why.textContent=hit.map(o=>o.lb).join('·')+' — 조례·결정 내용 확인';pl.className='pill rev';pl.textContent='확인 필요';}
  else{why.textContent='지구·구역 조회 결과 없음(조례는 별도 확인)';pl.className='pill nv';pl.textContent='조례 확인';}}
 function syncSiteUI(){if(zone)setZone(zoneKey());syncOvlUI();const r=!!SITE;$$('.lay input[data-l=lot],.lay input[data-l=zone],.lay input[data-l=buse],#bgLbl,#bgSel').forEach(i=>i.parentElement.style.display=r?'':'none');if(!r){lay.bg='';lay.lbl=0;$('#bgSel').value='';$('#bgLbl').checked=false;}$$('.demoRd').forEach(e=>e.style.display=r?'none':'');$('#frontInfo').style.display=r?'block':'none';const ro=$('#terr').options;for(const o of ro){o.hidden=r?!(o.value==='flat'||o.value==='real'):o.value==='real';if(o.value==='real')o.disabled=r&&!SITE.dem;}$('#terr').disabled=false;$('#demoSite').style.display=r?'':'none';
- $('#srcMeta').textContent=r?`자료: 브이월드(국토교통부)${SITE.dem?' · 표고 Mapzen/AWS':''} · ${SITE.fetched}`:'PROTOTYPE · 데모 데이터';if(r){$('#addr').value=SITE.addr;const F=frontages(plot);$('#frontInfo').innerHTML=(SITE.dem?`대지 중심 해발 약 ${SITE.dem.base}m (위성 표고, 약 30m 해상도)<br>`:'지형 자료 없음 → 평지로 계산<br>')+(F.length?'접도(자동 추정): '+F.map(f=>`${f.side} ${f.w}m 도로 · 접면 ${f1(f.len)}m`).join('<br>'):'도로 필지와 맞닿은 변을 찾지 못했습니다. 건축선은 직접 확인하세요.');}}
+ $('#srcMeta').textContent=r?`자료: 브이월드(국토교통부)${SITE.dem?' · 표고 Mapzen/AWS':''} · ${SITE.fetched}`:'PROTOTYPE · 데모 데이터';if(r){$('#addr').value=SITE.addr;const F=frontages(plot);$('#frontInfo').innerHTML=(SITE.dem?`대지 중심 해발 약 ${SITE.dem.base}m (위성 표고, 약 30m 해상도)<br>`:'지형 자료 없음 → 평지로 계산<br>')+(F.length?'접도(자동 추정): '+F.map(f=>`${f.side} ${f.wide?'25m 이상':f.w+'m'} 도로 · 접면 ${f1(f.len)}m`).join('<br>'):'도로 필지와 맞닿은 변을 찾지 못했습니다. 건축선은 직접 확인하세요.');}}
 function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h){R.setSize(2,2,false);return;}// 숨겨진 3D 화면은 작은 버퍼로(보드·캡처 후 큰 버퍼 유지 방지)
  R.setSize(w,h,false);R.domElement.style.width=w+'px';R.domElement.style.height=h+'px';cam.aspect=w/h;cam.updateProjectionMatrix();}
 addEventListener('resize',()=>{resize();if(curPane==='vproc')drawProcess();if(curPane==='vdiag')drawDiag();if(curPane==='vsec')drawSec();});
