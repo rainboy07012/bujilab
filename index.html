@@ -183,7 +183,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 </div></div>
 <div class="vwdlg" id="shtDlg" role="dialog" aria-modal="true" aria-labelledby="shtT"><div class="box axobox">
  <div class="row" style="justify-content:space-between;align-items:center"><h3 id="shtT">분석 시트</h3><label class="tg"><input type="checkbox" id="shtGrid" checked> 배경 격자</label></div>
- <div class="chk" id="shtKeys" style="display:flex;flex-wrap:wrap;gap:4px 10px"><label class="tg"><input type="checkbox" value="sun" checked>일조 궤적</label><label class="tg"><input type="checkbox" value="view" checked>조망</label><label class="tg"><input type="checkbox" value="green" checked>녹지</label><label class="tg"><input type="checkbox" value="offset" checked>건축 가능 영역</label><label class="tg"><input type="checkbox" value="drain" checked>배수</label><label class="tg"><input type="checkbox" value="dim" checked>치수</label><label class="tg"><input type="checkbox" value="wind" checked>계절풍</label><label class="tg"><input type="checkbox" value="move" checked>접근·동선</label><label class="tg"><input type="checkbox" value="height" checked>주변 높이</label><label class="tg"><input type="checkbox" value="noise">소음</label><label class="tg"><input type="checkbox" value="shade">동지 그늘</label><label class="tg"><input type="checkbox" value="zone">용도지역</label></div>
+ <div class="chk" id="shtKeys" style="display:flex;flex-wrap:wrap;gap:4px 10px"><label class="tg"><input type="checkbox" value="sun" checked>일조 궤적</label><label class="tg"><input type="checkbox" value="view" checked>조망</label><label class="tg"><input type="checkbox" value="green" checked>녹지</label><label class="tg"><input type="checkbox" value="offset" checked>건축 가능 영역</label><label class="tg"><input type="checkbox" value="drain" checked>배수</label><label class="tg"><input type="checkbox" value="dim" checked>치수</label><label class="tg"><input type="checkbox" value="wind" checked>계절풍</label><label class="tg"><input type="checkbox" value="move" checked>접근·동선</label><label class="tg"><input type="checkbox" value="height" checked>주변 높이</label><label class="tg"><input type="checkbox" value="noise">소음</label><label class="tg"><input type="checkbox" value="age">건물 노후도</label><label class="tg"><input type="checkbox" value="shade">동지 그늘</label><label class="tg"><input type="checkbox" value="zone">용도지역</label></div>
  <canvas id="shtCv" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#fff"></canvas>
  <div class="row" style="justify-content:space-between;align-items:center"><span class="note">같은 대지를 칸마다 반복하고, 칸마다 주제 하나만 그립니다. SVG는 일러스트레이터에서 칸·선·글자를 따로 고칠 수 있습니다.</span><div class="row"><button class="btn line" id="shtClose">닫기</button><button class="btn line" id="shtSvg">SVG</button><button class="btn" id="shtPng">PNG 저장</button></div></div>
 </div></div>
@@ -495,7 +495,7 @@ let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES;
 const roadPolys=()=>SITE?SITE.roads:roadRects().map(rectPoly);
 const greenPolys=()=>SITE?SITE.greens:GREENS.map(rectPoly);
 function setSiteData(s){SITE=s||null;SUNH={};SUNK=null;if(!SITE){lay.photo=0;const a=document.querySelector('#photoT');if(a)a.checked=false;const b=document.querySelector('.lay input[data-l=photo]');if(b)b.checked=false;}
- if(SITE){CTXP=SITE.ctx.map(c=>{const b=bbox(c.poly);return{...b,h:c.h,poly:c.poly,fl:c.fl,u:c.u};});TREES=[];}else{CTXP=DEMO_CTXP;TREES=DEMO_TREES;}}
+ if(SITE){CTXP=SITE.ctx.map(c=>{const b=bbox(c.poly);return{...b,h:c.h,poly:c.poly,fl:c.fl,u:c.u,yr:c.yr};});TREES=[];}else{CTXP=DEMO_CTXP;TREES=DEMO_TREES;}}
 let ann=[],lands=[],pkPlan=null;
 
 // ---------- geometry helpers ----------
@@ -1643,7 +1643,7 @@ function drawReqBoard(c,mm,font,x,y,w,h,s,MX){const R0=reqStatus();c.fillStyle='
   c.fillStyle=r.st==='ok'?'#1f8a4c':r.st==='rev'?'#8a5a00':'#6b7280';c.font=font(600,3.8);c.fillText({ok:'충족',nv:'미배치',rev:'부족',na:'-'}[r.st],mm(x+pad+(w-2*pad)*cols[4]),mm(ty));yy+=rh;});}
 // ---------- 분석 시트: 같은 대지 그림을 여러 칸에 반복하고 칸마다 주제 하나(작은 다이어그램 모음) ----------
 const SHT={keys:['sun','view','green','offset','drain','dim','wind','move','height'],grid:true};
-const SHK={sun:['sun path','일조 궤적'],view:['views','조망'],green:['vegetation','녹지'],offset:['buildable','건축 가능 영역'],drain:['drainage','배수'],dim:['dimensions','치수'],wind:['wind','계절풍'],move:['access','접근·동선'],height:['context height','주변 높이'],noise:['noise','소음'],shade:['winter shade','동지 그늘'],zone:['zoning','용도지역']};
+const SHK={sun:['sun path','일조 궤적'],view:['views','조망'],green:['vegetation','녹지'],offset:['buildable','건축 가능 영역'],drain:['drainage','배수'],dim:['dimensions','치수'],wind:['wind','계절풍'],move:['access','접근·동선'],height:['context height','주변 높이'],age:['building age','건물 노후도'],noise:['noise','소음'],shade:['winter shade','동지 그늘'],zone:['zoning','용도지역']};
 const SY='#f0b72f',STL='#5fb3b3',SINK='#16181d',SG='#8e9a8c';
 function insetPoly(P,dfn){// 변마다 다른 거리로 안쪽 평행 이동(볼록·완만한 오목 다각형)
  const n=P.length;if(n<3)return P;const sgn=polySigned(P)>0?1:-1;const L=[];
@@ -1727,6 +1727,8 @@ function drawTile(c,key,tx,ty,T,G0){const {c:C,E}=G0,k=T/(2*E);const X=x=>tx+(x-
  else if(key==='height'){base({ctx:false});const cls=[[2,'#e7e9ec','1–2층'],[5,'#b9bec6','3–5층'],[99,'#6b7280','6층+']];const cnt=[0,0,0];
   G0.ctx.forEach(b=>{const f=b.fl||Math.round(b.h/FH);const i=f<=2?0:f<=5?1:2;cnt[i]++;c.fillStyle=cls[i][1];path(b.q);c.fill();c.strokeStyle='#9aa0a8';c.lineWidth=0.5;c.stroke();});plotL();
   cls.forEach((cl,i)=>{const x=tx+8+i*T*0.24,y=ty+8;c.fillStyle=cl[1];c.fillRect(x,y,10,10);c.strokeStyle='#9aa0a8';c.strokeRect(x,y,10,10);c.fillStyle='#4b5563';c.font=`${Math.max(8,T*0.038)}px "IBM Plex Sans KR",sans-serif`;c.fillText(`${cl[2]} ${cnt[i]}`,x+13,y+9);});}
+ else if(key==='age'){base({ctx:false});const Y=new Date().getFullYear();const cls=[[15,'#e8eef8','15년 미만'],[30,'#b9c9e6','15–30년'],[999,'#6b84b8','30년 이상']];const cnt=[0,0,0,0];G0.ctx.forEach(b=>{if(!b.yr){c.fillStyle='#f1f2f4';path(b.q);c.fill();c.strokeStyle='#c3c7cd';c.lineWidth=0.5;c.stroke();cnt[3]++;return;}const a=Y-b.yr,i=a<15?0:a<30?1:2;cnt[i]++;c.fillStyle=cls[i][1];path(b.q);c.fill();c.strokeStyle='#8a97b0';c.lineWidth=0.5;c.stroke();});plotL();
+  cls.forEach((cl,i)=>{const x=tx+8+i*T*0.3,y=ty+8;c.fillStyle=cl[1];c.fillRect(x,y,10,10);c.strokeStyle='#8a97b0';c.strokeRect(x,y,10,10);c.fillStyle='#4b5563';c.font=`${Math.max(8,T*0.036)}px "IBM Plex Sans KR",sans-serif`;c.fillText(`${cl[2]} ${cnt[i]}`,x+13,y+9);});const n=cnt[0]+cnt[1]+cnt[2];note(n?`30년 이상 ${Math.round(cnt[2]/n*100)}% · 사용승인일 기준`:'사용승인일 자료 없음');}
  else if(key==='noise'){base();G0.roads.forEach(q=>{const b=bbox(q),w=Math.min(b.x1-b.x0,b.z1-b.z0);const lvl=Math.min(1,w/12);[5,3.4,2,1].forEach((m,j)=>{c.strokeStyle=`rgba(200,55,45,${(0.05+0.06*j)*lvl+0.02})`;c.lineWidth=w*m*k;c.lineJoin='round';path(q);c.stroke();});});plotL();note('넓은 도로일수록 붉게 · 도로 폭으로 추정한 상대 소음');}
  else if(key==='shade'){base();const SHP=CTXP.map(b=>({poly:b.poly,h:b.h})).concat(masses.flatMap(rectsOf));c.fillStyle='rgba(22,24,29,.065)';for(let h=9;h<=15;h++){const v=sunVecAt(-23.44,h);if(v.y<=0.03)continue;c.beginPath();SHP.forEach(r=>{let q=sheetClip(shadowPoly(r.poly,r.h,v),G0);if(!q)return;if(polySigned(q)<0)q=q.slice().reverse();q.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.closePath();});c.fill();}ctxLine();plotL();note('동지 09–15시 그림자 겹침 · 진할수록 오래 그늘');}
  else if(key==='zone'){base();(SITE.zones||[]).forEach(z=>{const q=sheetClip(z.poly,G0);if(!q)return;c.fillStyle=zoneCol(z.n);c.globalAlpha=0.55;path(q);c.fill();c.globalAlpha=1;});ctxLine();plotL();note([...new Set(SITE.zones.map(z=>z.n))].slice(0,3).join(' · '));}
@@ -1784,7 +1786,7 @@ function siteFacts(){const M=lastM||metrics();const F=frontages(plot);const pc=r
  out.push(['접도',F.length?F.map(f=>`${f.side} ${f.wide?'25m 이상':f.w+'m'} 도로 (접면 ${f1(f.len)}m)`).join(', '):SITE?'맞닿은 도로를 찾지 못함':'남측 8m · 서측 6m 도로 (데모)']);
  const hs=plot.map(p=>G(p[0],p[1]));const dh=Math.max(...hs)-Math.min(...hs);const TS=terrainStats('slope');const steep=TS.tot?(TS.A.slice(2).reduce((a,b)=>a+b,0)/TS.tot*100):0;
  out.push(['지형',dh<0.3?'거의 평탄':`대지 안 높이차 ${f1(dh)}m · 경사 15% 이상 ${steep.toFixed(0)}%`]);
- const near=CTXP.filter(b=>Math.hypot((b.x0+b.x1)/2-pc[0],(b.z0+b.z1)/2-pc[1])<50);if(near.length){const fl=near.map(b=>b.fl||Math.round(b.h/FH));out.push(['주변 건물',`반경 50m ${near.length}동 · 평균 ${(fl.reduce((a,b)=>a+b,0)/fl.length).toFixed(1)}층 · 최고 ${Math.max(...fl)}층`]);}
+ const near=CTXP.filter(b=>Math.hypot((b.x0+b.x1)/2-pc[0],(b.z0+b.z1)/2-pc[1])<50);if(near.length){const fl=near.map(b=>b.fl||Math.round(b.h/FH));const yy=near.filter(b=>b.yr);out.push(['주변 건물',`반경 50m ${near.length}동 · 평균 ${(fl.reduce((a,b)=>a+b,0)/fl.length).toFixed(1)}층 · 최고 ${Math.max(...fl)}층`+(yy.length>=3?` · 30년 이상 ${Math.round(yy.filter(b=>new Date().getFullYear()-b.yr>=30).length/yy.length*100)}%`:'')]);}
  try{const S=terrainStats('sunh');if(S.tot)out.push(['동지 일조',`4시간 이상 ${fmtPct(S.A[2]+S.A[3],S.tot)} · 2시간 미만 ${fmtPct(S.A[0],S.tot)}`]);}catch(e){}
  const gr=greenPolys();if(gr.length){let dm=Infinity;gr.forEach(q=>q.forEach(p=>dm=Math.min(dm,Math.hypot(p[0]-pc[0],p[1]-pc[1]))));out.push(['녹지',dm<200?`가장 가까운 녹지·공원 약 ${Math.round(dm)}m`:'반경 200m 안 녹지 없음']);}
  return out;}
@@ -1915,10 +1917,10 @@ function siteSignals(){const M=lastM||metrics(),A=M.A,maxFA=A*zone.f/100,maxBA=A
  let gd=Infinity;greenPolys().forEach(q=>q.forEach(p=>gd=Math.min(gd,Math.hypot(p[0]-pc[0],p[1]-pc[1]))));
  let sun=null;try{const S=terrainStats('sunh');if(S.tot)sun=(S.A[2]+S.A[3])/S.tot;}catch(e){}
  const TS=terrainStats('slope'),steep=TS.tot?TS.A.slice(2).reduce((a,b)=>a+b,0)/TS.tot:0;
- const U=near.filter(b=>b.u!=null),us=[0,0,0,0,0];U.forEach(b=>us[b.u]++);
+ const U=near.filter(b=>b.u!=null),us=[0,0,0,0,0];U.forEach(b=>us[b.u]++);const YY=near.filter(b=>b.yr),old=YY.length?YY.filter(b=>new Date().getFullYear()-b.yr>=30).length/YY.length:null;
  const du=SITE&&SITE.ovl&&SITE.ovl.find(o=>o.st==='hit'&&o.d==='LT_C_UPISUQ161');
  const zs=SITE&&SITE.zones?[...new Set(SITE.zones.map(z=>z.n))]:[];const nearCom=zs.some(n=>/상업/.test(n));
- return{A,maxFA,maxBA,floors:maxBA?Math.max(1,Math.floor(maxFA/maxBA)):0,avgF,nNear:near.length,gd,sun,steep,us,nU:U.length,du,nearCom,zk};}
+ return{old,nY:YY.length,A,maxFA,maxBA,floors:maxBA?Math.max(1,Math.floor(maxFA/maxBA)):0,avgF,nNear:near.length,gd,sun,steep,us,nU:U.length,du,nearCom,zk};}
 function scoreTpl(t,S){let sc=1;const why=[];const P=t.cat.map(c=>usePerm(S.zk,c));if(P[0]==='X')return{sc:-99,why:['이 용도지역에서는 주용도를 지을 수 없음'],perm:'X'};
  const perm=P[0];sc+=perm==='O'?2:0.5;const lib=['lib','care','commu','kitchen'];
  if(S.gd>150&&lib.concat(['cohouse']).includes(t.id)){sc+=1;why.push('가까운 녹지·공원이 멀어 실내외 쉼터 수요');}
@@ -1930,11 +1932,13 @@ function scoreTpl(t,S){let sc=1;const why=[];const P=t.cat.map(c=>usePerm(S.zk,c
  if(S.sun!=null&&S.sun<0.25&&['maker','stage','cowork'].includes(t.id)){sc+=0.5;why.push('일조가 적어 실내 중심 프로그램이 유리');}
  if(S.steep>0.3&&['cohouse','gallery'].includes(t.id)){sc+=0.5;why.push('경사지 — 층마다 다른 레벨로 진입하는 구성에 유리');}
  if(S.nU>=5){const res=(S.us[0])/S.nU,pub=S.us[3]/S.nU;if(res>=0.6&&pub<0.05&&['commu','lib','care'].includes(t.id)){sc+=1.5;why.push(`주변 건물 ${Math.round(res*100)}%가 주거인데 공공·교육 시설이 거의 없음`);}if(S.us[1]/S.nU>0.4&&['gallery','maker'].includes(t.id)){sc+=0.5;why.push('근린생활시설이 많은 골목 — 가게형 1층과 잘 맞음');}}
+ if(S.old!=null&&S.nY>=5&&S.old>=0.5&&['commu','maker','cohouse','kitchen'].includes(t.id)){sc+=0.5;why.push(`노후 건물이 많은 동네(30년 이상 ${Math.round(S.old*100)}%) — 재생형 프로그램`);}
  if(perm==='△')why.push('주용도가 조례·규모 조건부 — 조례 확인');else why.push(`${zone.n}에서 주용도를 바로 지을 수 있음`);
  return{sc,why,perm};}
 function drawSugg(){const box=$('#sgBox');if(!box)return;const S=siteSignals();const tgt=S.maxFA*SG_RATIO;
  const sig=[`대지 ${f1(S.A)}㎡ · ${zone.n} · 건폐율 ${zone.b}% · 용적률 ${zone.f}%${zone.ord?' ('+zone.ord.replace(' 도시계획조례','')+' 조례)':''}`,`지을 수 있는 최대: 건축면적 약 ${Math.round(S.maxBA)}㎡, 연면적 약 ${Math.round(S.maxFA).toLocaleString('ko-KR')}㎡ (꽉 채우면 약 ${S.floors}층)`];
  if(S.nNear)sig.push(`주변 60m 건물 ${S.nNear}동 · 평균 ${S.avgF.toFixed(1)}층`);sig.push(S.gd<9999?`가장 가까운 녹지·공원 약 ${Math.round(S.gd)}m`:'근처에 녹지·공원 자료 없음');if(S.sun!=null)sig.push(`동지 4시간 이상 일조 ${Math.round(S.sun*100)}% · 경사 15% 이상 ${Math.round(S.steep*100)}%`);
+ if(S.old!=null&&S.nY>=5)sig.push(`주변 건물 ${S.nY}동 중 30년 이상 된 건물 ${Math.round(S.old*100)}%`);
  if(S.nU>=5)sig.push(`주변 건물 용도: 주거 ${S.us[0]} · 근생 ${S.us[1]} · 상업·업무 ${S.us[2]} · 공공·교육 ${S.us[3]} · 기타 ${S.us[4]}`);else sig.push('주변 건물 용도 자료 없음 → 현장 답사로 보완');
  const perms=UCAT.map(([k,n])=>{const p=usePerm(S.zk,k);return`<span class="uchip u${p==='O'?'o':p==='X'?'x':'c'}" title="${p==='O'?'건축 가능':p==='X'?'건축 불가':'조례·규모 조건부'}">${p==='O'?'●':p==='X'?'×':'◐'} ${n}</span>`;}).join('');
  const C=PTPL.map(t=>({t,...scoreTpl(t,S)})).sort((a,b)=>b.sc-a.sc);
@@ -2138,10 +2142,16 @@ async function loadRealSite(query,pick){
   const plotL=cleanRing(ring0.map(P));if(plotL.length<3){toast('필지 도형이 올바르지 않습니다.');return;}
   step('용도지역·주변 건물·도로를 불러오는 중…');
   const dl=80/(111320*Math.cos(c0[1]*Math.PI/180)),dt=80/110574,BOX=`BOX(${c0[0]-dl},${c0[1]-dt},${c0[0]+dl},${c0[1]+dt})`;
-  const [uq,bld,lots,ovl,zs]=await Promise.all([vwData('LT_C_UQ111',`POINT(${c0[0]} ${c0[1]})`,5).catch(()=>[]),vwData('LT_C_SPBD',BOX).catch(e=>{throw e;}),vwData('LP_PA_CBND_BUBUN',BOX).catch(()=>[]),Promise.all(OVL.map(([d,lb])=>vwData(d,`POINT(${c0[0]} ${c0[1]})`,5).then(fs=>({d,lb,st:fs.length?'hit':'none',ns:[...new Set(fs.map(f=>{const p=f.properties||{};return String(p.uname||p.dgm_nm||p.UNAME||lb).trim();}))]})).catch(e=>({d,lb,st:'err',ns:[],m:e.message})))),Promise.all(['LT_C_UQ111','LT_C_UQ112','LT_C_UQ113','LT_C_UQ114'].map(d=>vwData(d,BOX,100).catch(()=>[]))).then(a=>a.flat())]);
+  const [uq,bld,lots,ovl,zs,binfo]=await Promise.all([vwData('LT_C_UQ111',`POINT(${c0[0]} ${c0[1]})`,5).catch(()=>[]),vwData('LT_C_SPBD',BOX).catch(e=>{throw e;}),vwData('LP_PA_CBND_BUBUN',BOX).catch(()=>[]),Promise.all(OVL.map(([d,lb])=>vwData(d,`POINT(${c0[0]} ${c0[1]})`,5).then(fs=>({d,lb,st:fs.length?'hit':'none',ns:[...new Set(fs.map(f=>{const p=f.properties||{};return String(p.uname||p.dgm_nm||p.UNAME||lb).trim();}))]})).catch(e=>({d,lb,st:'err',ns:[],m:e.message})))),Promise.all(['LT_C_UQ111','LT_C_UQ112','LT_C_UQ113','LT_C_UQ114'].map(d=>vwData(d,BOX,100).catch(()=>[]))).then(a=>a.flat()),vwData('LT_C_BLDGINFO',BOX).catch(()=>[])]);
   const uname=uq[0]&&uq[0].properties&&(uq[0].properties.uname||uq[0].properties.UNAME)||'';const zk=(ZMAP.find(([k])=>uname.includes(k))||[])[1]||null;
   const inPlot=(q)=>{const c=ringC(q);return pip(c[0],c[1],plotL);};
-  USEKEY=findUseKey(bld);const ctx=[];bld.forEach(f=>{const fl=Math.max(1,parseInt((f.properties||{}).gro_flo_co)||1);const u=useGrp(f.properties||{});rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length>=3&&polyArea(q)>4&&!inPlot(q))ctx.push(u==null?{poly:q,h:fl*FH,fl}:{poly:q,h:fl*FH,fl,u});});});const bkeys=bld[0]?Object.keys(bld[0].properties||{}):[];
+  USEKEY=findUseKey(bld);
+  // GIS건물통합정보(건축물대장 연계): 용도코드·실제 높이·사용승인일 → 도로명주소 건물 도형에 붙임
+  const BI=[];binfo.forEach(f=>{const p=f.properties||{};rings(f.geometry).forEach(r=>{const q=r.map(P);if(q.length>=3){const b=bbox(q);BI.push({q,b,c:ringC(q),use:String(p.usability||'').trim(),h:parseFloat(p.height)||0,fl:parseInt(p.grnd_flr)||0,yr:parseInt(String(p.useapr_day||'').slice(0,4))||0,nm:String(p.bld_nm||'').trim()});}});});
+  const matchBI=q=>{const c=ringC(q),bb=bbox(q);return BI.find(o=>c[0]>=o.b.x0&&c[0]<=o.b.x1&&c[1]>=o.b.z0&&c[1]<=o.b.z1&&pip(c[0],c[1],o.q))||BI.find(o=>o.c[0]>=bb.x0&&o.c[0]<=bb.x1&&o.c[1]>=bb.z0&&o.c[1]<=bb.z1&&pip(o.c[0],o.c[1],q));};
+  const ctx=[];bld.forEach(f=>{const fl=Math.max(1,parseInt((f.properties||{}).gro_flo_co)||1);let u=useGrp(f.properties||{});rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length<3||polyArea(q)<=4||inPlot(q))return;const m=matchBI(q);const o={poly:q,h:fl*FH,fl};let uu=u;if(m){if(uu==null&&m.use)uu=useGrp({bdtyp_cd:m.use});if(m.h>2&&m.h<300)o.h=Math.round(m.h*10)/10;if(m.yr>1900)o.yr=m.yr;if(m.nm)o.nm=m.nm;}if(uu!=null)o.u=uu;ctx.push(o);});});
+  // 도로명주소 건물이 비었으면 통합정보 도형을 그대로 씀
+  if(!ctx.length)BI.forEach(o=>{const q=cleanRing(o.q);if(q.length<3||polyArea(q)<=4||inPlot(q))return;const c={poly:q,h:o.h>2?o.h:Math.max(1,o.fl)*FH,fl:Math.max(1,o.fl)};const uu=o.use?useGrp({bdtyp_cd:o.use}):null;if(uu!=null)c.u=uu;if(o.yr>1900)c.yr=o.yr;ctx.push(c);});const bkeys=bld[0]?Object.keys(bld[0].properties||{}):[];
   const roads=[],greens=[];lots.forEach(f=>{const j=String((f.properties||{}).jibun||'');const last=j.trim().slice(-1);if(last!=='도'&&last!=='공')return;rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length>=3)(last==='도'?roads:greens).push(q);});});
   const lotsL=[];lots.forEach(f=>{const p=f.properties||{};if(p.pnu&&p.pnu===pr0.pnu)return;rings(f.geometry).forEach(r=>{const q=clipSq(cleanRing(r.map(P)),82);if(q.length>=3)lotsL.push({poly:q,j:String(p.jibun||'').replace(/\s+/g,'')});});});
   const zonesL=[];zs.forEach(f=>{const p=f.properties||{};const n=String(p.uname||p.UNAME||p.dgm_nm||'').trim();if(!n)return;rings(f.geometry).forEach(r=>{const q=clipSq(r.map(P),82);if(q.length>=3&&polyArea(q)>1)zonesL.push({poly:q.map(v=>[Math.round(v[0]*10)/10,Math.round(v[1]*10)/10]),n});});});zonesL.sort((a,b)=>polyArea(b.poly)-polyArea(a.poly));
