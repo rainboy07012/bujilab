@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"><head>
+<script>try{var t=localStorage.getItem("bujilab.theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>부지랩 — 대지 분석부터 제출 보드까지</title>
@@ -8,21 +9,21 @@
 <style>
 :root{
  /* a drawing set: white sheets laid on a grey drafting table; one blue for action, ink for everything else */
- --paper:#ffffff;--table:#eceef1;--ink:#16181d;--mut:#5d6470;--line:#d9dce1;--hair:#e6e8eb;--acc:#2f5bd3;--acc2:#2649ad;
+ --paper:#ffffff;--onacc:#ffffff;--btnline:#c3c8cf;--sel:#dbe4fb;--hl:#f4f6fb;--foot:#16181d;--footline:#3a3d44;--footmut:#9298a2;--foottx:#c6c9cf;--shadow:rgba(22,24,29,.35);--table:#eceef1;--ink:#16181d;--mut:#5d6470;--line:#d9dce1;--hair:#e6e8eb;--acc:#2f5bd3;--acc2:#2649ad;
  --ease-out:cubic-bezier(.23,1,.32,1);
  --f:'IBM Plex Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;color-scheme:light}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:var(--f);background:var(--paper);color:var(--ink);line-height:1.65;letter-spacing:.16px;word-break:keep-all;-webkit-font-smoothing:antialiased}
-::selection{background:#dbe4fb;color:var(--ink)}
+::selection{background:var(--sel);color:var(--ink)}
 img{max-width:100%;display:block}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
 h1,h2,h3{text-wrap:balance;font-weight:300;letter-spacing:-.4px}
-.btn{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:14px;font-weight:500;padding:12px 18px;text-decoration:none;cursor:pointer;border:1px solid var(--acc);background:var(--acc);color:#fff;transition:transform 120ms var(--ease-out),background-color 120ms ease,border-color 120ms ease}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:14px;font-weight:500;padding:12px 18px;text-decoration:none;cursor:pointer;border:1px solid var(--acc);background:var(--acc);color:var(--onacc);transition:transform 120ms var(--ease-out),background-color 120ms ease,border-color 120ms ease}
 .btn:active{transform:scale(.97)}
-.btn.line{background:var(--paper);color:var(--ink);border-color:#c3c8cf}
+.btn.line{background:var(--paper);color:var(--ink);border-color:var(--btnline)}
 @media (hover:hover) and (pointer:fine){.btn:hover{background:var(--acc2);border-color:var(--acc2)}.btn.line:hover{background:var(--table);border-color:var(--ink)}}
 
 /* nav */
@@ -34,7 +35,7 @@ nav .wrap{display:flex;align-items:center;height:56px;gap:28px}
 nav .links{display:flex;gap:24px;font-size:14px;color:var(--mut)}
 nav .links a{text-decoration:none}
 @media (hover:hover){nav .links a:hover{color:var(--ink)}}
-nav .act{margin-left:auto;display:flex;gap:8px}
+nav .act{margin-left:auto;display:flex;gap:8px;align-items:center}
 nav .btn{padding:8px 14px}
 
 /* hero */
@@ -50,7 +51,7 @@ h1{font-size:clamp(36px,5.2vw,64px);line-height:1.15;letter-spacing:-.6px}
 .boardgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;align-items:start}
 .dim{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--mut);margin-bottom:10px}
 .dim::before,.dim::after{content:'';flex:1;height:7px;border-left:1px solid var(--mut);border-right:1px solid var(--mut);background:linear-gradient(var(--mut),var(--mut)) center/100% 1px no-repeat}
-.board{position:relative;background:var(--paper);box-shadow:0 1px 0 rgba(22,24,29,.06),0 18px 40px -24px rgba(22,24,29,.35)}
+.board{position:relative;background:var(--paper);box-shadow:0 1px 0 rgba(22,24,29,.06),0 18px 40px -24px var(--shadow)}
 .board img{width:100%;height:auto}
 .zone{position:absolute;outline:2px solid var(--acc);outline-offset:-1px;background:rgba(47,91,211,.06);opacity:0;transition:opacity 150ms var(--ease-out);pointer-events:none}
 .board[data-on] .zone{opacity:0}
@@ -106,7 +107,7 @@ figcaption{font-size:13px;color:var(--mut);margin-top:10px}
 .sched.price thead th{font-size:15px;color:var(--ink);font-weight:500}
 .sched.price thead small{display:block;font-size:22px;font-weight:300;margin-top:4px;color:var(--ink)}
 .sched.price thead small em{font-style:normal;font-size:13px;color:var(--mut)}
-.sched.price .hl{background:#f4f6fb}
+.sched.price .hl{background:var(--hl)}
 .yes::before{content:'';display:inline-block;width:9px;height:9px;background:var(--ink)}
 .no{color:var(--mut)}
 .tscroll{overflow-x:auto}
@@ -129,11 +130,11 @@ figcaption{font-size:13px;color:var(--mut);margin-top:10px}
 .go .btn{width:100%;padding:15px;font-size:16px}
 
 /* footer as title block */
-footer{background:var(--ink);color:#c6c9cf;font-size:13px}
-.tblock{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-left:1px solid #3a3d44}
-.tblock div{padding:22px 18px;border-right:1px solid #3a3d44}
-.tblock small{display:block;font-size:11.5px;color:#9298a2;margin-bottom:4px}
-.tblock b{font-weight:500;color:#fff}
+footer{background:var(--foot);color:var(--foottx);font-size:13px}
+.tblock{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-left:1px solid var(--footline)}
+.tblock div{padding:22px 18px;border-right:1px solid var(--footline)}
+.tblock small{display:block;font-size:11.5px;color:var(--footmut);margin-bottom:4px}
+.tblock b{font-weight:500;color:#f4f4f4}
 footer .wrap{padding-top:36px;padding-bottom:48px}
 
 @media (max-width:960px){
@@ -152,12 +153,21 @@ footer .wrap{padding-top:36px;padding-bottom:48px}
  nav .act .line{display:none}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* dark: 어두운 제도대 위 종이. 스크린샷(도면)은 밝은 종이 그대로 둔다 */
+html[data-theme=dark]{color-scheme:dark;--paper:#1c1c1e;--table:#121213;--ink:#f2f3f5;--mut:#b4b9c2;--line:#3a3b3f;--hair:#2c2d30;--acc:#78a9ff;--acc2:#a6c8ff;--onacc:#101114;--btnline:#55575d;--sel:#2d4a8a;--hl:#1e2a44;--foot:#0c0c0d;--footline:#2c2d30;--footmut:#8d929b;--foottx:#c6c9cf;--shadow:rgba(0,0,0,.7)}
+html[data-theme=dark] footer{border-top:1px solid var(--line)}
+html[data-theme=dark] .yes::before{background:var(--acc)}
+.thm{width:34px;height:34px;display:inline-grid;place-items:center;border:1px solid var(--btnline);border-radius:2px;background:transparent;color:var(--ink);cursor:pointer;transition:transform 160ms var(--ease-out)}
+.thm:active{transform:scale(.97)}.thm:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.thm svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5}.thm .mn{display:none}html[data-theme=dark] .thm .sn{display:none}html[data-theme=dark] .thm .mn{display:block}
+html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-color 200ms ease,color 200ms ease!important}
 </style></head>
 <body>
 <nav><div class="wrap">
  <a class="logo" href="#top"><i></i>부지랩</a>
  <div class="links"><a href="#site">대지</a><a href="#analysis">분석</a><a href="#program">프로그램</a><a href="#output">출력</a><a href="#price">요금</a></div>
- <div class="act"><a class="btn line" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a><a class="btn" href="#signup">베타 신청</a></div>
+ <div class="act"><button class="thm" id="thmB" type="button" aria-label="다크 모드 전환" aria-pressed="false" title="다크 모드로 바꾸기"><svg class="sn" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg><svg class="mn" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.6 5.6 0 016.4 2.5a5.6 5.6 0 107.1 7.1z"/></svg></button><a class="btn line" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a><a class="btn" href="#signup">베타 신청</a></div>
 </div></nav>
 
 <header class="hero" id="top">
@@ -340,4 +350,9 @@ const bd=document.getElementById('board'),lg=document.querySelectorAll('#legend 
 const on=z=>{if(z)bd.dataset.on=z;else delete bd.dataset.on;lg.forEach(l=>l.classList.toggle('on',l.dataset.z===z));};
 lg.forEach(l=>{l.tabIndex=0;l.addEventListener('pointerenter',()=>on(l.dataset.z));l.addEventListener('focus',()=>on(l.dataset.z));l.addEventListener('pointerleave',()=>on(null));l.addEventListener('blur',()=>on(null));});
 </script>
+<script>(function(){var h=document.documentElement,b=document.getElementById('thmB');
+function ap(t,a){if(a&&!matchMedia('(prefers-reduced-motion: reduce)').matches){h.classList.add('thm-anim');setTimeout(function(){h.classList.remove('thm-anim')},260);}h.dataset.theme=t;b.setAttribute('aria-pressed',t==='dark');b.title=t==='dark'?'라이트 모드로 바꾸기':'다크 모드로 바꾸기';}
+ap(h.dataset.theme||'light',false);
+b.onclick=function(){var t=h.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('bujilab.theme',t)}catch(e){}ap(t,true);};
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(e){var t=null;try{t=localStorage.getItem('bujilab.theme')}catch(_){}if(!t)ap(e.matches?'dark':'light',true);});}catch(e){}})();</script>
 </body></html>
