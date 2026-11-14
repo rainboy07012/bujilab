@@ -118,6 +118,17 @@ tfoot td{font-weight:500;border-bottom:1px solid var(--line)}tfoot tr:first-chil
 .obcard h3{font-size:15px;margin:2px 0 6px}.obcard p{font-size:13px;line-height:1.65;color:var(--mut);margin:0 0 12px}.obn{font-family:var(--mono);font-size:11.5px;color:var(--acc)}.obrow{display:flex;gap:6px;align-items:center}
 #helpB{font-weight:700;font-size:13px}
 .vwdlg .box.axobox{width:min(1040px,96vw)}.vwdlg{position:fixed;inset:0;background:var(--scrim);display:none;align-items:flex-start;justify-content:center;z-index:50;padding-top:80px}.vwdlg.on{display:flex}
+#planForm{display:flex;gap:6px}#planForm input{flex:1;min-width:0;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.planmsg:empty{display:none}.planmsg.bad{color:var(--bad)}
+html[data-plan=free] .gated::after{content:'';display:inline-block;width:11px;height:11px;margin-left:6px;vertical-align:-1px;background:currentColor;opacity:.7;
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.5 5V3.6a2.5 2.5 0 015 0V5H10v6H2V5zm1 0h3V3.6a1.5 1.5 0 00-3 0z'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.5 5V3.6a2.5 2.5 0 015 0V5H10v6H2V5zm1 0h3V3.6a1.5 1.5 0 00-3 0z'/%3E%3C/svg%3E") center/contain no-repeat}
+
+.dxflist{list-style:none;display:flex;flex-direction:column;border-top:1px solid var(--line);max-height:300px;overflow:auto}
+.dxflist button{width:100%;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:2px 12px;text-align:left;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;font:inherit}
+.dxflist button:hover{background:var(--hover)}.dxflist button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.dxflist b{font-weight:500}.dxflist svg{grid-row:1/3;width:44px;height:44px}.dxflist svg path{fill:var(--accsoft);stroke:var(--acc);stroke-width:1.5;vector-effect:non-scaling-stroke}.dxflist small{grid-column:2/-1;color:var(--mut);font-size:12px}.dxflist .a{font-family:var(--mono);font-size:13px}
+
 .vwdlg .box{background:var(--surface);border:1px solid var(--line);border-radius:2px;width:min(440px,92vw);padding:20px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 100px);overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.12)}.vwdlg .btn,.vwdlg h3,.vwdlg .seg button{white-space:nowrap}.vwdlg .row{flex-wrap:wrap}@media(max-width:600px){.vwdlg{padding-top:12px}.vwdlg .box{max-height:calc(100vh - 24px)}}
 .vwdlg h3{font-size:16px}.vwlead{font-size:13.5px;line-height:1.6;color:var(--ink)}.vwact{justify-content:flex-start!important}.vwact .btn{text-decoration:none}.vwdev{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:10px}.vwdev[open]{gap:10px}.vwdev summary{cursor:pointer;font-size:12.5px;color:var(--mut);list-style:none}.vwdev summary::-webkit-details-marker{display:none}.vwdev>*:not(summary){margin-top:10px}.vwdlg .f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--mut)}.vwdlg input{font:inherit;font-size:13.5px;color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:7px 9px}
 .vwdlg .row{display:flex;gap:8px;justify-content:flex-end}.vwhow{margin:0;padding-left:18px;line-height:1.7}.vwhow b{color:var(--ink)}
@@ -209,6 +220,21 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
  <canvas id="axoCv" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#fff"></canvas>
  <div class="row" style="justify-content:space-between;align-items:center"><span class="note">패널에 바로 넣는 평행 투영 이미지입니다. 동선·구역은 바닥에, 라벨은 세워서 표시합니다.</span><div class="row"><button class="btn line" id="axoClose">닫기</button><button class="btn" id="axoPng">PNG 저장 (3300×2200)</button></div></div>
 </div></div>
+<div class="vwdlg" id="dxfDlg" role="dialog" aria-modal="true" aria-labelledby="dxfT"><div class="box">
+ <h3 id="dxfT">어느 선이 대지 경계인가요?</h3>
+ <p class="note" id="dxfInfo"></p>
+ <div class="f">도면 단위<div class="seg" id="dxfU"><button data-u="1">m</button><button data-u="0.01">cm</button><button data-u="0.001">mm</button></div></div>
+ <ul class="dxflist" id="dxfList"></ul>
+ <div class="row" style="justify-content:flex-end"><button class="btn" id="dxfX">취소</button></div>
+</div></div>
+<div class="vwdlg" id="planDlg" role="dialog" aria-modal="true" aria-labelledby="planT"><div class="box">
+ <h3 id="planT">학기 패스 기능입니다</h3>
+ <p class="vwlead" id="planWhat">보드 PDF·PNG·SVG, 분석 시트, 배치도 주석판, DXF·OBJ 내보내기는 학기 패스에서 씁니다. 대지 불러오기, 법규 검토, 3D 매스, 분석도 보기는 무료입니다.</p>
+ <p class="note">베타 기간에는 학기 패스를 무료로 드립니다. 신청하면 받는 베타 코드를 넣으세요.</p>
+ <form class="vrow" id="planForm" autocomplete="off"><input id="planCode" placeholder="베타 코드" aria-label="베타 코드" spellcheck="false" autocapitalize="characters"><button class="btn pri" id="planGo" type="submit">코드 적용</button></form>
+ <p class="note planmsg" id="planMsg" role="status"></p>
+ <div class="row vwact"><button class="btn line" id="planX" type="button">닫기</button><a class="btn" id="planJoin" href="https://forms.gle/K4s4K93qU86FmXqS8" target="_blank" rel="noopener">베타 신청</a></div>
+</div></div>
 <div class="vwdlg" id="vwDlg" role="dialog" aria-modal="true" aria-labelledby="vwT"><div class="box">
  <h3 id="vwT">실제 주소는 부지랩 사이트에서 불러옵니다</h3>
  <p class="vwlead">내려받은 파일이나 다른 주소에서 열면 국가 지도 자료(브이월드)를 받을 수 없습니다. 사이트에서 같은 주소를 넣으면 인증키 없이 바로 불러옵니다.</p>
@@ -298,7 +324,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
   <div class="tools">
    <div class="seg" id="mode"><button data-m="edit" class="on">선택·이동</button><button data-m="plot">대지 경계</button><button data-m="measure">거리 재기</button><button data-m="land">조경 구역</button></div>
    <div class="modebar" id="mbPlot">점을 차례로 클릭해 경계를 그리세요. 첫 점을 다시 누르면 닫힙니다. <b id="plotN" class="mono">0점</b>
-    <button class="btn sm pri" id="plotDone">완료</button><button class="btn sm" id="plotCancel">취소</button><button class="btn sm" id="plotRect">직사각형으로</button></div>
+    <button class="btn sm pri" id="plotDone">완료</button><button class="btn sm" id="plotCancel">취소</button><button class="btn sm" id="plotRect">직사각형으로</button><button class="btn sm" id="plotDxf" title="캐드에서 그린 대지 경계(닫힌 폴리선)를 불러옵니다">DXF 불러오기</button><input type="file" id="dxfF" accept=".dxf" hidden></div>
    <div class="modebar" id="mbLand">점을 찍어 조경 구역을 그리세요. 첫 점을 다시 누르면 닫힙니다. 건물 아래와 대지 밖은 면적에서 빠집니다. <b id="landN" class="mono">0점</b>
     <button class="btn sm pri" id="landDone">완료</button><button class="btn sm" id="landCancel">취소</button><button class="btn sm" id="landClear">조경 구역 모두 지우기</button></div>
    <div class="modebar" id="mbMeasure">두 점을 클릭하면 거리가 표시됩니다. 꼭짓점 근처는 자동으로 붙습니다. <button class="btn sm" id="mClear">측정 지우기</button></div>
@@ -853,6 +879,23 @@ function thmApply(t,anim){const h=document.documentElement;if(anim&&!matchMedia(
 $('#thmB').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('bujilab.theme',t);}catch(e){}thmApply(t,true);};
 thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
+// ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
+const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
+const GATED='#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj]';
+const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
+function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
+let planPending=null;
+function planOpen(btn){planPending=btn||null;$('#planMsg').textContent='';$('#planMsg').classList.remove('bad');$('#planCode').value='';$('#planDlg').classList.add('on');setTimeout(()=>$('#planCode').focus(),0);}
+async function planHash(c){const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(c.trim().toUpperCase().replace(/\s+/g,'')));return Array.from(new Uint8Array(d)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function planTry(code){if(!code||!code.trim())return false;let h='';try{h=await planHash(code);}catch(e){return false;}if(!PLAN_CODES.includes(h))return false;try{localStorage.setItem(PLAN_KEY,'pass');}catch(e){}planMark();return true;}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest(GATED);if(!b||planIsPass())return;e.preventDefault();e.stopImmediatePropagation();planOpen(b);},true);
+$('#planForm').onsubmit=async e=>{e.preventDefault();const ok=await planTry($('#planCode').value);
+ if(!ok){$('#planMsg').textContent='코드가 맞지 않습니다. 신청 메일에 적힌 코드를 대소문자 상관없이 그대로 넣으세요.';$('#planMsg').classList.add('bad');$('#planCode').select();return;}
+ $('#planDlg').classList.remove('on');toast('학기 패스가 켜졌습니다. 이 브라우저에서 계속 쓸 수 있습니다.');const b=planPending;planPending=null;if(b)setTimeout(()=>b.click(),60);};
+$('#planX').onclick=()=>$('#planDlg').classList.remove('on');
+$('#planDlg').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();$('#planDlg').classList.remove('on');}});
+planMark();
+(async()=>{try{const u=new URL(location.href),c=u.searchParams.get('code');if(c){const ok=await planTry(c);u.searchParams.delete('code');history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);if(ok)toast('학기 패스가 켜졌습니다.');}}catch(e){}})();
 // ---------- 시작 가이드: 실제 작업을 하면 단계가 넘어감 ----------
 const GK='bujilab.guide.v1';let GD={hidden:false,done:{}};try{GD={...GD,...JSON.parse(localStorage.getItem(GK)||'{}')};}catch(e){}
 let gBase=null;const massSig=()=>JSON.stringify(masses.map(m=>[m.shape,m.w,m.d,m.floors,m.rot,m.setFl,m.setD,m.lev,Math.round(m.x),Math.round(m.z)]));
@@ -997,6 +1040,58 @@ function finishPlot(){if(!draft||draft.length<3){toast('점을 3개 이상 찍�
  plot=draft.map(p=>p.slice());buildPlot();setMode('edit');updateUI();commit();toast(`대지 경계를 바꿨습니다. 면적 ${f1(polyArea(plot))}㎡`);}
 function finishLand(){if(!draft||draft.length<3){toast('점을 3개 이상 찍어야 조경 구역이 됩니다.');return;}if(polyArea(draft)<1){toast('구역이 너무 작습니다.');return;}
  lands.push(draft.map(p=>p.slice()));buildLand();setMode('edit');updateUI();commit();toast(`조경 구역을 추가했습니다. 인정 면적 ${f1(landArea())}㎡`);}
+// ---------- DXF 대지 경계 불러오기 ----------
+function dxfParse(txt){const t=txt.replace(/\r/g,'').split('\n');const P=[];for(let i=0;i+1<t.length;i+=2)P.push([t[i].trim(),t[i+1].replace(/\s+$/,'')]);
+ let ins=0;for(let i=0;i<P.length;i++)if(P[i][0]==='9'&&P[i][1]==='$INSUNITS'){const n=P.slice(i+1,i+4).find(q=>q[0]==='70');if(n)ins=+n[1];break;}
+ const out=[],lines=[];let i=P.findIndex(q=>q[0]==='2'&&q[1]==='ENTITIES');if(i<0)i=0;
+ const arc=(a,b,bul)=>{if(!bul)return[];const th=4*Math.atan(bul),d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<1e-9)return[];const r=d/2/Math.sin(th/2),mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,h=r*Math.cos(th/2),nx=-(b[1]-a[1])/d,ny=(b[0]-a[0])/d;
+  const cx=mx+nx*h,cy=my+ny*h,a0=Math.atan2(a[1]-cy,a[0]-cx),R_=Math.abs(r),n=Math.max(2,Math.ceil(Math.abs(th)/(Math.PI/18)));const o=[];for(let k=1;k<n;k++){const an=a0+th*k/n;o.push([cx+R_*Math.cos(an),cy+R_*Math.sin(an)]);}return o;};
+ const pushPoly=(ly,V,closed)=>{if(V.length<2)return;const pts=[];V.forEach((v,k)=>{pts.push([v.x,v.y]);const nx=V[(k+1)%V.length];if(k<V.length-1||closed)pts.push(...arc([v.x,v.y],[nx.x,nx.y],v.b||0));});
+  if(!closed&&pts.length>2&&Math.hypot(pts[0][0]-pts.at(-1)[0],pts[0][1]-pts.at(-1)[1])<1e-6){pts.pop();closed=true;}
+  if(closed)out.push({ly,pts});else for(let k=0;k+1<pts.length;k++)lines.push({ly,a:pts[k],b:pts[k+1]});};
+ for(;i<P.length;i++){const [c,v]=P[i];if(c!=='0')continue;
+  if(v==='LWPOLYLINE'){let ly='0',fl=0;const V=[];let j=i+1;for(;j<P.length&&P[j][0]!=='0';j++){const [cc,vv]=P[j];if(cc==='8')ly=vv;else if(cc==='70')fl=+vv;else if(cc==='10')V.push({x:+vv,y:0,b:0});else if(cc==='20'&&V.length)V.at(-1).y=+vv;else if(cc==='42'&&V.length)V.at(-1).b=+vv;}pushPoly(ly,V,!!(fl&1));i=j-1;}
+  else if(v==='POLYLINE'){let ly='0',fl=0;const V=[];let j=i+1;for(;j<P.length&&P[j][0]!=='0';j++){if(P[j][0]==='8')ly=P[j][1];if(P[j][0]==='70')fl=+P[j][1];}
+   while(j<P.length&&P[j][1]==='VERTEX'){const q={x:0,y:0,b:0};let vf=0;j++;for(;j<P.length&&P[j][0]!=='0';j++){const [cc,vv]=P[j];if(cc==='10')q.x=+vv;else if(cc==='20')q.y=+vv;else if(cc==='42')q.b=+vv;else if(cc==='70')vf=+vv;}if(!(vf&16))V.push(q);}
+   if(!(fl&16)&&!(fl&64))pushPoly(ly,V,!!(fl&1));i=j-1;}
+  else if(v==='LINE'){let ly='0';const a=[0,0],b=[0,0];let j=i+1;for(;j<P.length&&P[j][0]!=='0';j++){const [cc,vv]=P[j];if(cc==='8')ly=vv;else if(cc==='10')a[0]=+vv;else if(cc==='20')a[1]=+vv;else if(cc==='11')b[0]=+vv;else if(cc==='21')b[1]=+vv;}lines.push({ly,a,b});i=j-1;}
+  else if(v==='ENDSEC'&&i>0)break;}
+ // 선분을 이어 닫힌 고리 만들기 (레이어별)
+ const tol=1e-3,key=p=>Math.round(p[0]/tol)+','+Math.round(p[1]/tol);const byL={};lines.forEach(l=>{if(Math.hypot(l.a[0]-l.b[0],l.a[1]-l.b[1])>tol)(byL[l.ly]=byL[l.ly]||[]).push(l);});
+ Object.entries(byL).forEach(([ly,L])=>{if(L.length>4000)return;const used=new Array(L.length).fill(false);const adj={};L.forEach((l,k)=>{[key(l.a),key(l.b)].forEach(kk=>(adj[kk]=adj[kk]||[]).push(k));});
+  for(let s0=0;s0<L.length;s0++){if(used[s0])continue;used[s0]=true;const ring=[L[s0].a,L[s0].b];const start=key(L[s0].a);let cur=key(L[s0].b),ok=false;
+   for(let g=0;g<L.length;g++){if(cur===start){ok=true;break;}const nx=(adj[cur]||[]).find(k=>!used[k]);if(nx==null)break;used[nx]=true;const l=L[nx];const np=key(l.a)===cur?l.b:l.a;cur=key(np);if(cur!==start)ring.push(np);else{ok=true;break;}}
+   if(ok&&ring.length>=3)out.push({ly,pts:ring});}});
+ return{ins,polys:out};}
+const DXF_HINT=/plot|site|lot|bound|parcel|대지|경계|필지|부지/i;
+let DXFS=null;
+function dxfUnitGuess(D){const m={1:0.0254,2:0.3048,4:0.001,5:0.01,6:1};if(m[D.ins])return{u:m[D.ins],src:'파일 단위 설정'};
+ const big=Math.max(0,...D.polys.map(q=>polyArea(q.pts)));return{u:big>1e7?0.001:big>1e6?0.01:1,src:'크기로 추정'};}
+function dxfCands(){const u=DXFS.u;return DXFS.D.polys.map(q=>{const pts=q.pts.map(p=>[p[0]*u,-p[1]*u]);return{ly:q.ly,pts,a:polyArea(pts),n:pts.length,hint:DXF_HINT.test(q.ly)};})
+ .filter(c=>c.a>=20&&c.a<=500000).sort((a,b)=>(b.hint-a.hint)||(b.a-a.a));}
+function dxfApply(c){let pts=c.pts;const A=polyArea(pts);const sg=pts.reduce((s,p,i)=>{const q=pts[(i+1)%pts.length];return s+p[0]*q[1]-q[0]*p[1];},0)>0?1:-1;
+ let cx=0,cz=0;pts.forEach((p,i)=>{const q=pts[(i+1)%pts.length],cr=p[0]*q[1]-q[0]*p[1];cx+=(p[0]+q[0])*cr;cz+=(p[1]+q[1])*cr;});cx/=6*A*sg;cz/=6*A*sg;
+ const o=centroidOf(plot);pts=pts.map(p=>[+(p[0]-cx+o[0]).toFixed(3),+(p[1]-cz+o[1]).toFixed(3)]);
+ for(let k=pts.length-1;k>0&&pts.length>3;k--)if(Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1])<0.01)pts.splice(k,1);
+ plot=pts;buildPlot();setMode('edit');updateUI();commit();$('#dxfDlg').classList.remove('on');
+ toast(`DXF에서 대지 경계를 불러왔습니다. 레이어 ${c.ly}, 면적 ${f1(polyArea(plot))}㎡${SITE?'. 위치는 지금 대지 중심에 맞췄으니 이동해서 맞추세요.':''}`);}
+function centroidOf(P){let x=0,z=0;P.forEach(p=>{x+=p[0];z+=p[1];});return[x/P.length,z/P.length];}
+function dxfShow(){const C=dxfCands();$('#dxfT').textContent=C.length?'어느 선이 대지 경계인가요?':'대지 경계를 찾지 못했습니다';$('#dxfU').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.u===DXFS.u));
+ $('#dxfInfo').textContent=C.length?`닫힌 선 ${C.length}개를 찾았습니다. 도면 단위는 ${DXFS.src==='파일 단위 설정'?'파일 설정대로':DXFS.src==='직접 고른'?'고른 대로':'크기로 추정해'} ${DXFS.u===1?'m':DXFS.u===0.01?'cm':'mm'}로 읽었습니다. 면적이 이상하면 단위를 바꾸세요.`:'20㎡~50만㎡ 크기의 닫힌 선을 찾지 못했습니다. 단위를 바꾸거나, 캐드에서 경계를 닫힌 폴리선(PLINE, 닫기)으로 그려 저장하세요.';
+ const ul=$('#dxfList');ul.innerHTML='';C.slice(0,30).forEach(c=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';
+  const bb=bbox(c.pts),sz=Math.max(bb.x1-bb.x0,bb.z1-bb.z0)||1;const dp='M'+c.pts.map(q=>((q[0]-bb.x0)/sz*40+2).toFixed(1)+' '+((q[1]-bb.z0)/sz*40+2).toFixed(1)).join('L')+'Z';
+  b.innerHTML=`<svg viewBox="0 0 44 44" aria-hidden="true"><path d="${dp}"/></svg><b></b><span class="a">${f1(c.a)}㎡</span><small>꼭짓점 ${c.n}개${c.hint?' · 대지 경계로 보이는 레이어':''}</small>`;b.querySelector('b').textContent='레이어 '+c.ly;b.onclick=()=>dxfApply(c);li.append(b);ul.append(li);});
+ $('#dxfDlg').classList.add('on');setTimeout(()=>{const f=ul.querySelector('button')||$('#dxfX');f.focus();},0);}
+async function dxfLoad(file){let txt='';try{txt=await file.text();}catch(e){toast('파일을 읽지 못했습니다.');return;}
+ if(!/\bSECTION\b/.test(txt.slice(0,4000))||!/ENTITIES/.test(txt)){toast(/^AutoCAD Binary DXF/.test(txt)?'바이너리 DXF는 읽지 못합니다. 캐드에서 ASCII DXF로 다시 저장하세요.':'DXF 파일이 아닌 것 같습니다. 캐드에서 다른 이름으로 저장 → DXF로 저장하세요.');return;}
+ const D=dxfParse(txt);const g=dxfUnitGuess(D);DXFS={D,u:g.u,src:g.src};const C=dxfCands();
+ if(C.length===1||(C.length>1&&C[0].hint&&!C[1].hint))dxfApply(C[0]);else dxfShow();}
+$('#plotDxf').onclick=()=>{$('#dxfF').value='';$('#dxfF').click();};
+$('#dxfF').onchange=e=>{const f=e.target.files[0];if(f)dxfLoad(f);};
+$('#dxfU').onclick=e=>{const b=e.target.closest('button');if(!b||!DXFS)return;DXFS.u=+b.dataset.u;DXFS.src='직접 고른';dxfShow();};
+$('#dxfX').onclick=()=>$('#dxfDlg').classList.remove('on');
+$('#dxfDlg').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();$('#dxfDlg').classList.remove('on');}});
+window.__dxfLoadText=(t,name)=>dxfLoad(new File([t],name||'t.dxf'));
 $('#landDone').onclick=finishLand;$('#landCancel').onclick=()=>setMode('edit');
 $('#landClear').onclick=()=>{if(!lands.length)return;lands=[];buildLand();setMode('edit');updateUI();commit();toast('조경 구역을 지웠습니다. Ctrl+Z로 되돌릴 수 있습니다.');};
 $('#plotDone').onclick=finishPlot;$('#plotCancel').onclick=()=>setMode('edit');
