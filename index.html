@@ -118,6 +118,12 @@ tfoot td{font-weight:500;border-bottom:1px solid var(--line)}tfoot tr:first-chil
 .obcard h3{font-size:15px;margin:2px 0 6px}.obcard p{font-size:13px;line-height:1.65;color:var(--mut);margin:0 0 12px}.obn{font-family:var(--mono);font-size:11.5px;color:var(--acc)}.obrow{display:flex;gap:6px;align-items:center}
 #helpB{font-weight:700;font-size:13px}
 .vwdlg .box.axobox{width:min(1040px,96vw)}.vwdlg{position:fixed;inset:0;background:var(--scrim);display:none;align-items:flex-start;justify-content:center;z-index:50;padding-top:80px}.vwdlg.on{display:flex}
+.refp{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:10px 12px;width:290px;display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.refp[hidden]{display:none}.refh{display:flex;justify-content:space-between;align-items:center;gap:8px}.refh b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.refg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.refg label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:6px;color:var(--mut);white-space:nowrap}.refg input{width:100%;min-width:0;font-family:var(--mono)}
+
+.ctip{position:absolute;z-index:6;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:6px 9px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.12);white-space:nowrap}.ctip b{font-weight:600}.ctip small{display:block;color:var(--mut)}
+#tlB[aria-pressed=true]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .stlsz{font-family:var(--mono);font-size:13px;color:var(--ink);border-top:1px solid var(--line);padding-top:10px}.stlsz em{display:block;font-family:var(--f);font-style:normal;color:var(--warn);font-size:12.5px;margin-top:4px}
 #planForm{display:flex;gap:6px}#planForm input{flex:1;min-width:0;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
 .planmsg:empty{display:none}.planmsg.bad{color:var(--bad)}
@@ -333,6 +339,14 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
  <div class="pane on" id="v3d">
   <div class="tools">
    <div class="seg" id="mode"><button data-m="edit" class="on">선택·이동</button><button data-m="plot">대지 경계</button><button data-m="measure">거리 재기</button><button data-m="land">조경 구역</button></div>
+   <div class="row" style="gap:6px"><button class="btn sm" id="refB" type="button" title="스케치업·라이노 등에서 내보낸 glTF(GLB)·OBJ 모델을 대지 위에 올립니다">내 모델 불러오기</button><input type="file" id="refF" accept=".glb,.gltf,.obj" hidden></div>
+   <div class="refp" id="refP" hidden>
+    <div class="refh"><b id="refN"></b><button class="btn sm" id="refDel" type="button">지우기</button></div>
+    <div class="f">파일 단위<div class="seg" id="refU"><button data-u="1">m</button><button data-u="0.01">cm</button><button data-u="0.001">mm</button><button data-u="0.0254">inch</button></div></div>
+    <div class="refg"><label>동 x<input id="refX" type="number" step="0.5"></label><label>남 z<input id="refZ" type="number" step="0.5"></label><label>회전°<input id="refR" type="number" step="5"></label><label>띄움<input id="refY" type="number" step="0.1"></label></div>
+    <label class="ck"><input type="checkbox" id="refUp"> Z축이 위 (라이노·캐드)</label><label class="ck"><input type="checkbox" id="refCol"> 원래 색 유지</label>
+    <p class="note" id="refInfo"></p>
+   </div>
    <div class="modebar" id="mbPlot">점을 차례로 클릭해 경계를 그리세요. 첫 점을 다시 누르면 닫힙니다. <b id="plotN" class="mono">0점</b>
     <button class="btn sm pri" id="plotDone">완료</button><button class="btn sm" id="plotCancel">취소</button><button class="btn sm" id="plotRect">직사각형으로</button><button class="btn sm" id="plotDxf" title="캐드에서 그린 대지 경계(닫힌 폴리선)를 불러옵니다">DXF 불러오기</button><input type="file" id="dxfF" accept=".dxf" hidden></div>
    <div class="modebar" id="mbLand">점을 찍어 조경 구역을 그리세요. 첫 점을 다시 누르면 닫힙니다. 건물 아래와 대지 밖은 면적에서 빠집니다. <b id="landN" class="mono">0점</b>
@@ -341,9 +355,11 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
   </div>
   <div class="compass" aria-label="방위"><svg id="cmp3d" viewBox="-50 -50 100 100"></svg></div>
   <div id="labels"></div>
+  <div class="ctip" id="ctip" role="tooltip" hidden></div>
   <div class="ovl">
    <div class="seg" id="season"><button data-d="-23.44" class="on">동지</button><button data-d="0">춘·추분</button><button data-d="23.44">하지</button></div>
    <label class="tg">시각 <input type="range" id="hour" min="8" max="17" step="0.25" value="12" aria-label="시각"> <b id="hourV" class="mono">12:00</b></label>
+   <button class="btn sm" id="tlB" type="button" aria-pressed="false" title="8시부터 17시까지 그림자 움직임을 재생합니다">그림자 재생</button>
    <label class="tg"><input type="checkbox" id="envT" checked> 일조사선</label>
    <label class="tg"><input type="checkbox" id="ctxT" checked> 주변 건물</label>
    <label class="tg" title="브이월드 항공사진을 바닥에 깔기(실제 대지에서만)"><input type="checkbox" id="photoT"> 항공사진</label>
@@ -353,6 +369,8 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <label class="tg">층 보기 <select id="vf" aria-label="층 보기"><option value="0">전체</option></select></label>
    <label class="tg"><input type="checkbox" id="exT"> 분해 보기</label>
    <label class="tg" title="건물 면을 숨기고 모서리 선만 보기"><input type="checkbox" id="wireT"> 선만 보기</label>
+   <label class="tg" title="건물이 만나는 구석과 바닥에 은은한 음영을 넣어 모형 사진처럼 보이게 합니다. 느리면 끄세요."><input type="checkbox" id="aoT"> 모형 음영</label>
+   <label class="tg" title="3D 화면의 모형 재료(바닥·주변 건물·계획 매스·나무)">재료 <select id="matSel" aria-label="모형 재료"><option value="base">기본</option><option value="white">화이트 모델</option><option value="wood">우드</option><option value="clay">클레이</option></select></label>
    <label class="tg" title="공원·녹지 필지 안에 나무를 일정 간격으로 그린 표현입니다. 실제 나무 위치가 아닙니다."><input type="checkbox" id="treeT" checked> 나무 (표현)</label>
    <label class="tg" title="분석은 대지 중심 160m 안에서 하고, 넓힌 범위는 3D 보기와 3D 내보내기에만 들어갑니다(실제 대지에서만)">주변 범위 <select id="farSel" aria-label="주변 범위"><option value="0">160m</option><option value="150">300m</option><option value="250">500m</option></select></label>
    <button class="btn sm" id="topV">위에서 보기</button>
@@ -581,7 +599,8 @@ const rectPoly=r=>[[r.x0,r.z0],[r.x1,r.z0],[r.x1,r.z1],[r.x0,r.z1]];
 const DEMO_CTXP=CTX.flat().map(c=>({...c,poly:rectPoly(c)}));
 const DEMO_TREES=[];GREENS.forEach(r=>{for(let i=0;i<14;i++)DEMO_TREES.push([r.x0+2+rnd()*(r.x1-r.x0-4),r.z0+2+rnd()*(r.z1-r.z0-4),1.4+rnd()*0.8]);});
 // 대지 출처: SITE=null 이면 데모, 아니면 브이월드에서 불러온 실제 대지(로컬 좌표 m, 북=-z)
-let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES,FAR=null,farG=null;
+let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES,FAR=null,farG=null,REF=null;
+const MSTY={base:{road:0xc9ccd1,green:0xd3dfd2,ground:0xe2e4e7,gG:'#e2e4e7',gGr:'#d3dfd2',gRd:'#c9ccd1',ctx:0xfafafa,mass:0xffffff,sel:0xc9d7f7,tree:0x9fb8a0,far:0xf4f5f7},white:{road:0xe6e6e3,green:0xecefe9,ground:0xf4f4f2,gG:'#f4f4f2',gGr:'#ecefe9',gRd:'#e6e6e3',ctx:0xffffff,mass:0xffffff,sel:0xdfe7fb,tree:0xf2f2ef,far:0xfbfbfa},wood:{road:0xc2b190,green:0xc6bb92,ground:0xd6c5a5,gG:'#d6c5a5',gGr:'#c6bb92',gRd:'#c2b190',ctx:0xf4eadb,mass:0x9c7350,sel:0xb98c63,tree:0xa8b388,far:0xeee2cc},clay:{road:0xcbc2b6,green:0xcdc9b6,ground:0xd9d0c5,gG:'#d9d0c5',gGr:'#cdc9b6',gRd:'#cbc2b6',ctx:0xebe4da,mass:0xc29275,sel:0xd3a68a,tree:0xb6b99e,far:0xebe5dc}};let MS=MSTY.base;
 const roadPolys=()=>SITE?SITE.roads:roadRects().map(rectPoly);
 const greenPolys=()=>SITE?SITE.greens:GREENS.map(rectPoly);
 function setSiteData(s){SITE=s||null;SUNH={};SUNK=null;if(!SITE){lay.photo=0;const a=document.querySelector('#photoT');if(a)a.checked=false;const b=document.querySelector('.lay input[data-l=photo]');if(b)b.checked=false;}
@@ -668,14 +687,14 @@ function contourSegs(step=1,ext=70,cell=1){const segs=[];const n=Math.round(ext*
 let CONT=[];
 function buildTerrain(){[groundM,cntG,roadsG,greensG,treesG,ctxG].forEach(drop);
  const GE=SITE?100:75;const geo=new THREE.PlaneGeometry(2*GE,2*GE,SITE?100:150,SITE?100:150);geo.rotateX(-Math.PI/2);const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,G(p.getX(i),p.getZ(i)));geo.computeVertexNormals();
- groundM=new THREE.Mesh(geo,new THREE.MeshLambertMaterial(SITE?{map:siteGroundTex(GE)}:{color:0xe2e4e7}));groundM.receiveShadow=true;groundM.userData.base=groundM.material.map;S.add(groundM);
+ groundM=new THREE.Mesh(geo,new THREE.MeshLambertMaterial(SITE?{map:siteGroundTex(GE)}:{color:MS.ground}));groundM.receiveShadow=true;groundM.userData.base=groundM.material.map;S.add(groundM);
  CONT=terrKey==='flat'?[]:contourSegs();const cp=[];CONT.forEach(s=>{cp.push(new THREE.Vector3(s.a[0],G(s.a[0],s.a[1])+0.12,s.a[1]),new THREE.Vector3(s.b[0],G(s.b[0],s.b[1])+0.12,s.b[1]));});
  cntG=new THREE.Group();if(cp.length){cntG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(cp),new THREE.LineBasicMaterial({color:0x6f7a87})));}cntG.visible=$('#cntT').checked;S.add(cntG);
  buildRoads();
- greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,0xd3dfd2)));S.add(greensG);
+ greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,MS.green)));S.add(greensG);
  treesG=treeGroup(TREES);treesG.visible=$('#treeT').checked;S.add(treesG);
  ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
-  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();}
+  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();}
 // ---------- 항공사진 (브이월드 WMTS Satellite, 웹메르카토르 z19 타일을 대지 중심 ±80m로 맞춰 붙임) ----------
 let PHOTO=null,photoG=null,photoBusy=false;const PHOTO_E=100;
 const tileXY=(lon,lat,z)=>{const n=2**z,r=lat*Math.PI/180;return[(lon+180)/360*n,(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n];};
@@ -713,7 +732,7 @@ function buildPhoto3D(){drop(photoG);photoG=null;const on=$('#photoT').checked&&
  if(roadsG)roadsG.visible=!on;if(greensG)greensG.visible=!on;
  const roofOn=on&&$('#roofT').checked;$('#roofW').style.display=on?'':'none';
  if(ctxG)ctxG.traverse(o=>{if(o.isMesh&&o.userData.roofMat)o.material=roofOn?[o.userData.roofMat,ctxMat]:ctxMat;});plotPhotoLook(on);if(!on)return;
- if(groundM&&!groundM.userData.photo){const tex=new THREE.CanvasTexture(PHOTO.cv);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;groundM.userData.photo=tex;}
+ if(groundM&&!groundM.userData.photo){const tex=new THREE.CanvasTexture(PHOTO.cv);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=R.capabilities.getMaxAnisotropy();tex.generateMipmaps=true;tex.minFilter=THREE.LinearMipmapLinearFilter;groundM.userData.photo=tex;}
  if(groundM){groundM.material.map=groundM.userData.photo;groundM.material.needsUpdate=true;}}
 function prepRoofs(){if(!PHOTO||!ctxG)return;const tex=new THREE.CanvasTexture(PHOTO.cv);tex.colorSpace=THREE.SRGBColorSpace;tex.repeat.set(1/(2*PHOTO.E),1/(2*PHOTO.E));tex.offset.set(0.5,0.5);
  const roof=new THREE.MeshLambertMaterial({map:tex});const E=PHOTO.E-0.5;ctxG.traverse(o=>{if(!o.isMesh||o.geometry.type!=='ExtrudeGeometry')return;o.geometry.computeBoundingBox();const bb=o.geometry.boundingBox;
@@ -727,10 +746,10 @@ async function setPhoto(on){$('#photoT').checked=on;lay.photo=on?1:0;const c=$('
  buildPhoto3D();if(curPane==='vdiag')drawDiag();}
 $('#photoT').onchange=e=>setPhoto(e.target.checked);
 // 실제 대지: 도로·공원을 바닥 텍스처에 칠함(지형을 따라 휘어짐)
-function siteGroundTex(GE){const N=1024,cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');const X=v=>(v+GE)/(2*GE)*N;g.fillStyle='#e2e4e7';g.fillRect(0,0,N,N);
- const fillP=(q,c)=>{g.fillStyle=c;g.beginPath();q.forEach((p,i)=>i?g.lineTo(X(p[0]),X(p[1])):g.moveTo(X(p[0]),X(p[1])));g.closePath();g.fill();};SITE.greens.forEach(q=>fillP(q,'#d3dfd2'));SITE.roads.forEach(q=>fillP(q,'#c9ccd1'));
- const tx=new THREE.CanvasTexture(cv);tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=4;return tx;}
-function buildRoads(){drop(roadsG);roadsG=new THREE.Group();if(SITE){}else roadRects().forEach(r=>roadsG.add(drape(r,0.04,0xc9ccd1)));S.add(roadsG);}
+function siteGroundTex(GE){const N=1024,cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');const X=v=>(v+GE)/(2*GE)*N;g.fillStyle=MS.gG;g.fillRect(0,0,N,N);
+ const fillP=(q,c)=>{g.fillStyle=c;g.beginPath();q.forEach((p,i)=>i?g.lineTo(X(p[0]),X(p[1])):g.moveTo(X(p[0]),X(p[1])));g.closePath();g.fill();};SITE.greens.forEach(q=>fillP(q,MS.gGr));SITE.roads.forEach(q=>fillP(q,MS.gRd));
+ const tx=new THREE.CanvasTexture(cv);tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=R.capabilities.getMaxAnisotropy();return tx;}
+function buildRoads(){drop(roadsG);roadsG=new THREE.Group();if(SITE){}else roadRects().forEach(r=>roadsG.add(drape(r,0.04,MS.road)));S.add(roadsG);}
 
 // plot + setback line + envelope
 let plotG=null,envG=null;
@@ -786,7 +805,7 @@ function layoutFloor(ms,f){
  const core=needCore(ms,f)?coreA(ms):0;return{blocks,total,core,used,over,avail:total-core};}
 function clearLabels(ms){(ms.labels||[]).forEach(l=>l.el.remove());ms.labels=[];}
 function build(ms){drop(ms.grp);clearLabels(ms);const g=new THREE.Group();const s=ms===sel;const gs=groundStats(ms);const lv=gs.avg+ms.lev;
- const mat=()=>new THREE.MeshLambertMaterial({color:s?0xc9d7f7:0xffffff});const em=()=>new THREE.LineBasicMaterial({color:s?0x2f5bd3:0x16181d});const fm=()=>new THREE.LineBasicMaterial({color:s?0x9db3ea:0xd3d7dd});
+ const mat=()=>new THREE.MeshLambertMaterial({color:s?MS.sel:MS.mass});const em=()=>new THREE.LineBasicMaterial({color:s?0x2f5bd3:0x16181d});const fm=()=>new THREE.LineBasicMaterial({color:s?0x9db3ea:0xd3d7dd});
  const inner=new THREE.Group();
  const k=Math.min(VF,ms.floors);
  if(!EXP&&!VF){localParts(ms).forEach(p=>{const yb=p.f0===0?Math.min(gs.min,lv)-0.05:lv+p.f0*FH;const pg=boxPart(p.x1-p.x0,p.z1-p.z0,yb,lv+p.f1*FH,mat(),em(),fm(),lv);pg.position.set((p.x0+p.x1)/2,0,(p.z0+p.z1)/2);inner.add(pg);});}
@@ -1032,14 +1051,19 @@ function groundPt(e){setPt(e);const h=groundM?ray.intersectObject(groundM,false)
 const sn=v=>Math.round(v*2)/2;
 function snapPts(){const P=plot.concat(effPlot());masses.forEach(m=>worldParts(m).forEach(p=>P.push(...p.poly)));CTXP.forEach(c=>P.push([c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]));return P;}
 function snapTo(q){let best=null,bd=0.9;for(const p of snapPts()){const d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<bd){bd=d;best=p;}}return best?best.slice():[sn(q[0]),sn(q[1])];}
-R.domElement.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};if(mode!=='edit')return;setPt(e);
+R.domElement.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};if(mode!=='edit')return;setPt(e);ctipHide();
+ if(rotG&&sel&&e.button===0){const hk=ray.intersectObjects(rotG.children,false)[0];if(hk){const q=groundPt(e);if(q){rotDrag={ms:sel,a0:Math.atan2(q[1]-sel.z,q[0]-sel.x),r0:sel.rot,moved:false};ctr.enabled=false;R.domElement.setPointerCapture(e.pointerId);return;}}}
  const meshes=[];masses.forEach(m=>m.grp.traverse(o=>{if(o.isMesh)meshes.push(o);}));const h=ray.intersectObjects(meshes,false)[0];
  if(h){const ms=h.object.userData.ms;if(ms!==sel)select(ms);const q=groundPt(e)||[ms.x,ms.z];drag={ms,ox:ms.x-q[0],oz:ms.z-q[1],moved:false};ctr.enabled=false;R.domElement.setPointerCapture(e.pointerId);}});
+R.domElement.addEventListener('pointerleave',()=>ctipHide());
 R.domElement.addEventListener('pointermove',e=>{
+ if(rotDrag){const q=groundPt(e);if(!q)return;const ms=rotDrag.ms,a=Math.atan2(q[1]-ms.z,q[0]-ms.x);let r=rotDrag.r0-(a-rotDrag.a0)*180/Math.PI;const st=e.shiftKey?1:5;r=Math.round(r/st)*st;r=((r+180)%360+360)%360-180;if(r!==ms.rot){ms.rot=r;rotDrag.moved=true;build(ms);updateUI();}return;}
+ if(!drag&&mode==='edit'&&e.buttons===0)ctipQ(e);
  if(drag){const q=groundPt(e);if(!q)return;drag.ms.x=sn(q[0]+drag.ox);drag.ms.z=sn(q[1]+drag.oz);drag.moved=true;build(drag.ms);updateUI();return;}
  if((mode==='plot'||mode==='land')&&draft){const q=groundPt(e);if(q){draftHover=[sn(q[0]),sn(q[1])];drawDraft();}}
  if(mode==='measure'&&mA){const q=groundPt(e);if(q)drawMeasurePreview(snapTo(q));}});
 R.domElement.addEventListener('pointerup',e=>{
+ if(rotDrag){const mv=rotDrag.moved;rotDrag=null;ctr.enabled=true;if(mv){commit();toast(`회전 ${sel?sel.rot:0}°`);}return;}
  if(drag){const mv=drag.moved;drag=null;ctr.enabled=true;if(mv)commit();return;}
  if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;const q=groundPt(e);if(!q)return;
  if(mode==='plot'||mode==='land')addDraft([sn(q[0]),sn(q[1])]);else if(mode==='measure')addMeasure(snapTo(q));});
@@ -2299,7 +2323,7 @@ function model3DDXF(){const E=[];massBoxes().forEach(b=>boxFaces(b).forEach(f=>E
 // --- OBJ (Y-up, meters)
 function modelOBJ(){const L=['# BUJILAB export · units: meters · Y-up','# objects: masses, context, terrain'];let vi=1;
  const add=(name,faces)=>{L.push('o '+name);faces.forEach(f=>{f.forEach(p=>L.push(`v ${fx(p[0])} ${fx(p[1])} ${fx(p[2])}`));L.push('f '+f.map((_,k)=>vi+k).join(' '));vi+=f.length;});};
- massBoxes().forEach(b=>add('mass_'+b.name,boxFaces(b)));ctxBoxes().forEach(b=>add(b.name,boxFaces(b)));farBoxes().forEach(b=>add(b.name,boxFaces(b)));add('terrain',terrainQuads());return L.join('\n')+'\n';}
+ massBoxes().forEach(b=>add('mass_'+b.name,boxFaces(b)));ctxBoxes().forEach(b=>add(b.name,boxFaces(b)));farBoxes().forEach(b=>add(b.name,boxFaces(b)));add('terrain',terrainQuads());const rf=refOBJ(vi);L.push(...rf.lines);return L.join('\n')+'\n';}
 // --- STL (3D 프린트: mm, Z-up, 닫힌 솔리드 여러 개)
 function stlPrism(poly,y0,y1,k,T){let P=poly.map(q=>[q[0]*k,-q[1]*k]);if(P.reduce((s,p,i)=>{const q=P[(i+1)%P.length];return s+p[0]*q[1]-q[0]*p[1];},0)<0)P=P.slice().reverse();
  const z0=y0*k,z1=y1*k,n=P.length;const tri=n===3?[[0,1,2]]:THREE.ShapeUtils.triangulateShape(P.map(q=>new THREE.Vector2(q[0],q[1])),[]);
@@ -2574,7 +2598,7 @@ function buildFar(){drop(farG);farG=null;if(!FAR||!FAR.ctx.length){if(cam.far<10
   const T=P.length===3?[[0,1,2]]:THREE.ShapeUtils.triangulateShape(P.map(q=>new THREE.Vector2(q[0],q[1])),[]);T.forEach(([a,b,c])=>tri([P[a][0],y1,P[a][1]],[P[b][0],y1,P[b][1]],[P[c][0],y1,P[c][1]]));
   for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];tri([a[0],y0,a[1]],[b[0],y0,b[1]],[b[0],y1,b[1]]);tri([a[0],y0,a[1]],[b[0],y1,b[1]],[a[0],y1,a[1]]);ln.push(a[0],y1,a[1],b[0],y1,b[1],a[0],y0,a[1],a[0],y1,a[1]);}});
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();
- const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:0xf4f5f7,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;
+ const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:MS.far,side:THREE.DoubleSide}));m.castShadow=false;m.receiveShadow=true;
  const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(ln,3));
  // 바깥 바닥: 안쪽 지형판(±100m) 밖만 10m 격자로
  const E=FAR.R+10,st=10,gp=[];for(let x=-E;x<E;x+=st)for(let z=-E;z<E;z+=st){if(x>=-100&&x+st<=100&&z>=-100&&z+st<=100)continue;const a=[x,G(x,z)-0.08,z],b=[x+st,G(x+st,z)-0.08,z],c=[x+st,G(x+st,z+st)-0.08,z+st],d=[x,G(x,z+st)-0.08,z+st];gp.push(...a,...d,...c,...a,...c,...b);}
@@ -2582,9 +2606,85 @@ function buildFar(){drop(farG);farG=null;if(!FAR||!FAR.ctx.length){if(cam.far<10
  farG=new THREE.Group();farG.add(gm,m,new THREE.LineSegments(lg,EDGE));farG.visible=$('#ctxT').checked;S.add(farG);cam.far=Math.max(cam.far,3000);cam.updateProjectionMatrix();ctr.maxDistance=Math.max(ctr.maxDistance||0,FAR.R*3.2);}
 function farBoxes(){return FAR?FAR.ctx.map((c,i)=>{const g=c.poly.map(q=>G(q[0],q[1]));return{name:'far_'+(i+1),poly:c.poly,y0:Math.min(...g),y1:g.reduce((a,b)=>a+b)/g.length+c.h};}):[];}
 $('#farSel').onchange=e=>loadFar(+e.target.value);
-window.__S=()=>S;window.__far=()=>FAR?{R:FAR.R,n:FAR.ctx.length,polys:FAR.ctx.map(c=>c.poly)}:null;window.__trees=()=>TREES;window.__farMesh=()=>!!(farG&&farG.parent);
+window.__S=()=>S;window.__perf=()=>{R.info.autoReset=false;R.info.reset();renderMain();const r={calls:R.info.render.calls,tris:R.info.render.triangles,geo:R.info.memory.geometries,tex:R.info.memory.textures};R.info.autoReset=true;return r;};window.__far=()=>FAR?{R:FAR.R,n:FAR.ctx.length,polys:FAR.ctx.map(c=>c.poly)}:null;window.__trees=()=>TREES;window.__farMesh=()=>!!(farG&&farG.parent);
+// ---------- 모형 재료·모형 음영(AO) ----------
+function setMatStyle(k){MS=MSTY[k]||MSTY.base;ctxMat.color.setHex(MS.ctx);treeMat.color.setHex(MS.tree);try{localStorage.setItem('bujilab.mat',k);}catch(e){}buildTerrain();masses.forEach(build);if(FAR)buildFar();if(REF)refApply();}
+$('#matSel').onchange=e=>setMatStyle(e.target.value);
+let AO=null,aoOn=false,aoBusy=false;
+async function aoInit(){if(AO||aoBusy)return AO;aoBusy=true;try{const [{EffectComposer},{RenderPass},{SSAOPass},{OutputPass}]=await Promise.all(['EffectComposer','RenderPass','SSAOPass','OutputPass'].map(n=>import(`three/addons/postprocessing/${n}.js`)));
+  const sz=R.getSize(new THREE.Vector2());const c=new EffectComposer(R);c.addPass(new RenderPass(S,cam));const ss=new SSAOPass(S,cam,sz.x,sz.y);ss.kernelRadius=6;ss.minDistance=0.0004;ss.maxDistance=0.02;c.addPass(ss);c.addPass(new OutputPass());
+  AO={c,ss,w:0,h:0,pr:0};}catch(e){AO=null;toast('이 브라우저에서는 모형 음영을 켤 수 없습니다.');$('#aoT').checked=false;aoOn=false;}finally{aoBusy=false;}return AO;}
+$('#aoT').onchange=async e=>{aoOn=e.target.checked;try{localStorage.setItem('bujilab.ao',aoOn?'1':'0');}catch(_){}if(aoOn)await aoInit();};
+function renderMain(){inMain=true;try{renderMain0();}finally{inMain=false;}}
+function renderMain0(){if(aoOn&&AO&&!WIRE){const sz=R.getSize(new THREE.Vector2()),pr=R.getPixelRatio();if(sz.x!==AO.w||sz.y!==AO.h||pr!==AO.pr){AO.c.setPixelRatio(pr);AO.c.setSize(sz.x,sz.y);AO.w=sz.x;AO.h=sz.y;AO.pr=pr;}AO.c.render();}else R.render(S,cam);}
+// 그림자: 바깥 바이어스로 줄무늬(acne) 제거, 고성능 기기는 4096
+sun.shadow.normalBias=0.03;sun.shadow.bias=-0.0002;if(R.capabilities.maxTextureSize>=8192&&!matchMedia('(pointer: coarse)').matches){sun.shadow.mapSize.set(4096,4096);}
+(function(){let k='base',a=null;try{k=localStorage.getItem('bujilab.mat')||'base';a=localStorage.getItem('bujilab.ao');}catch(e){}if(MSTY[k]&&k!=='base'){$('#matSel').value=k;setMatStyle(k);}
+ const def=a==null?!matchMedia('(pointer: coarse)').matches:a==='1';if(def){$('#aoT').checked=true;setTimeout(()=>{if(window.__noAO){$('#aoT').checked=false;return;}aoOn=true;aoInit();},0);}})();
+// ---------- 내 모델 불러오기 (glTF·GLB·OBJ): 3D 보기·그림자·3D 캡처·OBJ 내보내기에 포함 ----------
+function refBox(o){const b=new THREE.Box3().setFromObject(o);return b;}
+function refApply(){if(!REF)return;const o=REF.obj,r=REF.root;o.position.set(0,0,0);o.rotation.set(0,0,0);r.rotation.set(REF.up?-Math.PI/2:0,0,0);r.scale.setScalar(REF.u);r.position.set(0,0,0);o.updateMatrixWorld(true);
+ const b=refBox(r),c=b.getCenter(new THREE.Vector3());r.position.set(-c.x,-b.min.y,-c.z);
+ o.position.set(REF.x,G(REF.x,REF.z)+REF.y,REF.z);o.rotation.y=REF.rot*Math.PI/180;o.updateMatrixWorld(true);
+ r.traverse(m=>{if(m.isMesh){m.material=REF.col?m.userData.orig:REF.mat;m.castShadow=m.receiveShadow=true;}});REF.mat.color.setHex(MS.mass);
+ const bb=refBox(o),sz=bb.getSize(new THREE.Vector3());$('#refInfo').textContent=`크기 ${f1(sz.x)} × ${f1(sz.z)} m, 높이 ${f1(sz.y)} m. 법규 계산에는 들어가지 않습니다. 새로고침하면 다시 불러와야 합니다.`;
+ ['refX','refZ','refR','refY'].forEach((id,i)=>{const el=$('#'+id);if(document.activeElement!==el)el.value=[REF.x,REF.z,REF.rot,REF.y][i];});$('#refU').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.u===REF.u));$('#refUp').checked=REF.up;$('#refCol').checked=REF.col;shDirty=true;}
+async function refLoad(file){const ext=file.name.split('.').pop().toLowerCase();let root=null;toast('모델을 불러오는 중…');
+ try{if(ext==='obj'){const {OBJLoader}=await import('three/addons/loaders/OBJLoader.js');root=new OBJLoader().parse(await file.text());}
+  else if(ext==='glb'||ext==='gltf'){const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');const buf=await file.arrayBuffer();root=await new Promise((res,rej)=>new GLTFLoader().parse(ext==='glb'?buf:new TextDecoder().decode(buf),'',g=>res(g.scene),rej));}
+  else{toast('glb, gltf, obj 파일만 불러올 수 있습니다.');return;}}catch(e){toast('모델을 읽지 못했습니다. glTF는 파일 하나로 묶인 GLB로, OBJ는 텍스트 OBJ로 내보내 보세요.');return;}
+ let n=0,tri=0;const ms0=[];root.traverse(m=>{if(m.isMesh){n++;ms0.push(m);const g=m.geometry;tri+=(g.index?g.index.count:g.attributes.position.count)/3;m.userData.orig=m.material;}});
+ if(tri<=200000)ms0.forEach(m=>m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry,30),EDGE)));
+ if(!n){toast('모델 안에 면(메시)이 없습니다. 선만 있는 파일은 불러올 수 없습니다.');return;}
+ if(tri>800000){toast(`면이 너무 많습니다(${Math.round(tri/1000)}천 개). 단순화한 모델을 내보내 주세요.`);return;}
+ refClear(true);const o=new THREE.Group();o.add(root);
+ const mat=new THREE.MeshLambertMaterial({color:MS.mass,side:THREE.DoubleSide});mat.userData.keep=true;
+ const b0=refBox(root),s0=b0.getSize(new THREE.Vector3());const big=Math.max(s0.x,s0.y,s0.z);
+ const u=big>5000?0.001:big>500?0.01:1;const up=false;
+ const c=centroidOf(plot);REF={obj:o,root,mat,name:file.name,u,up,x:+c[0].toFixed(2),z:+c[1].toFixed(2),rot:0,y:0,col:false,tri:Math.round(tri)};S.add(o);
+ $('#refN').textContent=file.name;$('#refP').hidden=false;refApply();toast(`${file.name}을 대지 중심에 올렸습니다. 면 ${Math.round(tri).toLocaleString()}개${u!==1?', 단위를 '+(u===0.01?'cm':'mm')+'로 추정':''}.${ext==='obj'?' 건물이 누워 있으면 \'Z축이 위\'를 켜세요.':''}`);}
+function refClear(silent){if(!REF)return;drop(REF.obj);REF=null;$('#refP').hidden=true;if(!silent)toast('불러온 모델을 지웠습니다.');}
+$('#refB').onclick=()=>{$('#refF').value='';$('#refF').click();};
+$('#refF').onchange=e=>{const f=e.target.files[0];if(f)refLoad(f);};
+$('#refDel').onclick=()=>refClear();
+$('#refU').onclick=e=>{const b=e.target.closest('button');if(!b||!REF)return;REF.u=+b.dataset.u;refApply();};
+$('#refUp').onchange=e=>{if(REF){REF.up=e.target.checked;refApply();}};$('#refCol').onchange=e=>{if(REF){REF.col=e.target.checked;refApply();}};
+[['refX','x'],['refZ','z'],['refR','rot'],['refY','y']].forEach(([id,k])=>{$('#'+id).addEventListener('input',e=>{if(!REF)return;const v=parseFloat(e.target.value);if(isFinite(v)){REF[k]=v;refApply();}});});
+function refOBJ(vi){if(!REF)return{lines:[],vi};const L=['o my_model'];const v=new THREE.Vector3();REF.obj.updateMatrixWorld(true);REF.obj.traverse(m=>{if(!m.isMesh)return;const g=m.geometry,p=g.attributes.position,ix=g.index;
+  for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(m.matrixWorld);L.push(`v ${fx(v.x)} ${fx(v.y)} ${fx(v.z)}`);}
+  const n=ix?ix.count:p.count;for(let i=0;i<n;i+=3){const a=ix?ix.getX(i):i,b=ix?ix.getX(i+1):i+1,c=ix?ix.getX(i+2):i+2;L.push(`f ${vi+a} ${vi+b} ${vi+c}`);}vi+=p.count;});return{lines:L,vi};}
+window.__ref=()=>REF?{u:REF.u,up:REF.up,x:REF.x,z:REF.z,tri:REF.tri,box:(()=>{const b=refBox(REF.obj);return[b.min.x,b.min.y,b.min.z,b.max.x,b.max.y,b.max.z];})()}:null;
+window.__refLoadText=(t,name)=>refLoad(new File([t],name));
+// ---------- 회전 손잡이·주변 건물 정보·그림자 재생 ----------
+let rotG=null,rotKey='',rotDrag=null;
+function updRot(){const on=sel&&mode==='edit'&&curPane==='v3d'&&!EXP;const k=on?[sel.x,sel.z,sel.rot,sel.w,sel.d,sel.lev,terrKey,MS===MSTY.base].join('|'):'';if(k===rotKey)return;rotKey=k;drop(rotG);rotG=null;if(!on)return;
+ const r=Math.hypot(sel.w,sel.d)/2+1.6,y=groundStats(sel).avg+0.18,t=sel.rot*Math.PI/180;const g=new THREE.Group();
+ const ring=new THREE.Mesh(new THREE.RingGeometry(r-0.09,r+0.09,96),new THREE.MeshBasicMaterial({color:0x2f5bd3,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(sel.x,y,sel.z);
+ const hit=new THREE.Mesh(new THREE.RingGeometry(r-0.7,r+0.7,64),new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide}));hit.rotation.x=-Math.PI/2;hit.position.copy(ring.position);
+ const kn=new THREE.Mesh(new THREE.SphereGeometry(0.55,20,14),new THREE.MeshBasicMaterial({color:0x2f5bd3}));kn.position.set(sel.x+r*Math.cos(t),y+0.1,sel.z-r*Math.sin(t));
+ g.add(ring,hit,kn);g.renderOrder=3;rotG=g;S.add(g);}
+let ctipT=0,ctipE=null;
+function ctipHide(){const t=$('#ctip');if(t)t.hidden=true;}
+function ctipQ(e){ctipE=e;if(ctipT)return;ctipT=requestAnimationFrame(()=>{ctipT=0;const ev=ctipE;if(!ctxG||!ctxG.visible){ctipHide();return;}setPt(ev);
+ const ms=[];masses.forEach(m=>m.grp&&m.grp.traverse(o=>{if(o.isMesh)ms.push(o);}));const hm=ray.intersectObjects(ms,false)[0];
+ const h=ray.intersectObjects(ctxG.children,true).find(x=>x.object.isMesh&&x.object.userData.ci!=null);if(!h||(hm&&hm.distance<h.distance)){ctipHide();return;}
+ const c=CTXP[h.object.userData.ci];if(!c){ctipHide();return;}const b=[];if(c.fl)b.push(c.fl+'층');if(c.u!=null&&BUSE[c.u])b.push(BUSE[c.u][0]);if(c.yr)b.push(c.yr+'년 사용승인');
+ const t=$('#ctip');t.innerHTML='';const nm=document.createElement('b');nm.textContent=c.nm||(SITE?'주변 건물':'가상 주변 건물');const sm=document.createElement('small');sm.textContent=(b.length?b.join(' · ')+' · ':'')+'높이 '+f1(c.h)+'m';t.append(nm,sm);
+ const rc=host.getBoundingClientRect();t.hidden=false;let x=ev.clientX-rc.left+14,y=ev.clientY-rc.top+14;if(x+t.offsetWidth>rc.width-8)x=ev.clientX-rc.left-t.offsetWidth-14;if(y+t.offsetHeight>rc.height-8)y=ev.clientY-rc.top-t.offsetHeight-14;t.style.left=x+'px';t.style.top=y+'px';});}
+let TL=null;
+function tlStop(){if(!TL)return;cancelAnimationFrame(TL.raf);TL=null;$('#tlB').setAttribute('aria-pressed','false');$('#tlB').textContent='그림자 재생';}
+$('#tlB').onclick=()=>{if(TL){tlStop();return;}const hr=$('#hour'),mn=+hr.min,mx=+hr.max;const red=matchMedia('(prefers-reduced-motion: reduce)').matches;const dur=red?0:9000;
+ TL={t0:performance.now(),back:+hr.value,raf:0};$('#tlB').setAttribute('aria-pressed','true');$('#tlB').textContent='정지';
+ const step=now=>{if(!TL)return;const k=dur?Math.min(1,(now-TL.t0)/dur):1;const v=Math.round((mn+(mx-mn)*k)/0.25)*0.25;if(+hr.value!==v){hr.value=v;hr.dispatchEvent(new Event('input',{bubbles:true}));}
+  if(k<1)TL.raf=requestAnimationFrame(step);else{const b=TL.back;tlStop();setTimeout(()=>{hr.value=b;hr.dispatchEvent(new Event('input',{bubbles:true}));hr.dispatchEvent(new Event('change',{bubbles:true}));},600);}};TL.raf=requestAnimationFrame(step);};
+// 그림자 지도는 장면이 바뀔 때만 다시 그림 (매 프레임 다시 그리던 것을 줄임)
+let shDirty=true;const shSun=new THREE.Vector3();R.shadowMap.autoUpdate=false;
+{const a=S.add.bind(S),r=S.remove.bind(S);S.add=(...o)=>{shDirty=true;return a(...o);};S.remove=(...o)=>{shDirty=true;return r(...o);};}
+let inMain=false;{const rr=R.render.bind(R);R.render=(sc,c)=>{if(!inMain){R.shadowMap.needsUpdate=true;shDirty=true;}return rr(sc,c);};}
+['input','change','pointerup','keyup'].forEach(ev=>document.addEventListener(ev,()=>{shDirty=true;},true));
+function shTick(){if(!sun.position.equals(shSun)){shSun.copy(sun.position);shDirty=true;}if(shDirty||WIRE!==wireOn){R.shadowMap.needsUpdate=true;shDirty=false;}}
 let WIRE=false,wireOn=false;$('#wireT').onchange=e=>{WIRE=e.target.checked;};
 function wireApply(){if(!WIRE&&!wireOn)return;S.traverse(o=>{if(o.isMesh&&o.parent&&o.parent!==S&&o.parent.children.some(c=>c.isLineSegments))o.visible=!WIRE;});wireOn=WIRE;}
-(function loop(){requestAnimationFrame(loop);ctr.update();wireApply();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){R.render(S,cam);updLabels();}})();
+(function loop(){requestAnimationFrame(loop);ctr.update();shTick();wireApply();updRot();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){renderMain();updLabels();}})();
 </script>
 </body></html>
