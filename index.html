@@ -118,6 +118,7 @@ tfoot td{font-weight:500;border-bottom:1px solid var(--line)}tfoot tr:first-chil
 .obcard h3{font-size:15px;margin:2px 0 6px}.obcard p{font-size:13px;line-height:1.65;color:var(--mut);margin:0 0 12px}.obn{font-family:var(--mono);font-size:11.5px;color:var(--acc)}.obrow{display:flex;gap:6px;align-items:center}
 #helpB{font-weight:700;font-size:13px}
 .vwdlg .box.axobox{width:min(1040px,96vw)}.vwdlg{position:fixed;inset:0;background:var(--scrim);display:none;align-items:flex-start;justify-content:center;z-index:50;padding-top:80px}.vwdlg.on{display:flex}
+.stlsz{font-family:var(--mono);font-size:13px;color:var(--ink);border-top:1px solid var(--line);padding-top:10px}.stlsz em{display:block;font-family:var(--f);font-style:normal;color:var(--warn);font-size:12.5px;margin-top:4px}
 #planForm{display:flex;gap:6px}#planForm input{flex:1;min-width:0;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
 .planmsg:empty{display:none}.planmsg.bad{color:var(--bad)}
 html[data-plan=free] .gated::after{content:'';display:inline-block;width:11px;height:11px;margin-left:6px;vertical-align:-1px;background:currentColor;opacity:.7;
@@ -235,6 +236,15 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
  <p class="note planmsg" id="planMsg" role="status"></p>
  <div class="row vwact"><button class="btn line" id="planX" type="button">닫기</button><a class="btn" id="planJoin" href="https://forms.gle/K4s4K93qU86FmXqS8" target="_blank" rel="noopener">베타 신청</a></div>
 </div></div>
+<div class="vwdlg" id="stlDlg" role="dialog" aria-modal="true" aria-labelledby="stlT"><div class="box">
+ <h3 id="stlT">3D 프린트용 STL</h3>
+ <p class="note">지형 바닥판 위에 계획 매스와 주변 건물을 붙인 모형입니다. 파일 단위는 mm이고, 고른 축척 크기 그대로 슬라이서에서 열립니다.</p>
+ <div class="f">축척<div class="seg" id="stlS"><button data-v="200">1:200</button><button data-v="500" class="on">1:500</button><button data-v="1000">1:1000</button></div></div>
+ <div class="f">범위 (대지 중심 기준 정사각형)<div class="seg" id="stlE"><button data-v="20">40m</button><button data-v="40" class="on">80m</button><button data-v="60">120m</button><button data-v="100">200m</button></div></div>
+ <label class="ck"><input type="checkbox" id="stlCtx" checked> 주변 건물 포함</label>
+ <p class="stlsz" id="stlSz" role="status"></p>
+ <div class="row" style="justify-content:flex-end;gap:6px"><button class="btn line" id="stlX" type="button">닫기</button><button class="btn pri" id="stlGo" type="button">STL 내려받기</button></div>
+</div></div>
 <div class="vwdlg" id="vwDlg" role="dialog" aria-modal="true" aria-labelledby="vwT"><div class="box">
  <h3 id="vwT">실제 주소는 부지랩 사이트에서 불러옵니다</h3>
  <p class="vwlead">내려받은 파일이나 다른 주소에서 열면 국가 지도 자료(브이월드)를 받을 수 없습니다. 사이트에서 같은 주소를 넣으면 인증키 없이 바로 불러옵니다.</p>
@@ -342,6 +352,9 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <label class="tg"><input type="checkbox" id="edgeT"> 변 길이</label>
    <label class="tg">층 보기 <select id="vf" aria-label="층 보기"><option value="0">전체</option></select></label>
    <label class="tg"><input type="checkbox" id="exT"> 분해 보기</label>
+   <label class="tg" title="건물 면을 숨기고 모서리 선만 보기"><input type="checkbox" id="wireT"> 선만 보기</label>
+   <label class="tg" title="공원·녹지 필지 안에 나무를 일정 간격으로 그린 표현입니다. 실제 나무 위치가 아닙니다."><input type="checkbox" id="treeT" checked> 나무 (표현)</label>
+   <label class="tg" title="분석은 대지 중심 160m 안에서 하고, 넓힌 범위는 3D 보기와 3D 내보내기에만 들어갑니다(실제 대지에서만)">주변 범위 <select id="farSel" aria-label="주변 범위"><option value="0">160m</option><option value="150">300m</option><option value="250">500m</option></select></label>
    <button class="btn sm" id="topV">위에서 보기</button>
    <button class="btn sm" id="axoB" title="화이트 모델·그림자 누적·지형 단층 액소를 패널용 이미지로">다이어그램 뷰</button>
   </div>
@@ -493,9 +506,10 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <button class="btn" data-xp="dxf2">배치도 DXF</button>
    <button class="btn" data-xp="dxf3">3D DXF</button>
    <button class="btn" data-xp="obj">3D OBJ</button>
+   <button class="btn" data-xp="stl" title="3D 프린터로 대지 모형을 뽑는 파일">3D 프린트 STL</button>
    <button class="btn pri" id="packB" title="분석도·시트·배치도·다이어그램 뷰·과정도·표·CAD를 각각 파일로 묶음" style="grid-column:1/-1">출력 묶음 ZIP (모든 도면·표 따로)</button>
   </div>
-  <p class="note" style="margin-top:8px">DXF는 AutoCAD·Rhino·SketchUp Pro, OBJ는 Rhino·Blender 등에서 열 수 있습니다. 단위는 m입니다. 렌더는 내보낸 파일로 이어서 작업하세요.</p>
+  <p class="note" style="margin-top:8px">DXF는 AutoCAD·Rhino·SketchUp Pro, OBJ는 Rhino·Blender 등에서 열 수 있습니다. 단위는 m이고, STL만 고른 축척의 mm입니다. 렌더는 내보낸 파일로 이어서 작업하세요.</p>
  </div>
 </aside>
 </main>
@@ -567,11 +581,11 @@ const rectPoly=r=>[[r.x0,r.z0],[r.x1,r.z0],[r.x1,r.z1],[r.x0,r.z1]];
 const DEMO_CTXP=CTX.flat().map(c=>({...c,poly:rectPoly(c)}));
 const DEMO_TREES=[];GREENS.forEach(r=>{for(let i=0;i<14;i++)DEMO_TREES.push([r.x0+2+rnd()*(r.x1-r.x0-4),r.z0+2+rnd()*(r.z1-r.z0-4),1.4+rnd()*0.8]);});
 // 대지 출처: SITE=null 이면 데모, 아니면 브이월드에서 불러온 실제 대지(로컬 좌표 m, 북=-z)
-let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES;
+let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES,FAR=null,farG=null;
 const roadPolys=()=>SITE?SITE.roads:roadRects().map(rectPoly);
 const greenPolys=()=>SITE?SITE.greens:GREENS.map(rectPoly);
 function setSiteData(s){SITE=s||null;SUNH={};SUNK=null;if(!SITE){lay.photo=0;const a=document.querySelector('#photoT');if(a)a.checked=false;const b=document.querySelector('.lay input[data-l=photo]');if(b)b.checked=false;}
- if(SITE){CTXP=SITE.ctx.map(c=>{const b=bbox(c.poly);return{...b,h:c.h,poly:c.poly,fl:c.fl,u:c.u,yr:c.yr};});TREES=[];}else{CTXP=DEMO_CTXP;TREES=DEMO_TREES;}}
+ if(SITE){CTXP=SITE.ctx.map(c=>{const b=bbox(c.poly);return{...b,h:c.h,poly:c.poly,fl:c.fl,u:c.u,yr:c.yr};});TREES=siteTrees(SITE);}else{CTXP=DEMO_CTXP;TREES=DEMO_TREES;}FAR=null;if(farG){drop(farG);farG=null;}const fs=document.querySelector('#farSel');if(fs)fs.value='0';}
 let ann=[],lands=[],pkPlan=null;
 
 // ---------- geometry helpers ----------
@@ -659,7 +673,7 @@ function buildTerrain(){[groundM,cntG,roadsG,greensG,treesG,ctxG].forEach(drop);
  cntG=new THREE.Group();if(cp.length){cntG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(cp),new THREE.LineBasicMaterial({color:0x6f7a87})));}cntG.visible=$('#cntT').checked;S.add(cntG);
  buildRoads();
  greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,0xd3dfd2)));S.add(greensG);
- treesG=new THREE.Group();TREES.forEach(([x,z,r])=>{const t=new THREE.Mesh(new THREE.SphereGeometry(r,12,8),treeMat);t.position.set(x,G(x,z)+2.4,z);t.castShadow=true;treesG.add(t);});S.add(treesG);
+ treesG=treeGroup(TREES);treesG.visible=$('#treeT').checked;S.add(treesG);
  ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
   const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();}
 // ---------- 항공사진 (브이월드 WMTS Satellite, 웹메르카토르 z19 타일을 대지 중심 ±80m로 맞춰 붙임) ----------
@@ -881,7 +895,7 @@ thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
 // ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
 const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
-const GATED='#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj]';
+const GATED='#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
 const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
 function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
 let planPending=null;
@@ -1123,7 +1137,7 @@ function updSun(){const v=sunVec();sun.position.set(v.x*150,Math.max(v.y,0.02)*1
  const h=+$('#hour').value;$('#hourV').textContent=`${String(Math.floor(h)).padStart(2,'0')}:${String(Math.round((h%1)*60)).padStart(2,'0')}`;if(curPane==='vdiag')drawDiag();}
 $('#hour').oninput=updSun;
 $$('#season button').forEach(b=>b.onclick=()=>{$$('#season button').forEach(x=>x.classList.remove('on'));b.classList.add('on');decl=+b.dataset.d;updSun();});
-$('#envT').onchange=updateUI;$('#ctxT').onchange=e=>{if(ctxG)ctxG.visible=e.target.checked;};
+$('#envT').onchange=updateUI;$('#ctxT').onchange=e=>{if(ctxG)ctxG.visible=e.target.checked;if(farG)farG.visible=e.target.checked;};
 
 // ---------- terrain analysis ----------
 function grad(x,z){const e=terrKey==='real'?2:0.25;/* 실제 지형은 4m 격자라 2m 간격 차분 */return[(G(x+e,z)-G(x-e,z))/(2*e),(G(x,z+e)-G(x,z-e))/(2*e)];}
@@ -2279,13 +2293,43 @@ function sitePlanDXF(){const E=[];const eff=effPlot();
  CONT.forEach(s=>E.push(...dLine('CONTOUR',s.a,s.b,s.lv)));
  const bb=bbox(plot);E.push(...dText('TEXT',[bb.x0,bb.z1+3],1,`BUJILAB SITE PLAN  AREA ${polyArea(eff).toFixed(2)} m2  NORTH = +Y`));
  return dxfDoc([['PLOT',5],['SETBACK',1],['MASS',4],['LANDSCAPE',3],['ROAD',8],['CONTEXT',9],['CONTOUR',8],['TEXT',7]],E);}
-function model3DDXF(){const E=[];massBoxes().forEach(b=>boxFaces(b).forEach(f=>E.push(...d3f('MASS',f))));ctxBoxes().forEach(b=>boxFaces(b).forEach(f=>E.push(...d3f('CONTEXT',f))));
+function model3DDXF(){const E=[];massBoxes().forEach(b=>boxFaces(b).forEach(f=>E.push(...d3f('MASS',f))));ctxBoxes().forEach(b=>boxFaces(b).forEach(f=>E.push(...d3f('CONTEXT',f))));farBoxes().forEach(b=>boxFaces(b).forEach(f=>E.push(...d3f('CONTEXT_FAR',f))));
  terrainQuads().forEach(q=>E.push(...d3f('TERRAIN',q)));
- E.push(...dPoly('PLOT',plot,true,0));return dxfDoc([['MASS',4],['CONTEXT',9],['TERRAIN',8],['PLOT',5]],E);}
+ E.push(...dPoly('PLOT',plot,true,0));return dxfDoc([['MASS',4],['CONTEXT',9],['CONTEXT_FAR',8],['TERRAIN',8],['PLOT',5]],E);}
 // --- OBJ (Y-up, meters)
 function modelOBJ(){const L=['# BUJILAB export · units: meters · Y-up','# objects: masses, context, terrain'];let vi=1;
  const add=(name,faces)=>{L.push('o '+name);faces.forEach(f=>{f.forEach(p=>L.push(`v ${fx(p[0])} ${fx(p[1])} ${fx(p[2])}`));L.push('f '+f.map((_,k)=>vi+k).join(' '));vi+=f.length;});};
- massBoxes().forEach(b=>add('mass_'+b.name,boxFaces(b)));ctxBoxes().forEach(b=>add(b.name,boxFaces(b)));add('terrain',terrainQuads());return L.join('\n')+'\n';}
+ massBoxes().forEach(b=>add('mass_'+b.name,boxFaces(b)));ctxBoxes().forEach(b=>add(b.name,boxFaces(b)));farBoxes().forEach(b=>add(b.name,boxFaces(b)));add('terrain',terrainQuads());return L.join('\n')+'\n';}
+// --- STL (3D 프린트: mm, Z-up, 닫힌 솔리드 여러 개)
+function stlPrism(poly,y0,y1,k,T){let P=poly.map(q=>[q[0]*k,-q[1]*k]);if(P.reduce((s,p,i)=>{const q=P[(i+1)%P.length];return s+p[0]*q[1]-q[0]*p[1];},0)<0)P=P.slice().reverse();
+ const z0=y0*k,z1=y1*k,n=P.length;const tri=n===3?[[0,1,2]]:THREE.ShapeUtils.triangulateShape(P.map(q=>new THREE.Vector2(q[0],q[1])),[]);
+ tri.forEach(([a,b,c])=>{const A=P[a],B=P[b],C=P[c];const cw=(B[0]-A[0])*(C[1]-A[1])-(B[1]-A[1])*(C[0]-A[0])<0;const [u,v]=cw?[C,B]:[B,C];
+  T.push([[A[0],A[1],z1],[u[0],u[1],z1],[v[0],v[1],z1]],[[A[0],A[1],z0],[v[0],v[1],z0],[u[0],u[1],z0]]);});
+ for(let i=0;i<n;i++){const a=P[i],b=P[(i+1)%n];T.push([[a[0],a[1],z0],[b[0],b[1],z0],[b[0],b[1],z1]],[[a[0],a[1],z0],[b[0],b[1],z1],[a[0],a[1],z1]]);}}
+function stlModel(o){const k=1000/o.scale,E=o.ext,c=centroidOf(plot).map(v=>Math.round(v)),T=[];let objs=0;
+ const st=E<=20?1:2,N=Math.round(2*E/st),x0=c[0]-E,z0=c[1]-E;const H=[];let mn=1e9;
+ for(let i=0;i<=N;i++){H.push([]);for(let j=0;j<=N;j++){const h=G(x0+i*st,z0+j*st);H[i].push(h);if(h<mn)mn=h;}}
+ const yb=mn-Math.max(2,3*o.scale/1000);const V=(i,j)=>[(x0+i*st)*k,-(z0+j*st)*k,H[i][j]*k],Vb=(i,j)=>[(x0+i*st)*k,-(z0+j*st)*k,yb*k];
+ for(let i=0;i<N;i++)for(let j=0;j<N;j++){const a=V(i,j),b=V(i+1,j),cc=V(i+1,j+1),d=V(i,j+1);T.push([a,cc,b],[a,d,cc]);const A=Vb(i,j),B=Vb(i+1,j),C=Vb(i+1,j+1),D=Vb(i,j+1);T.push([A,B,C],[A,C,D]);}
+ const ring=[];for(let i=0;i<N;i++)ring.push([i,0]);for(let j=0;j<N;j++)ring.push([N,j]);for(let i=N;i>0;i--)ring.push([i,N]);for(let j=N;j>0;j--)ring.push([0,j]);
+ for(let q=0;q<ring.length;q++){const [i1,j1]=ring[q],[i2,j2]=ring[(q+1)%ring.length];const a=V(i1,j1),b=V(i2,j2),A=Vb(i1,j1),B=Vb(i2,j2);T.push([A,b,B],[A,a,b]);}
+ objs++;const inside=P=>P.every(q=>Math.abs(q[0]-c[0])<=E&&Math.abs(q[1]-c[1])<=E);
+ const emb=0.3;massBoxes().forEach(b=>{if(b.y1-b.y0<0.05)return;stlPrism(b.poly,b.y0-emb,b.y1,k,T);objs++;});
+ if(o.ctx)ctxBoxes().concat(farBoxes()).forEach(b=>{if(!inside(b.poly))return;stlPrism(b.poly,b.y0-emb,b.y1,k,T);objs++;});
+ return{T,objs,size:2*E*k,hmax:Math.max(0,...T.map(t=>Math.max(t[0][2],t[1][2],t[2][2])))-yb*k};}
+function stlBin(T){const buf=new ArrayBuffer(84+T.length*50),dv=new DataView(buf);const hd='BUJILAB site model, mm, Z-up';for(let i=0;i<80;i++)dv.setUint8(i,i<hd.length?hd.charCodeAt(i):32);dv.setUint32(80,T.length,true);
+ let o=84;T.forEach(([a,b,c])=>{const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2];let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;const l=Math.hypot(nx,ny,nz)||1;
+  [nx/l,ny/l,nz/l,...a,...b,...c].forEach(v=>{dv.setFloat32(o,v,true);o+=4;});dv.setUint16(o,0,true);o+=2;});return buf;}
+const STLO={scale:500,ext:40,ctx:true};
+function stlSize(){const m=stlModel(STLO);const w=m.size;$('#stlSz').innerHTML=`출력 크기 ${w.toFixed(0)} × ${w.toFixed(0)} × ${m.hmax.toFixed(0)} mm · 솔리드 ${m.objs}개`+(w>220?'<em>일반 3D 프린터 판(약 220mm)보다 큽니다. 축척을 줄이거나 범위를 좁히세요.</em>':w<60?'<em>건물이 아주 작게 나옵니다. 1:500보다 큰 축척을 고려하세요.</em>':'');return m;}
+function stlOpen(){['stlS','stlE'].forEach(id=>$('#'+id).querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(id==='stlS'?STLO.scale:STLO.ext))));$('#stlCtx').checked=STLO.ctx;stlSize();$('#stlDlg').classList.add('on');setTimeout(()=>$('#stlGo').focus(),0);}
+$('#stlS').onclick=e=>{const b=e.target.closest('button');if(!b)return;STLO.scale=+b.dataset.v;stlOpen();};
+$('#stlE').onclick=e=>{const b=e.target.closest('button');if(!b)return;STLO.ext=+b.dataset.v;stlOpen();};
+$('#stlCtx').onchange=e=>{STLO.ctx=e.target.checked;stlSize();};
+$('#stlX').onclick=()=>$('#stlDlg').classList.remove('on');
+$('#stlDlg').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();$('#stlDlg').classList.remove('on');}});
+$('#stlGo').onclick=()=>{const m=stlModel(STLO);$('#stlDlg').classList.remove('on');offer(`bujilab_${stamp()}_model_1-${STLO.scale}.stl`,new Blob([stlBin(m.T)],{type:'model/stl'}));};
+window.__stl=o=>{const m=stlModel(Object.assign({},STLO,o||{}));return{T:m.T,objs:m.objs,size:m.size};};
 // --- SVG (Canvas 2D 호출을 그대로 받아 벡터로 기록 → 일러스트레이터에서 레이어별 편집)
 class SVGCtx{
  constructor(W,H){this.W=W;this.H=H;this.isSVG=true;this.canvas={width:W,height:H};this.out=[];this.defs=[];this.st=[];this.m=[1,0,0,1,0,0];this.d='';this.has=false;this.uid=0;this.inL=false;
@@ -2360,7 +2404,8 @@ $$('[data-xp]').forEach(b=>b.onclick=async()=>{const k=b.dataset.xp;const base=`
   offer(`${base}_분석도_SVG.zip`,makeZip(files));}
  else if(k==='dxf2')offer(`${base}_siteplan.dxf`,sitePlanDXF());
  else if(k==='dxf3')offer(`${base}_model3d.dxf`,model3DDXF());
- else if(k==='obj')offer(`${base}_model.obj`,modelOBJ());});
+ else if(k==='obj')offer(`${base}_model.obj`,modelOBJ());
+ else if(k==='stl')stlOpen();});
 // ---------- 브이월드 실제 대지 ----------
 // 브이월드는 CORS를 허용하지 않아 JSONP(callback)로 호출한다. domain = 키 발급 때 등록한 서비스 URL.
 // ▼▼ 배포 설정: 웹에 올릴 때 여기만 채우면 학생은 키 없이 바로 씁니다 ▼▼
@@ -2497,6 +2542,49 @@ updSun();updateUI();renderSlots();resize();commit();
   $('#rsNo').onclick=()=>{$('#restoreBar').classList.remove('on');autosaveOn=true;try{localStorage.setItem(LSKEY,hist[hi]);}catch(e){}};}
  else autosaveOn=true;})();if(innerWidth<600)cam.position.set(95,85,115);
 const cmpEl=$('#cmp3d');
-(function loop(){requestAnimationFrame(loop);ctr.update();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){R.render(S,cam);updLabels();}})();
+// ---------- 나무 표현: 공원·녹지 필지 안에 일정 간격으로 (실제 위치 아님) ----------
+function siteTrees(st){const out=[];const G_=st.greens||[];if(!G_.length)return out;const blk=(st.ctx||[]).map(c=>({b:bbox(c.poly),q:c.poly}));const rd=(st.roads||[]).map(q=>({b:bbox(q),q}));const pl=st.plot||[];
+ const hit=(L,x,z)=>L.some(o=>x>=o.b.x0-1&&x<=o.b.x1+1&&z>=o.b.z0-1&&z<=o.b.z1+1&&pip(x,z,o.q));
+ G_.forEach((q,gi)=>{const b=bbox(q);let sd=(gi+1)*7919;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};const sp=6.5;
+  for(let x=b.x0+sp/2;x<b.x1;x+=sp)for(let z=b.z0+sp/2;z<b.z1;z+=sp){if(out.length>=1500)return;const px=x+(rnd()-.5)*sp*.7,pz=z+(rnd()-.5)*sp*.7;
+   if(!pip(px,pz,q)||(pl.length>2&&pip(px,pz,pl))||hit(blk,px,pz)||hit(rd,px,pz))continue;out.push([+px.toFixed(2),+pz.toFixed(2),+(1.8+rnd()*1.4).toFixed(2)]);}});return out;}
+function treeGroup(T){const g=new THREE.Group();if(!T.length)return g;const geo=new THREE.SphereGeometry(1,12,8),trunk=new THREE.CylinderGeometry(.12,.16,1,6),tm=new THREE.MeshLambertMaterial({color:0x9a8f80});
+ const im=new THREE.InstancedMesh(geo,treeMat,T.length),it=new THREE.InstancedMesh(trunk,tm,T.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3();
+ T.forEach(([x,z,r],i)=>{const y=G(x,z);M.compose(V.set(x,y+r+1.4,z),Q,new THREE.Vector3(r,r*1.05,r));im.setMatrixAt(i,M);M.compose(V.set(x,y+0.9,z),Q,new THREE.Vector3(1,1.8,1));it.setMatrixAt(i,M);});
+ im.castShadow=true;it.castShadow=true;g.add(im,it);return g;}
+$('#treeT').onchange=e=>{if(treesG)treesG.visible=e.target.checked;};
+// ---------- 넓은 주변 범위: 3D 보기·3D 내보내기 전용 (분석은 160m 안) ----------
+async function vwDataPaged(data,box,maxPages=3){const all=[];for(let pg=1;pg<=maxPages;pg++){let r=null;try{r=vwOk(await vwJsonp('data',{service:'data',request:'GetFeature',version:'2.0',data,geomFilter:box,geometry:'true',attribute:'true',crs:'EPSG:4326',size:'1000',page:String(pg)}));}catch(e){if(pg===1&&!all.length)throw e;break;}
+  const f=r&&r.result&&r.result.featureCollection?r.result.featureCollection.features||[]:[];all.push(...f);if(f.length<1000)break;}return all;}
+async function loadFar(Rh){if(!SITE||!SITE.origin){toast('넓은 주변 범위는 실제 주소로 불러온 대지에서 쓸 수 있습니다.');$('#farSel').value='0';return;}
+ if(!Rh){FAR=null;buildFar();toast('주변 범위를 160m로 되돌렸습니다.');return;}
+ const [lon0,lat0]=SITE.origin,kx=111320*Math.cos(lat0*Math.PI/180),kz=110574,P=mkProj(lon0,lat0),sid=SITE.id;toast(`주변 ${Rh*2}m 범위의 건물을 불러오는 중…`);
+ const n=Rh>200?4:3,tile=2*Rh/n,boxes=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x0=-Rh+i*tile,z0=-Rh+j*tile;if(x0>=-80&&x0+tile<=80&&z0>=-80&&z0+tile<=80)continue;
+  boxes.push(`BOX(${lon0+x0/kx},${lat0-(z0+tile)/kz},${lon0+(x0+tile)/kx},${lat0-z0/kz})`);}
+ let feats=[];try{const res=[];for(let i=0;i<boxes.length;i+=4)res.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwDataPaged('LT_C_SPBD',b).catch(()=>[]))));feats=res.flat();}catch(e){feats=[];}
+ if(!SITE||SITE.id!==sid)return;
+ const key=q=>{const c=ringC(q);return Math.round(c[0])+','+Math.round(c[1]);};const seen=new Set(SITE.ctx.map(c=>key(c.poly)));const plotL=plot;const out=[];
+ feats.forEach(f=>{const fl=Math.max(1,parseInt((f.properties||{}).gro_flo_co)||1);rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length<3||polyArea(q)<=4)return;const c=ringC(q);
+  if(Math.abs(c[0])>Rh||Math.abs(c[1])>Rh)return;const k=key(q);if(seen.has(k))return;if(Math.abs(c[0])<=80&&Math.abs(c[1])<=80&&pip(c[0],c[1],plotL))return;seen.add(k);out.push({poly:q,h:fl*FH,fl});});});
+ if(!out.length&&!feats.length){toast('넓은 범위 건물을 받지 못했습니다. 잠시 뒤 다시 고르세요.');$('#farSel').value='0';return;}
+ FAR={R:Rh,ctx:out};buildFar();toast(`주변 ${Rh*2}m 범위에 건물 ${out.length}동을 더했습니다. 3D 보기와 3D 내보내기에 들어갑니다.`);}
+function buildFar(){drop(farG);farG=null;if(!FAR||!FAR.ctx.length){if(cam.far<1001){}return;}
+ const pos=[],ln=[];const tri=(a,b,c)=>pos.push(...a,...b,...c);
+ FAR.ctx.forEach(o=>{const P=o.poly,gs=P.map(q=>G(q[0],q[1])),y0=Math.min(...gs)-0.05,y1=gs.reduce((a,b)=>a+b,0)/gs.length+o.h;
+  const T=P.length===3?[[0,1,2]]:THREE.ShapeUtils.triangulateShape(P.map(q=>new THREE.Vector2(q[0],q[1])),[]);T.forEach(([a,b,c])=>tri([P[a][0],y1,P[a][1]],[P[b][0],y1,P[b][1]],[P[c][0],y1,P[c][1]]));
+  for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];tri([a[0],y0,a[1]],[b[0],y0,b[1]],[b[0],y1,b[1]]);tri([a[0],y0,a[1]],[b[0],y1,b[1]],[a[0],y1,a[1]]);ln.push(a[0],y1,a[1],b[0],y1,b[1],a[0],y0,a[1],a[0],y1,a[1]);}});
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();
+ const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:0xf4f5f7,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;
+ const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(ln,3));
+ // 바깥 바닥: 안쪽 지형판(±100m) 밖만 10m 격자로
+ const E=FAR.R+10,st=10,gp=[];for(let x=-E;x<E;x+=st)for(let z=-E;z<E;z+=st){if(x>=-100&&x+st<=100&&z>=-100&&z+st<=100)continue;const a=[x,G(x,z)-0.08,z],b=[x+st,G(x+st,z)-0.08,z],c=[x+st,G(x+st,z+st)-0.08,z+st],d=[x,G(x,z+st)-0.08,z+st];gp.push(...a,...d,...c,...a,...c,...b);}
+ const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.Float32BufferAttribute(gp,3));gg.computeVertexNormals();const gm=new THREE.Mesh(gg,new THREE.MeshLambertMaterial({color:0xe6e8eb,side:THREE.DoubleSide}));gm.receiveShadow=true;
+ farG=new THREE.Group();farG.add(gm,m,new THREE.LineSegments(lg,EDGE));farG.visible=$('#ctxT').checked;S.add(farG);cam.far=Math.max(cam.far,3000);cam.updateProjectionMatrix();ctr.maxDistance=Math.max(ctr.maxDistance||0,FAR.R*3.2);}
+function farBoxes(){return FAR?FAR.ctx.map((c,i)=>{const g=c.poly.map(q=>G(q[0],q[1]));return{name:'far_'+(i+1),poly:c.poly,y0:Math.min(...g),y1:g.reduce((a,b)=>a+b)/g.length+c.h};}):[];}
+$('#farSel').onchange=e=>loadFar(+e.target.value);
+window.__S=()=>S;window.__far=()=>FAR?{R:FAR.R,n:FAR.ctx.length,polys:FAR.ctx.map(c=>c.poly)}:null;window.__trees=()=>TREES;window.__farMesh=()=>!!(farG&&farG.parent);
+let WIRE=false,wireOn=false;$('#wireT').onchange=e=>{WIRE=e.target.checked;};
+function wireApply(){if(!WIRE&&!wireOn)return;S.traverse(o=>{if(o.isMesh&&o.parent&&o.parent!==S&&o.parent.children.some(c=>c.isLineSegments))o.visible=!WIRE;});wireOn=WIRE;}
+(function loop(){requestAnimationFrame(loop);ctr.update();wireApply();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){R.render(S,cam);updLabels();}})();
 </script>
 </body></html>
