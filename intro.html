@@ -39,7 +39,7 @@ nav .act{margin-left:auto;display:flex;gap:8px;align-items:center}
 nav .btn{padding:8px 14px}
 
 /* hero */
-.hero{padding:72px 0 0}
+.hero{padding:0}
 .hero-top{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:end;padding-bottom:48px}
 h1{font-size:clamp(36px,5.2vw,64px);line-height:1.15;letter-spacing:-.6px}
 .lead{font-size:17px;color:var(--mut);max-width:500px}
@@ -162,6 +162,39 @@ html[data-theme=dark] .yes::before{background:var(--acc)}
 .thm:active{transform:scale(.97)}.thm:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .thm svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5}.thm .mn{display:none}html[data-theme=dark] .thm .sn{display:none}html[data-theme=dark] .thm .mn{display:block}
 html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-color 200ms ease,color 200ms ease!important}
+
+/* scroll-driven 3D: 대지 모형이 보드가 되기까지 */
+.fly{position:relative;height:560vh;background:var(--paper)}
+.fly-stick{position:sticky;top:56px;height:calc(100vh - 56px);overflow:hidden}
+#flyCv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fly-caps{position:relative;height:100%;pointer-events:none}
+.fcap{position:absolute;left:32px;bottom:12vh;max-width:min(470px,42vw);opacity:0;transform:translateY(8px);filter:blur(2px);transition:opacity 160ms ease,transform 160ms ease,filter 160ms ease;pointer-events:none}
+.fcap.on{opacity:1;transform:none;filter:none;pointer-events:auto;transition:opacity 320ms var(--ease-out) 140ms,transform 420ms var(--ease-out) 140ms,filter 320ms var(--ease-out) 140ms}
+.fly-stick::before{content:'';position:absolute;inset:0 auto 0 0;width:min(620px,52vw);z-index:1;pointer-events:none;background:linear-gradient(90deg,var(--paper) 0,color-mix(in srgb,var(--paper) 86%,transparent) 55%,transparent 100%)}
+.fly-caps,.fly-rail,.fly-hint{z-index:2}
+.fcap[data-s="0"]{bottom:auto;top:clamp(48px,11vh,120px);max-width:min(680px,50vw)}
+.fcap h2{font-size:clamp(28px,3.4vw,44px);line-height:1.18;letter-spacing:-.4px}
+.fcap p{font-size:16px;color:var(--mut);margin-top:14px;max-width:420px}
+.fcap .lead{margin-top:18px}
+.fly-rail{position:absolute;right:32px;top:50%;transform:translateY(-50%);list-style:none;display:flex;flex-direction:column;gap:14px;font-size:12.5px;color:var(--mut)}
+.fly-rail li{display:flex;align-items:center;gap:10px;justify-content:flex-end;transition:color 200ms ease}
+.fly-rail li::after{content:'';width:18px;height:1px;background:var(--line);transition:width 300ms var(--ease-out),background-color 200ms ease}
+.fly-rail li.on{color:var(--ink)}.fly-rail li.on::after{width:36px;background:var(--acc)}
+.fly-hint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:12.5px;color:var(--mut);transition:opacity 300ms ease}
+.fly[data-p] .fly-hint{opacity:0}
+.fly.flat{height:auto}.fly.flat .fly-stick{position:relative;top:0;height:auto;min-height:0}
+.fly.flat #flyCv,.fly.flat .fly-rail,.fly.flat .fly-hint,.fly.flat .fcap:not([data-s="0"]){display:none}
+.fly.flat .fly-caps{height:auto;padding:72px 32px 56px}.fly.flat .fcap[data-s="0"]{position:static;opacity:1;transform:none;filter:none;max-width:640px}
+.fly.still{height:auto}.fly.still .fly-stick{position:relative;top:0;height:min(86vh,820px)}.fly.still .fly-rail,.fly.still .fly-hint,.fly.still .fcap:not([data-s="0"]){display:none}
+@media (max-width:860px){
+ .fly{height:420vh}
+ .fcap,.fcap[data-s="0"]{left:20px;right:20px;top:24px;bottom:auto;max-width:none}
+ .fcap h2{font-size:26px}.fcap p{font-size:14.5px}
+ .fly-rail{right:auto;left:20px;top:auto;bottom:18px;transform:none;flex-direction:row;gap:12px}.fly-rail li::after{display:none}.fly-rail li.on{color:var(--acc)}
+ .fly-hint{display:none}
+ .fly.flat .fly-caps{padding:40px 20px}
+ .fly-stick::before{inset:0 0 auto 0;width:auto;height:58%;background:linear-gradient(180deg,var(--paper) 0,color-mix(in srgb,var(--paper) 84%,transparent) 60%,transparent 100%)}
+}
 </style></head>
 <body>
 <nav><div class="wrap">
@@ -170,15 +203,26 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
  <div class="act"><button class="thm" id="thmB" type="button" aria-label="다크 모드 전환" aria-pressed="false" title="다크 모드로 바꾸기"><svg class="sn" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg><svg class="mn" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.6 5.6 0 016.4 2.5a5.6 5.6 0 107.1 7.1z"/></svg></button><a class="btn line" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a><a class="btn" href="#signup">베타 신청</a></div>
 </div></nav>
 
-<header class="hero" id="top">
- <div class="wrap hero-top">
-  <h1>주소 하나로 시작해서<br>제출할 보드 한 장까지.</h1>
-  <div>
-   <p class="lead">필지, 주변 건물, 용도지역, 지형을 불러오고 법규를 계산합니다. 매스를 올려 보고, 분석 시트와 배치도 주석판이 들어간 A1·A2 보드를 PDF로 내보냅니다.</p>
-   <div class="ctas"><a class="btn" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a><a class="btn line" href="#signup">베타 신청</a></div>
-   <p class="who">건축·조경 전공 학생용. 설치 없이 브라우저에서 실행되고, 처음이면 화면 위 시작 가이드가 다섯 단계를 차례로 안내합니다.</p>
+<section class="fly" id="top" aria-label="부지랩이 하는 일">
+ <div class="fly-stick">
+  <canvas id="flyCv" aria-hidden="true"></canvas>
+  <div class="wrap fly-caps">
+   <div class="fcap on" data-s="0">
+    <h1>주소 하나로 시작해서<br>제출할 보드 한 장까지.</h1>
+    <p class="lead">필지, 주변 건물, 용도지역, 지형을 불러오고 법규를 계산합니다. 매스를 올려 보고, 분석 시트와 배치도 주석판이 들어간 A1·A2 보드를 PDF로 내보냅니다.</p>
+    <div class="ctas"><a class="btn" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a><a class="btn line" href="#signup">베타 신청</a></div>
+    <p class="who">건축·조경 전공 학생용. 설치 없이 브라우저에서 실행되고, 처음이면 화면 위 시작 가이드가 다섯 단계를 차례로 안내합니다.</p>
+   </div>
+   <div class="fcap" data-s="1"><h2>주소를 넣으면<br>주변 건물이 올라옵니다</h2><p>국가 지도 자료로 필지 경계, 건물 높이, 도로, 공원, 용도지역과 지형을 한 번에 불러옵니다.</p></div>
+   <div class="fcap" data-s="2"><h2>매스를 올리는 대로<br>법규와 그림자를 계산합니다</h2><p>건폐율·용적률, 정북 일조사선, 동지 일조시간이 매스를 움직일 때마다 다시 나옵니다. 계산 근거도 함께 보여 줍니다.</p></div>
+   <div class="fcap" data-s="3"><h2>같은 대지를<br>분석도로 나눠 그립니다</h2><p>배치도 주석판, 경사·향·표고, 일조시간, 단면, 분해 액소를 같은 축척과 방위로 맞춰 그립니다.</p></div>
+   <div class="fcap" data-s="4"><h2>도면이 모여<br>A2 보드 한 장이 됩니다</h2><p>배치를 고르고 이름과 학번을 넣으면 인쇄용 PDF와 일러스트레이터용 SVG로 나옵니다.</p><div class="ctas"><a class="btn" href="https://rainboy07012.github.io/bujilab/" target="_blank" rel="noopener">지금 써보기</a></div></div>
   </div>
+  <ol class="fly-rail" aria-hidden="true"><li data-s="1">대지</li><li data-s="2">매스·법규</li><li data-s="3">분석도</li><li data-s="4">보드</li></ol>
+  <p class="fly-hint" aria-hidden="true">내리면 과정이 이어집니다</p>
  </div>
+</section>
+<header class="hero" id="board-sec">
  <div class="table"><div class="wrap boardgrid">
   <div>
    <div class="dim">A2 · 594 × 420 mm</div>
@@ -355,4 +399,118 @@ function ap(t,a){if(a&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
 ap(h.dataset.theme||'light',false);
 b.onclick=function(){var t=h.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('bujilab.theme',t)}catch(e){}ap(t,true);};
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(e){var t=null;try{t=localStorage.getItem('bujilab.theme')}catch(_){}if(!t)ap(e.matches?'dark':'light',true);});}catch(e){}})();</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+const sec=document.getElementById('top'),cv=document.getElementById('flyCv');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,narrow=matchMedia('(max-width:860px)').matches;
+const okGL=(()=>{try{const c=document.createElement('canvas');return!!(c.getContext('webgl2')||c.getContext('webgl'));}catch(e){return false;}})();
+if(!okGL){sec.classList.add('flat');}else{
+const THREE=await import('three').catch(()=>null);
+if(!THREE){sec.classList.add('flat');}else{
+if(reduce)sec.classList.add('still');
+// ---------- 장면 ----------
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});R.setPixelRatio(Math.min(devicePixelRatio,narrow?1.5:1.75));R.shadowMap.enabled=!narrow;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,1,2000);
+const hemi=new THREE.HemisphereLight(0xffffff,0xc9ccd2,1.5);S.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-130,right:130,top:130,bottom:-130,near:1,far:600});sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.04;S.add(sun,sun.target);
+let sd=20261116;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
+const C=()=>{const d=document.documentElement.dataset.theme==='dark';return d?{bg:0x1c1c1e,ground:0x2a2b2e,road:0x232427,bld:0xe9eaec,edge:0x8d929b,park:0x34413a,acc:0x78a9ff,mass:0xc9d7f7}:{bg:0xffffff,ground:0xeceef1,road:0xdfe2e6,bld:0xffffff,edge:0x9aa0a8,park:0xdbe6d8,acc:0x2f5bd3,mass:0xc9d7f7};};
+let K=C();
+const mGround=new THREE.MeshLambertMaterial({color:K.ground}),mRoad=new THREE.MeshLambertMaterial({color:K.road}),mPark=new THREE.MeshLambertMaterial({color:K.park});
+const mB=new THREE.MeshLambertMaterial({color:K.bld}),mE=new THREE.LineBasicMaterial({color:K.edge,transparent:true,opacity:.7});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(900,900),mGround);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;S.add(ground);
+// 격자 도로: 블록 34m, 도로 8m
+const BL=34,RD=8,PER=BL+RD,N=narrow?3:4;
+for(let i=-N;i<=N+1;i++){const x=i*PER-RD/2-BL/2;[[x,0,RD,PER*(2*N+2)],[0,x,PER*(2*N+2),RD]].forEach(([cx,cz,w,d])=>{const r=new THREE.Mesh(new THREE.PlaneGeometry(w,d),mRoad);r.rotation.x=-Math.PI/2;r.position.set(cx,0.02,cz);r.receiveShadow=true;S.add(r);});}
+// 대지 = 가운데 블록 안 필지 22×16
+const PL=[[-11,-8],[11,-8],[11,8],[-11,8]];
+const blds=[];const park={x:PER,z:-PER};
+for(let bi=-N;bi<=N;bi++)for(let bj=-N;bj<=N;bj++){const cx=bi*PER,cz=bj*PER;
+ if(bi===park.x/PER&&bj===park.z/PER){const p=new THREE.Mesh(new THREE.PlaneGeometry(BL,BL),mPark);p.rotation.x=-Math.PI/2;p.position.set(cx,0.04,cz);p.receiveShadow=true;S.add(p);continue;}
+ const lots=[];for(let a=0;a<3;a++)for(let b=0;b<2;b++)lots.push([cx-BL/2+a*BL/3,cz-BL/2+b*BL/2,BL/3,BL/2]);
+ lots.forEach(([x0,z0,w,d])=>{const inner=bi===0&&bj===0;if(inner&&x0<cx+12&&x0+w>cx-12&&z0<cz+9&&z0+d>cz-9)return;
+  const m=1.2+rnd()*1.2,bw=w-2*m,bd=d-2*m-rnd()*3;if(bw<4||bd<4)return;const dist=Math.hypot(cx,cz);
+  const bx=x0+m+bw/2,bz=z0+m+bd/2;if([[52,66],[46,58],[30,40]].some(([qx,qz])=>Math.hypot(bx-qx,bz-qz)<26))return;const r0=rnd();const fl=dist<50?3+Math.floor(r0*4):r0<.12?6+Math.floor(rnd()*4):2+Math.floor(r0*4);const h=fl*3.2;
+  const geo=new THREE.BoxGeometry(bw,h,bd);geo.translate(0,h/2,0);const g=new THREE.Group();const me=new THREE.Mesh(geo,mB);me.castShadow=me.receiveShadow=true;g.add(me);g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),mE));
+  g.position.set(x0+m+bw/2,0,z0+m+bd/2);g.scale.y=0.02;S.add(g);blds.push({g,d:dist+rnd()*14,h});});}
+// 공원 나무
+const TN=60,tg=new THREE.SphereGeometry(1,10,8),tm=new THREE.MeshLambertMaterial({color:0xa9c0a6}),trees=new THREE.InstancedMesh(tg,tm,TN);trees.castShadow=true;
+{const M=new THREE.Matrix4();for(let i=0;i<TN;i++){const r=1.6+rnd()*1.4;M.compose(new THREE.Vector3(park.x-BL/2+3+rnd()*(BL-6),r+1.2,park.z-BL/2+3+rnd()*(BL-6)),new THREE.Quaternion(),new THREE.Vector3(r,r,r));trees.setMatrixAt(i,M);}}S.add(trees);
+// 필지 경계(파란 선)와 바닥
+const plotLine=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(PL.map(p=>new THREE.Vector3(p[0],0.12,p[1]))),new THREE.LineBasicMaterial({color:K.acc}));S.add(plotLine);
+const plotFill=new THREE.Mesh(new THREE.PlaneGeometry(22,16),new THREE.MeshBasicMaterial({color:K.acc,transparent:true,opacity:.1,depthWrite:false}));plotFill.rotation.x=-Math.PI/2;plotFill.position.y=0.1;S.add(plotFill);
+// 계획 매스: 4층, 한 층씩
+const mM=new THREE.MeshLambertMaterial({color:K.mass}),mME=new THREE.LineBasicMaterial({color:K.acc});const floors=[];
+[[14,10],[14,10],[12,10],[9,10]].forEach(([w,d],i)=>{const geo=new THREE.BoxGeometry(w,3.2,d);geo.translate(0,1.6,0);const g=new THREE.Group();const me=new THREE.Mesh(geo,mM);me.castShadow=me.receiveShadow=true;g.add(me,new THREE.LineSegments(new THREE.EdgesGeometry(geo),mME));
+ g.position.set(-1-(14-w)/2,i*3.2,1);g.visible=false;S.add(g);floors.push(g);});
+// 정북 일조사선(경사면): 북쪽 경계에서 높이 10m 위로 1:2
+const env=new THREE.Mesh(new THREE.PlaneGeometry(22,30),new THREE.MeshBasicMaterial({color:0xc8372d,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
+env.position.set(0,10+13.4/2*1,-8+6.7);env.rotation.x=-Math.atan(2);S.add(env);
+// 분석 패널 → 보드
+const boardImg=document.querySelector('#board img');const TL=new THREE.TextureLoader();
+const tex=src=>{const t=TL.load(src);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=R.capabilities.getMaxAnisotropy();return t;};
+const BW=59.4,BH=42,BY=36,BZ=0;// 보드 크기(1/10 m), 위치
+const tiles=[[0,0,.36,.48],[.36,0,.36,.48],[.72,0,.28,.42],[0,.49,.24,.24],[.24,.49,.24,.24],[0,.73,.71,.25]];
+const panelImgs=[...document.querySelectorAll('.sheet figure img')].slice(0,8);
+const panels=tiles.map((t,i)=>{const im=panelImgs[i%panelImgs.length];const w=t[2]*BW,h=t[3]*BH;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:im?tex(im.currentSrc||im.src):null,color:0xffffff,transparent:true,opacity:0,side:THREE.DoubleSide}));
+ const fx=-BW/2+(t[0]+t[2]/2)*BW,fy=BY+BH/2-(t[1]+t[3]/2)*BH;const sx=(i%3-1)*34,sy=16+Math.floor(i/3)*-14+30,sz=8+(i%2)*6;m.userData={f:[fx,fy,BZ+0.05],s:[sx,sy,sz],w,h};m.visible=false;S.add(m);return m;});
+const board=new THREE.Mesh(new THREE.PlaneGeometry(BW,BH),new THREE.MeshBasicMaterial({map:boardImg?tex(boardImg.currentSrc||boardImg.src):null,transparent:true,opacity:0}));board.position.set(0,BY,BZ);board.visible=false;S.add(board);
+const boardBack=new THREE.Mesh(new THREE.PlaneGeometry(BW+1.6,BH+1.6),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0}));boardBack.position.set(0,BY,BZ-0.1);boardBack.visible=false;S.add(boardBack);
+// ---------- 카메라 경로 ----------
+const KF=[ // p, 위치, 바라보는 점
+ [0.00,[150,230,190],[0,0,0]],
+ [0.20,[110,95,140],[0,4,0]],
+ [0.40,[52,40,66],[0,8,-2]],
+ [0.58,[46,34,58],[0,9,-2]],
+ [0.72,[0,62,120],[0,30,0]],
+ [0.86,[0,BY,150],[0,BY,0]],
+ [1.00,[0,BY,144],[0,BY,0]]];
+const ss=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
+const eo=t=>1-Math.pow(1-t,3);
+const v3=a=>new THREE.Vector3(...a);
+function camAt(p){let i=0;while(i<KF.length-2&&p>KF[i+1][0])i++;const a=KF[i],b=KF[i+1],t=ss(a[0],b[0],p);return[v3(a[1]).lerp(v3(b[1]),t),v3(a[2]).lerp(v3(b[2]),t)];}
+// ---------- 크기·화면 ----------
+let W=0,H=0;function size(){const r=cv.getBoundingClientRect();W=Math.max(1,r.width);H=Math.max(1,r.height);R.setSize(W,H,false);cam.aspect=W/H;
+ if(!narrow&&W>900){cam.setViewOffset(W,H,-W*0.16,0,W,H);}else{cam.setViewOffset(W,H,0,-H*0.12,W,H);}cam.updateProjectionMatrix();}
+size();addEventListener('resize',()=>{size();dirty=true;});
+// ---------- 진행도 ----------
+let pT=reduce?0.5:0,pS=pT,mx=0,my=0,mxs=0,mys=0,dirty=true,vis=true,t0=performance.now();
+const caps=[...sec.querySelectorAll('.fcap')],rail=[...sec.querySelectorAll('.fly-rail li')];
+function readP(){if(reduce)return;const r=sec.getBoundingClientRect(),span=r.height-innerHeight+56;pT=Math.min(1,Math.max(0,(56-r.top)/Math.max(1,span)));if(pT>0.01)sec.dataset.p='1';else delete sec.dataset.p;}
+addEventListener('scroll',()=>{readP();dirty=true;},{passive:true});readP();
+if(matchMedia('(hover:hover) and (pointer:fine)').matches&&!reduce)addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;dirty=true;},{passive:true});
+const stageOf=p=>p<0.13?0:p<0.37?1:p<0.62?2:p<0.8?3:4;let lastS=-1;
+function setStage(k){if(k===lastS)return;lastS=k;caps.forEach(c=>c.classList.toggle('on',+c.dataset.s===k));rail.forEach(l=>l.classList.toggle('on',+l.dataset.s===k));}
+new IntersectionObserver(es=>{vis=es[0].isIntersecting;},{rootMargin:'200px'}).observe(sec);
+new MutationObserver(()=>{K=C();S.background=new THREE.Color(K.bg);mGround.color.setHex(K.ground);mRoad.color.setHex(K.road);mPark.color.setHex(K.park);mB.color.setHex(K.bld);mE.color.setHex(K.edge);plotLine.material.color.setHex(K.acc);plotFill.material.color.setHex(K.acc);mME.color.setHex(K.acc);dirty=true;}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+S.background=new THREE.Color(K.bg);
+// ---------- 장면 갱신 ----------
+function apply(p,time){
+ // 1 건물 솟음 (거리 순, 겹치게)
+ const rise=ss(0.10,0.34,p);blds.forEach(b=>{const k=Math.min(1,Math.max(0,(rise*1.35-b.d/260)));b.g.scale.y=Math.max(0.02,eo(k));});
+ trees.scale.setScalar(Math.max(0.001,eo(ss(0.22,0.32,p))));trees.visible=p>0.2;
+ // 2 매스 한 층씩 + 일조사선 + 해 이동
+ floors.forEach((f,i)=>{const k=ss(0.38+i*0.035,0.42+i*0.035,p);f.visible=k>0;f.scale.y=Math.max(0.01,eo(k));});
+ env.material.opacity=0.16*ss(0.48,0.54,p)*(1-ss(0.66,0.72,p));
+ const sa=-1.1+2.2*ss(0.5,0.64,p)+(p<0.13&&!reduce?Math.sin(time*0.00015)*0.25:0);sun.position.set(Math.sin(sa)*160,150,Math.cos(sa)*-60+120);sun.target.position.set(0,0,0);
+ plotLine.material.linewidth=1;plotFill.material.opacity=0.08+0.1*ss(0.02,0.1,p);
+ // 3 패널 떠오름 → 4 보드로 모임
+ const up=ss(0.64,0.74,p),gather=ss(0.8,0.9,p);
+ panels.forEach((m,i)=>{const u=eo(Math.min(1,Math.max(0,up*1.4-i*0.07)));m.visible=u>0;m.material.opacity=u*(1-ss(0.9,0.95,p));const A=m.userData.s,B=m.userData.f;const g=eo(gather);
+  m.position.set(A[0]+(B[0]-A[0])*g,(A[1]-12*(1-u))+(B[1]-A[1])*g,A[2]+(B[2]-A[2])*g);m.rotation.y=(1-g)*(i%2?0.12:-0.12);});
+ const bo=ss(0.88,0.94,p);board.visible=boardBack.visible=bo>0;board.material.opacity=bo;boardBack.material.opacity=bo*0.9;
+ // 장면이 위로 올라가면 도시는 옅게
+ const fade=ss(0.86,0.96,p);[mB,mGround,mRoad].forEach(m=>{m.transparent=fade>0;m.opacity=1-fade*0.75;});
+ // 카메라
+ const [cp,ct]=camAt(p);if(cam.aspect<1){cp.sub(ct).multiplyScalar(1+(1-cam.aspect)*1.1).add(ct);}{const hf=2*Math.atan(Math.tan(cam.fov*Math.PI/360)*cam.aspect),need=(BW*(cam.aspect<1?1.08:1.55)/2)/Math.tan(hf/2),w=ss(0.8,0.88,p);if(cp.z<need)cp.z+= (need-cp.z)*w;}if(cam.aspect>=1){const sh=4*ss(0.8,0.88,p);cp.x+=sh;ct.x+=sh;}if(p<0.13&&!reduce){const a=time*0.00004;cp.applyAxisAngle(new THREE.Vector3(0,1,0),Math.sin(a)*0.12);}
+ cp.x+=mxs*8;cp.y+=mys*-5;cam.position.copy(cp);cam.lookAt(ct);
+ setStage(reduce?0:stageOf(p));}
+let lastT=0;function frame(time){requestAnimationFrame(frame);if(!vis){lastT=time;return;}const dt=Math.min(100,lastT?time-lastT:16);lastT=time;const kp=1-Math.exp(-dt/140),km=1-Math.exp(-dt/260);
+ const d=pT-pS;pS+=Math.abs(d)<0.0005?d:d*kp;mxs+=(mx-mxs)*km;mys+=(my-mys)*km;
+ const moving=Math.abs(d)>0.0004||Math.abs(mx-mxs)>0.001||Math.abs(my-mys)>0.001;const idle=pS<0.13&&!reduce;
+ if(!(dirty||moving||idle))return;dirty=false;apply(pS,time);R.shadowMap.needsUpdate=true;R.render(S,cam);}
+R.shadowMap.autoUpdate=false;requestAnimationFrame(frame);
+window.__fly={set:p=>{pT=pS=p;dirty=true;apply(p,t0);R.shadowMap.needsUpdate=true;R.render(S,cam);},stage:()=>lastS};
+}}
+</script>
 </body></html>
