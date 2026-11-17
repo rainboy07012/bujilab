@@ -146,6 +146,9 @@ html[data-plan=free] .gated::after{content:'';display:inline-block;width:11px;he
 #vboard{background:var(--bg)}#vboard.on{display:flex;height:100%}
 .bset{width:300px;flex:none;overflow:auto;background:var(--panel);border-right:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .bset label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
+.bset div.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
+.bform{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}.bfh{font-weight:600;font-size:13px;color:var(--ink)}.bfh span{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}.bform .note{margin:0}
+.bset input[type=number]{border:0;border-bottom:1px solid var(--field-line);border-radius:0;background:var(--field);padding:6px 8px;font:inherit;width:90px}.bset input[type=number]:focus{outline:none;background:var(--surface);border-bottom:2px solid var(--acc)}
 .bset input[type=text],.bset textarea{font:inherit;font-size:13px;color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:6px 8px;width:100%}
 .bset textarea{min-height:90px;resize:vertical;line-height:1.5}
 .bset .chk{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12.5px}
@@ -462,6 +465,20 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <div class="row"><button class="btn" id="bRefresh">미리보기 갱신</button><button class="btn pri" id="bVpdf" title="선과 글자가 벡터라 크게 인쇄해도 선명함. 글꼴을 내려받느라 처음엔 몇 초 걸림">PDF (벡터)</button></div>
    <div class="row"><button class="btn" id="bPdf" title="보드를 한 장의 이미지로 넣은 PDF">PDF (이미지)</button><button class="btn" id="bPng">PNG</button><button class="btn" id="bSvg" title="일러스트레이터에서 도면별·레이어별로 편집">SVG</button></div>
    <div class="row"><button class="btn" id="packB2" title="보드에 넣지 않고 도면·표를 각각 파일로 받기" style="flex:1">출력 묶음 ZIP (도면·표 따로)</button></div>
+   <div class="bform">
+    <div class="bfh">크리틱 북 <span>A3 가로 · 매주 크리틱용</span></div>
+    <p class="note">표지 → 대지 → 법규·볼륨 → 대안 비교 → 과정·단면 → 이번 주 결정할 것. 한 쪽에 질문 하나씩 묶어 PDF 한 파일로 냅니다.</p>
+    <label class="f">주차<input type="number" id="bWeek" min="1" max="20" value="1"></label>
+    <div class="f"><span style="display:flex;justify-content:space-between;align-items:center">이번 주 결정할 것 (한 줄에 하나) <button class="btn sm" id="bQAuto" type="button">자동 초안</button></span><textarea id="bQs" rows="4" placeholder="예: 열람실을 도로 레벨에 둘지, 한 층 올릴지"></textarea></div>
+    <div class="row"><button class="btn" id="bBookPv">미리보기</button><button class="btn pri" id="bBook">크리틱 북 PDF</button></div>
+   </div>
+   <div class="bform">
+    <div class="bfh">공모 제출용 <span>요강 규격 맞춤</span></div>
+    <label class="f">제출 양식<select id="bComp"><option value="a2x2">A2 가로 2쪽 → A1 한 장 (건축문화대상류)</option><option value="a1v">A1 세로 한 장 (아이디어 공모)</option><option value="a1h">A1 가로 한 장</option></select></label>
+    <label class="f">접수번호 (비우면 빈 칸으로 둡니다)<input type="text" id="bTag" placeholder="가-001" maxlength="12"></label>
+    <label class="tg"><input type="checkbox" id="bAnon" checked>이름·스튜디오 숨기기 (익명 심사)</label>
+    <div class="row"><button class="btn" id="bCompPv">미리보기</button><button class="btn pri" id="bCompPdf">공모용 PDF</button></div>
+   </div>
    <div class="baudit" id="bAudit" aria-live="polite"></div>
    <p class="bnote">현재 작업 상태(매스, 대지, 시각, 분석 결과)가 그대로 들어갑니다. 3D 매스는 지금 3D 화면의 시점으로 찍힙니다. A1 인쇄용은 만드는 데 몇 초 걸릴 수 있습니다.</p>
   </div>
@@ -914,7 +931,7 @@ thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
 // ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
 const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
-const GATED='#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
+const GATED='#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
 const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
 function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
 let planPending=null;
@@ -1709,7 +1726,7 @@ $('#pcPng').onclick=()=>exportProc('png');$('#packB').onclick=exportPack;$('#pac
 // ---------- board (A3/A2/A1) ----------
 const PAPER={A3:[420,297],A2:[594,420],A1:[841,594]};
 let board={paper:'A2',dpi:150,sc:'auto',layout:null,title:'대지 분석 및 매스 스터디',name:'',studio:'',note:'',panels:['diag','sun','slope','aspect','syn','m3d','sec']};
-function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
+function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
  $$('#bPanels input').forEach(i=>i.checked=board.panels.includes(i.value));}
 let bTimer=null;const bLater=()=>{clearTimeout(bTimer);bTimer=setTimeout(()=>{if(curPane==='vboard')previewBoard();},350);};
 $$('#bPaper button').forEach(b=>b.onclick=()=>{board.paper=b.dataset.p;syncBoardUI();commit();bLater();});
@@ -1733,8 +1750,8 @@ function drawCmpBoard(c,mm,font,x,y,w,h,s,MX){const F=slots.map((q,i)=>q&&{q,i})
  rows.forEach(([lab,fn,hk])=>{c.fillStyle='#e3e5e9';c.fillRect(mm(x+pad),mm(ry),mm(w-2*pad),MX(1,mm(0.15*s)));c.fillStyle='#5f6672';c.font=font(400,4.2);c.fillText(lab,mm(x+pad),mm(ry+rh*0.7));
   F.forEach(({q,i},j)=>{const best=hk&&(AB[hk]||[]).includes(i);c.fillStyle=best?'#1f8a4c':'#16181d';c.font=font(best?700:500,4.3,true);c.fillText(fn(q),mm(x+pad+labW+j*colW+1*s),mm(ry+rh*0.7));});ry+=rh;});
  c.fillStyle='#8a9099';c.font=font(400,3.4);c.fillText('초록 = 그 기준에서 가장 유리한 안(1% 안쪽 차이는 비김). 연면적은 위반 없는 안끼리 비교. 일조·그림자는 간이 계산',mm(x+pad),mm(y+h-1.5*s));}
-function renderBoard(dpi,vec){
- const [PW,PH]=PAPER[board.paper];const k=vec?1:dpi/25.4,s=PW/841;const cw=Math.round(PW*k),ch=Math.round(PH*k);
+function renderBoard(dpi,vec,o={}){
+ const [PW,PH]=o.dim||PAPER[board.paper];const k=vec?1:dpi/25.4,s=Math.max(PW,PH)/841;const cw=Math.round(PW*k),ch=Math.round(PH*k);
  let cv,c;if(vec){const r=svgCanvas(PW,PH);cv=r.cv;c=r.rec;}else{cv=document.createElement('canvas');cv.width=cw;cv.height=ch;c=cv.getContext('2d');}const mm=v=>v*k;
  const MX=(a,b)=>vec?b:Math.max(a,b);const FS=v=>`${MX(1,mm(v*s)).toFixed(vec?2:1)}px`;const font=(w,sz,mono)=>`${w} ${FS(sz)} ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;
  c.fillStyle='#fff';c.fillRect(0,0,cw,ch);
@@ -1742,16 +1759,17 @@ function renderBoard(dpi,vec){
  const m=14*s;const gap=6*s;
  // header
  const hh=30*s;c.fillStyle='#16181d';c.fillRect(mm(m),mm(m+hh),mm(PW-2*m),mm(0.6*s));
- c.fillStyle='#16181d';c.font=font(700,13);c.textBaseline='alphabetic';c.fillText(board.title||'대지 분석',mm(m),mm(m+14*s));
- c.font=font(400,5.2);c.fillStyle='#5f6672';c.fillText(`${SITE?SITE.addr:'가상 대지'} · ${zone.n} · 대지면적 ${f1(M.A)}㎡ · ${$('#terr').selectedOptions[0].text}`,mm(m),mm(m+24*s));
- c.textAlign='right';c.fillStyle='#16181d';c.font=font(600,5.2);c.fillText(board.name||'이름 · 학번',mm(PW-m),mm(m+12*s));
- c.font=font(400,4.4);c.fillStyle='#5f6672';c.fillText(board.studio||'스튜디오 · 과목',mm(PW-m),mm(m+19*s));
+ c.fillStyle='#16181d';c.font=font(700,13);c.textBaseline='alphabetic';c.fillText((o.title??board.title)||'대지 분석',mm(m),mm(m+14*s));
+ c.font=font(400,5.2);c.fillStyle='#5f6672';c.fillText(`${o.kicker?o.kicker+' · ':''}${SITE?SITE.addr:'가상 대지'} · ${zone.n} · 대지면적 ${f1(M.A)}㎡ · ${$('#terr').selectedOptions[0].text}`,mm(m),mm(m+24*s));
+ c.textAlign='right';if(!o.anon){c.fillStyle='#16181d';c.font=font(600,5.2);c.fillText(board.name||'이름 · 학번',mm(PW-m),mm(m+12*s));}
+ c.font=font(400,4.4);c.fillStyle='#5f6672';if(!o.anon)c.fillText(board.studio||'스튜디오 · 과목',mm(PW-m),mm(m+19*s));
  const d=new Date();c.fillText(`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`,mm(PW-m),mm(m+25.5*s));c.textAlign='left';
+ if(o.tag!==undefined){const tx=PW-m-30,ty=m-4;c.strokeStyle='#16181d';c.lineWidth=MX(1,mm(0.35));c.strokeRect(mm(tx),mm(ty),mm(30),mm(10));c.textAlign='center';c.fillStyle=o.tag?'#16181d':'#a0a6b0';c.font=o.tag?`600 ${mm(5)}px "IBM Plex Mono",monospace`:`400 ${mm(2.6)}px "IBM Plex Sans KR",sans-serif`;c.fillText(o.tag||'접수번호',mm(tx+15),mm(ty+(o.tag?6.8:6.1)));c.textAlign='left';}
  // layout
- const top=m+hh+gap*1.5,bottom=PH-m-8*s,bodyH=bottom-top;const rightW=(PW-2*m)*0.27,leftW=PW-2*m-rightW-gap*2;
- const P=board.panels.filter(x=>PNAME[x]);const n=P.length;const cols=n<=1?1:n<=4?2:3;const rows=MX(1,Math.ceil(n/cols));
+ const top=m+hh+gap*1.5,bottom=PH-m-8*s,bodyH=bottom-top;const rightW=o.noSide?0:(PW-2*m)*(PW<PH?0.32:0.27),leftW=PW-2*m-rightW-(o.noSide?0:gap*2);
+ const P=(o.panels||board.panels).filter(x=>PNAME[x]);const n=P.length;const cols=n<=1?1:n<=4?2:3;const rows=MX(1,Math.ceil(n/cols));
  const cellW=(leftW-(cols-1)*gap)/cols,cellH=(bodyH-(rows-1)*gap)/rows,capH=9*s;
- const css=96/25.4;const pr=dpi/96;const ks=boardScale();
+ const css=96/25.4;const pr=dpi/96;const ks=o.ks||boardScale();
  // 패널 위치: 직접 옮긴 배치(용지 비율로 저장)가 있으면 그것, 없으면 자동 격자
  // 자동 배치: 5~7개면 앞 두 장을 크게(윗줄), 나머지는 3열. 마지막 줄은 남는 칸 없이 폭을 채움
  const auto=(()=>{const out=[];const rowFill=(keys,y,h)=>{const k=keys.length,w=(leftW-(k-1)*gap)/k;keys.forEach((key,j)=>out.push({key,x:m+j*(w+gap),y,w,h}));};
@@ -1759,7 +1777,7 @@ function renderBoard(dpi,vec){
   if(n<=7){const rest=P.slice(2),rr=[];for(let i=0;i<rest.length;i+=3)rr.push(rest.slice(i,i+3));const h1=bodyH*(rr.length===1?0.56:0.46)-gap/2,hr=(bodyH-h1-gap-(rr.length-1)*gap)/rr.length;
    rowFill(P.slice(0,2),top,h1);rr.forEach((r,j)=>rowFill(r,top+h1+gap+j*(hr+gap),hr));return out;}
   const rws=[];for(let i=0;i<n;i+=3)rws.push(P.slice(i,i+3));const h=(bodyH-(rws.length-1)*gap)/rws.length;rws.forEach((r,j)=>rowFill(r,top+j*(h+gap),h));return out;})();
- const rects=P.map((key,i)=>{const L=board.layout&&board.layout[key];if(L)return{key,x:L.x*PW,y:L.y*PH,w:L.w*PW,h:L.h*PH};return auto[i];});
+ const rects=P.map((key,i)=>{const L=!o.panels&&!o.dim&&board.layout&&board.layout[key];if(L)return{key,x:L.x*PW,y:L.y*PH,w:L.w*PW,h:L.h*PH};return auto[i];});
  P.forEach((key,i)=>{const RC=rects[i];const x=RC.x,y=RC.y,iw=RC.w,ih=Math.max(10,RC.h-capH);
   c.fillStyle='#16181d';c.font=font(600,4.6,true);c.fillText(String(i+1).padStart(2,'0'),mm(x),mm(y+5.6*s));c.font=font(600,4.6);c.fillText(PNAME[key]+(key==='diag'||key==='m3d'?'':''),mm(x+9*s),mm(y+5.6*s));
   // ks: 도면 안 글자·선 배율(큰 용지일수록 크게). W,H를 줄이고 해상도를 올려 같은 크기로 그림
@@ -1776,6 +1794,7 @@ function renderBoard(dpi,vec){
   else{const sub=document.createElement('canvas');draw(sub,rdpi/96*kp);c.drawImage(sub,mm(x),mm(y+capH),mm(iw),mm(ih));}
   c.strokeStyle='#c9ced6';c.lineWidth=MX(1,mm(0.25*s));c.strokeRect(mm(x),mm(y+capH),mm(iw),mm(ih));});
  // right column
+ if(!o.noSide){
  let rx=m+leftW+gap*2,ry=top;const RW=rightW,RX0=rx;
  const sec=(title)=>{c.fillStyle='#16181d';c.font=font(700,6);c.fillText(title,mm(rx),mm(ry+6*s));ry+=9*s;c.fillRect(mm(rx),mm(ry),mm(RW),MX(1,mm(0.4*s)));ry+=4.5*s;};
  const row=(a,b,col)=>{c.font=font(400,4.8);c.fillStyle='#5f6672';c.fillText(a,mm(rx),mm(ry+4.2*s));c.textAlign='right';c.font=font(500,4.8,true);c.fillStyle=col||'#16181d';c.fillText(b,mm(rx+RW-(rx-RX0)),mm(ry+4.2*s));c.textAlign='left';ry+=7.6*s;c.fillStyle='#e3e5e9';c.fillRect(mm(rx),mm(ry-1.4*s),mm(RW-(rx-RX0)),MX(1,mm(0.15*s)));};
@@ -1791,9 +1810,10 @@ function renderBoard(dpi,vec){
  ry+=5*s;
  if(P.includes('syn')){const I=synInfo();if(I){ry+=5*s;sec('분석 종합 · 설계 시사점');const lh=7*s;synText(I).forEach(tx=>{c.font=font(400,4.7);const lines=wrapText(c,tx,mm(RW-4*s));c.fillStyle=ACOL[dstyleG]||'#c8372d';c.fillRect(mm(rx),mm(ry+2*s),MX(2,mm(1.2*s)),MX(2,mm(1.2*s)));c.fillStyle='#16181d';lines.forEach(L=>{if(ry+lh<bottom){c.fillText(L,mm(rx+3.5*s),mm(ry+4.4*s));ry+=lh;}});ry+=1.5*s;});c.font=font(400,3.8);c.fillStyle='#8a9099';if(ry+lh<bottom){c.fillText('자동 초안 · 검토 후 수정',mm(rx),mm(ry+4*s));ry+=lh;}}}
  if(board.note){sec('설계 전략');c.font=font(400,5);c.fillStyle='#16181d';const lines=wrapText(c,board.note,mm(RW));const lh=7.6*s;lines.forEach(L=>{if(ry+lh<bottom){c.fillText(L,mm(rx),mm(ry+4.6*s));ry+=lh;}});}
+ }
  // footer
  c.fillStyle='#16181d';c.fillRect(mm(m),mm(PH-m-5*s),mm(PW-2*m),MX(1,mm(0.3*s)));c.font=font(400,3.4);c.fillStyle='#6b7280';
- c.fillText(`부지랩 프로토타입으로 생성 · 법규 수치는 법정 상한과 단순화 기준이며 지자체 조례 확인 필요 · ${board.paper} ${PW}×${PH}mm`+(SITE?` · 자료: 브이월드(국토교통부) 연속지적도·도로명주소건물·용도지역${PHOTO&&PHOTO.site===SITE.id&&lay.photo?'·항공사진':''}${SITE.dem?' · 표고: Terrain Tiles(Mapzen, AWS Open Data)':''}`:''),mm(m),mm(PH-m));
+ c.fillText(`부지랩 프로토타입으로 생성 · 법규 수치는 법정 상한과 단순화 기준이며 지자체 조례 확인 필요 · ${o.label||board.paper} ${PW}×${PH}mm`+(SITE?` · 자료: 브이월드(국토교통부) 연속지적도·도로명주소건물·용도지역${PHOTO&&PHOTO.site===SITE.id&&lay.photo?'·항공사진':''}${SITE.dem?' · 표고: Terrain Tiles(Mapzen, AWS Open Data)':''}`:''),mm(m),mm(PH-m));
  if(vec)return{svg:c.toString(PW,PH,board.title||'부지랩 보드'),PW,PH,rects};
  return{cv,PW,PH,rects};}
 // 출력 전 확인: 자료 출처, 법규 판정의 한계, 문장 속 수치와 범례 수치의 일치 여부
@@ -1880,6 +1900,82 @@ $('#bSvg').onclick=async()=>{toast('SVG 보드를 만드는 중입니다...');aw
 $('#bVpdf').onclick=async()=>{toast('벡터 PDF를 만드는 중입니다… 처음에는 글꼴을 내려받느라 몇 초 걸립니다.');await new Promise(r=>setTimeout(r,60));
  try{const blob=await boardPDFVector();offer(`bujilab_board_${board.paper}_${stamp()}.pdf`,blob);}
  catch(e){toast(e.message==='lib'||e.message==='font'||/fetch|network/i.test(e.message)?'벡터 PDF용 도구를 내려받지 못했습니다(인터넷 연결 필요). PDF(이미지)나 SVG로 저장하세요.':'벡터 PDF를 만들지 못했습니다: '+e.message);}};
+
+// ---------- 제출 양식: 크리틱 북(A3 가로 여러 쪽) · 공모 요강 맞춤 ----------
+const ANA_K=['plan','sheet','diag','sun','syn','slope','aspect','elev'],DES_K=['m3d','axo','sec','proc','cmp','req'];
+const capDpi=(W,H,d)=>Math.min(d,Math.floor(Math.sqrt(16.5e6/((W/25.4)*(H/25.4)))));
+async function pdfFromPages(pages,title){const enc=new TextEncoder();const chunks=[];let len=0;const offs=[];
+ const push=x=>{const b=typeof x==='string'?enc.encode(x):x;chunks.push(b);len+=b.length;};
+ const obj=(n,parts)=>{offs[n]=len;push(`${n} 0 obj\n`);(Array.isArray(parts)?parts:[parts]).forEach(push);push('\nendobj\n');};
+ const jp=[];for(const p of pages){const b=await new Promise(r=>p.cv.toBlob(r,'image/jpeg',0.92));jp.push(new Uint8Array(await b.arrayBuffer()));}
+ push('%PDF-1.4\n');push(new Uint8Array([37,226,227,207,211,10]));const N=pages.length,kid=i=>3+i*3;
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${pages.map((_,i)=>kid(i)+' 0 R').join(' ')}] /Count ${N} >>`);
+ pages.forEach((p,i)=>{const W=(p.W*72/25.4).toFixed(2),H=(p.H*72/25.4).toFixed(2),a=kid(i);
+  obj(a,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im0 ${a+1} 0 R >> >> /Contents ${a+2} 0 R >>`);
+  obj(a+1,[`<< /Type /XObject /Subtype /Image /Width ${p.cv.width} /Height ${p.cv.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jp[i].length} >>\nstream\n`,jp[i],'\nendstream']);
+  const cs=`q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q`;obj(a+2,`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);});
+ const info=3+N*3;obj(info,`<< /Title <${utf16hex(title)}> /Producer (BUJILAB) >>`);
+ const xref=len;let x=`xref\n0 ${info+1}\n0000000000 65535 f \n`;for(let n=1;n<=info;n++)x+=String(offs[n]).padStart(10,'0')+' 00000 n \n';push(x);
+ push(`trailer\n<< /Size ${info+1} /Root 1 0 R /Info ${info} 0 R >>\nstartxref\n${xref}\n%%EOF\n`);return new Blob(chunks,{type:'application/pdf'});}
+// 이번 주 결정할 것: 법규 판정·대안·프로그램에서 초안
+function autoQs(){const M=lastM||metrics();const RS=regStatus(M,parkingReq(),pkPlan);const pk=parkingReq();const q=[];
+ const D={bf:()=>`건폐율 ${M.bcr.toFixed(1)}% / ${zone.b}%, 용적률 ${M.far.toFixed(1)}% / ${zone.f}% 초과를 어디서 줄일지`,sun:()=>'정북 일조사선을 넘는 북측 매스를 깎을지, 계단형으로 물릴지',edge:()=>'대지 경계·건축선을 넘는 매스를 어떻게 정리할지',
+  land:()=>`조경면적 ${f1(Math.max(0,M.ls.req-M.ls.plan))}㎡ 부족: 어디에 확보할지`,park:()=>`주차 ${pkPlan??0} / ${pk.total}대: 배치를 어디에 둘지`,flr:()=>'층수 제한 초과: 층을 줄일지, 면적을 옆으로 넓힐지',ord:()=>'조례·지구단위계획 확인'};
+ RS.items.filter(i=>i.st==='bad').forEach(i=>D[i.k]&&q.push(D[i.k]()));
+ RS.items.filter(i=>i.st==='rev'&&(i.k==='park'||i.k==='ord'||i.k==='land')).forEach(i=>D[i.k]&&q.push(D[i.k]()));
+ const F=slots.map((x,i)=>x&&'ABC'[i]).filter(Boolean);if(F.length>=2)q.push(`${F.join('·')}안 중 어느 안으로 발전시킬지`);
+ q.push('다음 크리틱까지: ');return q.slice(0,6).join('\n');}
+function bookCover(dpi,meta){const W=420,H=297,k=dpi/25.4,mm=v=>v*k;const cv=document.createElement('canvas');cv.width=Math.round(W*k);cv.height=Math.round(H*k);const c=cv.getContext('2d');
+ c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);const F=(w,sz,mono)=>`${w} ${mm(sz)}px ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;
+ const im=shot3D(Math.round(220*k),Math.round(240*k));c.drawImage(im,mm(186),mm(28),mm(220),mm(240));
+ c.fillStyle='#5f6672';c.font=F(400,4.2,true);c.fillText(`WEEK ${meta.week} · 크리틱`,mm(16),mm(30));
+ c.fillStyle='#16181d';c.font=F(300,15);wrapText(c,meta.title,mm(160)).slice(0,3).forEach((L,i)=>c.fillText(L,mm(16),mm(96+i*19)));
+ c.font=F(400,4.6);c.fillStyle='#5f6672';c.fillText(`${SITE?SITE.addr:'가상 대지'} · ${zone.n}`,mm(16),mm(96+Math.min(3,wrapText(c,meta.title,mm(160)).length)*19+4));
+ c.fillStyle='#16181d';c.fillRect(mm(16),mm(250),mm(160),Math.max(1,mm(0.4)));c.font=F(600,5);c.fillText(board.name||'이름 · 학번',mm(16),mm(260));
+ c.font=F(400,4.2);c.fillStyle='#5f6672';c.fillText(board.studio||'스튜디오 · 과목',mm(16),mm(267));const d=new Date();c.fillText(`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`,mm(16),mm(274));
+ c.font=F(400,3.2,true);c.fillStyle='#8a9099';c.fillText(`1 / ${meta.n}`,mm(W-16-12),mm(H-12));return cv;}
+function bookQs(dpi,meta){const W=420,H=297,k=dpi/25.4,mm=v=>v*k;const cv=document.createElement('canvas');cv.width=Math.round(W*k);cv.height=Math.round(H*k);const c=cv.getContext('2d');
+ c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);const F=(w,sz,mono)=>`${w} ${mm(sz)}px ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;
+ c.fillStyle='#5f6672';c.font=F(400,4.2,true);c.fillText(`WEEK ${meta.week} · ${meta.i} / ${meta.n}`,mm(16),mm(24));
+ c.fillStyle='#16181d';c.font=F(300,11);c.fillText('이번 주 결정할 것',mm(16),mm(44));c.fillRect(mm(16),mm(50),mm(W-32),Math.max(1,mm(0.4)));
+ const L=String((board.qs&&board.qs.trim())?board.qs:autoQs()).split('\n').map(t=>t.trim()).filter(Boolean).slice(0,8);let y=70;
+ L.forEach((t,i)=>{c.fillStyle='#0f62fe';c.font=F(600,6,true);c.fillText(String(i+1).padStart(2,'0'),mm(16),mm(y));c.fillStyle='#16181d';c.font=F(400,7);wrapText(c,t,mm(W-60)).slice(0,2).forEach((s2,j)=>c.fillText(s2,mm(32),mm(y+j*10)));
+  y+=Math.min(2,wrapText(c,t,mm(W-60)).length)*10+9;c.fillStyle='#e3e5e9';c.fillRect(mm(32),mm(y-12),mm(W-48),Math.max(1,mm(0.25)));});
+ c.font=F(400,3.4);c.fillStyle='#8a9099';c.fillText('법규 판정에서 뽑은 초안이 섞여 있으면 크리틱 전에 문장을 다듬으세요. 수치는 부지랩 간이 계산입니다.',mm(16),mm(H-12));return cv;}
+async function buildBook(dpi){const week=board.week||1,title=board.title||'크리틱';const D=[420,297];dpi=capDpi(420,297,dpi);
+ const spec=[['cover'],['p',['diag','sun','slope'],'대지는 어떤가',false],['p',['m3d'],'얼마나 지을 수 있나',true]];
+ if(slots.some(Boolean))spec.push(['p',['cmp'],'어느 안으로 갈까',false]);
+ spec.push(['p',proc.length?['proc','sec']:['axo','sec'],proc.length?'어떻게 여기까지 왔나':'매스와 단면',false]);spec.push(['qs']);
+ const n=spec.length,meta={week,title,n};const pages=[];
+ for(let i=0;i<n;i++){const sp=spec[i];let cv;
+  if(sp[0]==='cover')cv=bookCover(dpi,meta);else if(sp[0]==='qs')cv=bookQs(dpi,{...meta,i:i+1});
+  else cv=renderBoard(dpi,false,{dim:D,panels:sp[1],title:sp[2],noSide:!sp[3],ks:0.8,label:'A3 크리틱 북',kicker:`WEEK ${week} · ${i+1} / ${n}`}).cv;
+  pages.push({cv,W:D[0],H:D[1]});await new Promise(r=>setTimeout(r,0));}
+ return pages;}
+function compPanels(list,def){const P=board.panels.filter(k=>list.includes(k));return P.length?P:def;}
+async function buildComp(dpi){const kind=board.comp||'a2x2',anon=board.anon!==false,tag=board.tag||'';
+ if(kind==='a1v'||kind==='a1h'){const D=kind==='a1v'?[594,841]:[841,594];dpi=capDpi(D[0],D[1],dpi);const r=renderBoard(dpi,false,{dim:D,anon,tag,label:kind==='a1v'?'A1 세로 (공모)':'A1 가로 (공모)',panels:board.panels});return{cv:r.cv,W:D[0],H:D[1]};}
+ dpi=capDpi(594,841,dpi);const k=dpi/25.4;
+ const a=renderBoard(dpi,false,{dim:[594,420],anon,tag,kicker:'1 / 2 · 대지와 근거',label:'A2 1쪽',panels:compPanels(ANA_K,['diag','sun','slope'])}).cv;
+ const b=renderBoard(dpi,false,{dim:[594,420],anon,noSide:true,kicker:'2 / 2 · 매스와 계획',label:'A2 2쪽',panels:compPanels(DES_K,['m3d','sec'])}).cv;
+ const cv=document.createElement('canvas');cv.width=Math.round(594*k);cv.height=Math.round(841*k);const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);
+ c.drawImage(a,0,0);c.drawImage(b,0,Math.round(421*k));c.strokeStyle='#c9ced6';c.lineWidth=Math.max(1,0.3*k);c.setLineDash([3*k,2*k]);c.beginPath();c.moveTo(0,420.5*k);c.lineTo(cv.width,420.5*k);c.stroke();c.setLineDash([]);
+ return{cv,W:594,H:841};}
+function showPages(pages){const box=$('.bprev');const avail=Math.max(300,box.clientWidth-40);const gap=16;BPV=null;BZOOM=0;
+ const sc=avail/Math.max(...pages.map(p=>p.cv.width));const H=pages.reduce((t,p)=>t+p.cv.height*sc+gap,0);const b=$('#bcv');const dpr=Math.min(2,devicePixelRatio||1);
+ b.width=Math.round(avail*dpr);b.height=Math.round(H*dpr);const g=b.getContext('2d');g.fillStyle=getComputedStyle(box).backgroundColor||'#eee';g.fillRect(0,0,b.width,b.height);g.imageSmoothingQuality='high';let y=0;
+ pages.forEach(p=>{const w=p.cv.width*sc*dpr,h=p.cv.height*sc*dpr;g.drawImage(p.cv,(b.width-w)/2,y,w,h);y+=h+gap*dpr;});b.style.width=avail+'px';box.classList.remove('zoomed');}
+$('#bWeek').onchange=e=>{board.week=Math.max(1,+e.target.value||1);commit();};
+$('#bQs').oninput=e=>{board.qs=e.target.value;};$('#bQs').onchange=commit;
+$('#bQAuto').onclick=()=>{board.qs=autoQs();$('#bQs').value=board.qs;commit();};
+$('#bComp').onchange=e=>{board.comp=e.target.value;commit();};$('#bTag').oninput=e=>{board.tag=e.target.value.trim();};$('#bTag').onchange=commit;$('#bAnon').onchange=e=>{board.anon=e.target.checked;commit();};
+$('#bBookPv').onclick=async()=>{toast('크리틱 북 미리보기를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));showPages(await buildBook(60));};
+$('#bBook').onclick=async()=>{toast('크리틱 북을 만드는 중입니다. 쪽수만큼 몇 초 걸립니다…');await new Promise(r=>setTimeout(r,60));
+ const pages=await buildBook(board.dpi||150);await offer(`bujilab_critique_W${board.week||1}_${stamp()}.pdf`,await pdfFromPages(pages,(board.title||'크리틱')+` · WEEK ${board.week||1}`));};
+$('#bCompPv').onclick=async()=>{toast('공모용 보드 미리보기를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));showPages([await buildComp(60)]);};
+$('#bCompPdf').onclick=async()=>{toast('공모용 PDF를 만드는 중입니다…');await new Promise(r=>setTimeout(r,60));const p=await buildComp(board.dpi||150);
+ await offer(`bujilab_comp_${board.comp||'a2x2'}_${stamp()}.pdf`,await pdfFromPages([p],board.anon!==false?'공모 출품작':(board.title||'부지랩 보드')));};
+window.__book=async d=>buildBook(d||40);window.__comp=async(d,k)=>{if(k)board.comp=k;return buildComp(d||40);};window.__pdfPages=pdfFromPages;
 
 // ---------- panes / misc ----------
 let curPane='v3d';
