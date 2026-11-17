@@ -148,6 +148,10 @@ html[data-plan=free] .gated::after{content:'';display:inline-block;width:11px;he
 .bset label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
 .bset div.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
 .bform{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}.bfh{font-weight:600;font-size:13px;color:var(--ink)}.bfh span{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}.bform .note{margin:0}
+.cqlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:cq}.cqlist:empty{display:none}
+.cqlist li{counter-increment:cq;display:grid;grid-template-columns:22px 1fr;gap:2px 8px;font-size:12.5px;line-height:1.5}
+.cqlist li::before{content:counter(cq,decimal-leading-zero);font:600 11px var(--mono,'IBM Plex Mono',monospace);color:var(--acc);grid-row:1/4;padding-top:2px}
+.cqlist li[data-sev='3']::before{color:var(--bad)}.cqlist b{font-weight:600;color:var(--ink)}.cqlist span{color:var(--mut)}.cqlist em{font-style:normal;color:var(--mut);font-size:11.5px}
 .bset input[type=number]{border:0;border-bottom:1px solid var(--field-line);border-radius:0;background:var(--field);padding:6px 8px;font:inherit;width:90px}.bset input[type=number]:focus{outline:none;background:var(--surface);border-bottom:2px solid var(--acc)}
 .bset input[type=text],.bset textarea{font:inherit;font-size:13px;color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:6px 8px;width:100%}
 .bset textarea{min-height:90px;resize:vertical;line-height:1.5}
@@ -466,8 +470,14 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <div class="row"><button class="btn" id="bPdf" title="보드를 한 장의 이미지로 넣은 PDF">PDF (이미지)</button><button class="btn" id="bPng">PNG</button><button class="btn" id="bSvg" title="일러스트레이터에서 도면별·레이어별로 편집">SVG</button></div>
    <div class="row"><button class="btn" id="packB2" title="보드에 넣지 않고 도면·표를 각각 파일로 받기" style="flex:1">출력 묶음 ZIP (도면·표 따로)</button></div>
    <div class="bform">
+    <div class="bfh">크리틱 예상 질문 <span>지금 안의 수치로 뽑음</span></div>
+    <p class="note">법규 판정, 경사·일조, 접도, 대안, 과정, 과제 프로그램을 보고 크리틱에서 나올 만한 질문과 그 근거를 정리합니다. 대답할 때 보여 줄 도면도 같이 적습니다.</p>
+    <div class="row"><button class="btn" id="cqRun">질문 뽑기</button><label class="tg" style="margin-left:auto"><input type="checkbox" id="cqBook" checked>크리틱 북에 넣기</label></div>
+    <ol class="cqlist" id="cqList" aria-live="polite"></ol>
+   </div>
+   <div class="bform">
     <div class="bfh">크리틱 북 <span>A3 가로 · 매주 크리틱용</span></div>
-    <p class="note">표지 → 대지 → 법규·볼륨 → 대안 비교 → 과정·단면 → 이번 주 결정할 것. 한 쪽에 질문 하나씩 묶어 PDF 한 파일로 냅니다.</p>
+    <p class="note">표지 → 대지 → 법규·볼륨 → 대안 비교 → 과정·단면 → 나올 만한 질문 → 이번 주 결정할 것. 한 쪽에 질문 하나씩 묶어 PDF 한 파일로 냅니다.</p>
     <label class="f">주차<input type="number" id="bWeek" min="1" max="20" value="1"></label>
     <div class="f"><span style="display:flex;justify-content:space-between;align-items:center">이번 주 결정할 것 (한 줄에 하나) <button class="btn sm" id="bQAuto" type="button">자동 초안</button></span><textarea id="bQs" rows="4" placeholder="예: 열람실을 도로 레벨에 둘지, 한 층 올릴지"></textarea></div>
     <div class="row"><button class="btn" id="bBookPv">미리보기</button><button class="btn pri" id="bBook">크리틱 북 PDF</button></div>
@@ -1726,7 +1736,7 @@ $('#pcPng').onclick=()=>exportProc('png');$('#packB').onclick=exportPack;$('#pac
 // ---------- board (A3/A2/A1) ----------
 const PAPER={A3:[420,297],A2:[594,420],A1:[841,594]};
 let board={paper:'A2',dpi:150,sc:'auto',layout:null,title:'대지 분석 및 매스 스터디',name:'',studio:'',note:'',panels:['diag','sun','slope','aspect','syn','m3d','sec']};
-function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
+function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#cqBook').checked=board.cqBook!==false;$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
  $$('#bPanels input').forEach(i=>i.checked=board.panels.includes(i.value));}
 let bTimer=null;const bLater=()=>{clearTimeout(bTimer);bTimer=setTimeout(()=>{if(curPane==='vboard')previewBoard();},350);};
 $$('#bPaper button').forEach(b=>b.onclick=()=>{board.paper=b.dataset.p;syncBoardUI();commit();bLater();});
@@ -1901,6 +1911,54 @@ $('#bVpdf').onclick=async()=>{toast('벡터 PDF를 만드는 중입니다… 처
  try{const blob=await boardPDFVector();offer(`bujilab_board_${board.paper}_${stamp()}.pdf`,blob);}
  catch(e){toast(e.message==='lib'||e.message==='font'||/fetch|network/i.test(e.message)?'벡터 PDF용 도구를 내려받지 못했습니다(인터넷 연결 필요). PDF(이미지)나 SVG로 저장하세요.':'벡터 PDF를 만들지 못했습니다: '+e.message);}};
 
+// ---------- 크리틱 예상 질문 (규칙 기반: 지금 안의 수치에서 뽑음, AI 호출 없음) ----------
+function critQs(){const M=lastM||metrics();const RS=regStatus(M,parkingReq(),pkPlan);const pk=parkingReq();const Q=[];const add=(sev,q,why,show)=>Q.push({sev,q,why,show});
+ const it=k=>RS.items.find(i=>i.k===k)||{};
+ // 1) 법규 위반: 반드시 나오는 질문
+ if(it('sun').st==='bad')add(3,'북측 매스가 정북 일조사선을 넘습니다. 깎을 건가요, 계단형으로 물릴 건가요?','정북 일조사선 위반 (높이 10m 넘는 부분은 경계에서 높이의 1/2 이격)','단면도 A–A′, 3D 매스');
+ if(it('bf').st==='bad')add(3,`건폐율 ${M.bcr.toFixed(1)}% / ${zone.b}%, 용적률 ${M.far.toFixed(1)}% / ${zone.f}%를 넘습니다. 어디서 줄일 건가요?`,`${zone.n} 상한 초과`,'건축 개요, 층별 면적표');
+ if(it('edge').st==='bad')add(3,'매스가 대지 경계나 건축선을 넘습니다. 배치를 어떻게 정리할 건가요?','대지 경계·건축선 위반','배치도');
+ if(it('flr').st==='bad')add(3,`층수 제한(${it('flr').cap}층)을 넘습니다. 층을 줄일지, 옆으로 넓힐지 정했나요?`,`계획 ${it('flr').mf}층`,'단면도, 3D 매스');
+ if(it('land').st==='bad'||it('land').st==='rev')add(2,`법정 조경 ${f1(M.ls.req)}㎡를 어디에 둘 건가요?`,`계획 ${f1(M.ls.plan)}㎡ / 법정 ${f1(M.ls.req)}㎡`,'배치도 (조경 구역 표시)');
+ if(it('park').st==='bad'||(it('park').st==='rev'&&pk.total>0))add(2,`주차 ${pk.total}대는 어디에, 어떻게 진입하나요?`,`법정 ${pk.total}대 · 계획 ${pkPlan??'미입력'}`,'배치도 (주차 구역)');
+ // 2) 대지 읽기: 경사·일조·접도
+ const I=(()=>{try{return synInfo();}catch(e){return null;}})();
+ if(I&&I.tot>0){const pc=k=>I.A[k]/I.tot,dir=k=>I.rep[k]?dirName(I.rep[k][0]-I.C[0],I.rep[k][1]-I.C[1]):'';
+  const steep=pc(3)+pc(4);if(steep>=0.15)add(2,`대지의 ${fmtPct(I.A[3]+I.A[4],I.tot)}가 경사 15% 이상입니다. 단차를 건물 안에서 풀었나요, 밖에서 풀었나요?`,`경사 15~30% ${f1(I.A[3])}㎡${I.A[4]>0?`, 30% 이상 ${f1(I.A[4])}㎡`:''}`,'경사분석도, 단면도 A–A′');
+  if(I.A[0]>0&&pc(0)>=0.08)add(1,`${dir(0)}측 평탄하고 볕 드는 땅(${f1(I.A[0])}㎡)을 무엇으로 썼나요?`,'경사 15% 미만 · 동지 일조 4시간 이상','분석 종합 · 설계 시사점, 배치도');
+  else if(I.h4/I.tot<0.3)add(1,'겨울에 4시간 이상 해가 드는 땅이 적습니다. 외부공간은 어디서 볕을 받나요?',`동지 4시간 이상 일조 ${fmtPct(I.h4,I.tot)}`,'동지 일조시간도');
+  if(pc(2)>=0.15)add(1,`볕이 2시간도 안 드는 ${dir(2)}측에는 무엇을 두었나요?`,`동지 일조 2시간 미만 ${fmtPct(I.A[2],I.tot)}`,'동지 일조시간도');
+  if(I.F.length){const m=I.F[0],cr=I.F[1]&&I.F[1].w>=4?I.F[1]:m;add(1,cr===m?`${m.side} ${m.w}m 도로 하나로 보행과 차량이 같이 들어옵니다. 동선이 어디서 갈라지나요?`:`주출입은 ${m.side} ${m.w}m 도로, 차량은 ${cr.side} ${cr.w}m 도로가 맞나요?`,'도로 폭·접도 길이 기준 출입 후보','대지 분석 다이어그램');}}
+ // 3) 매스 규모: 용적률을 얼마나 썼나
+ if(M.fa>0&&!(it('bf').st==='bad')){const u=M.far/zone.f;if(u<0.55)add(2,`용적률을 ${M.far.toFixed(0)}%만 썼습니다(상한 ${zone.f}%). 비워 둔 이유가 설계 의도인가요?`,`허용 연면적의 ${Math.round(u*100)}%`,'건축 개요, 3D 매스');
+  else if(u>0.95)add(1,'용적률을 거의 다 채웠습니다. 그 대신 잃은 것(외부공간, 이웃 일조)은 무엇인가요?',`허용 연면적의 ${Math.round(u*100)}%`,'대안 비교');}
+ // 4) 대안·과정: 왜 이 안인가
+ const nA=slots.filter(Boolean).length;
+ if(nA<2)add(2,'다른 매스 대안은 검토했나요? 지금 안이 나은 근거는 무엇인가요?','저장된 대안 '+nA+'개','대안 비교 (최소 2안)');
+ else{const AB=altBest();const C=ALT_CRIT.filter(c=>(AB[c.k]||[]).length===1);const a=C[0],b=C.find(c=>AB[c.k][0]!==AB[a?.k]?.[0]);
+  if(a&&b)add(2,`${'ABC'[AB[a.k][0]]}안은 ${a.n}, ${'ABC'[AB[b.k][0]]}안은 ${b.n}에서 유리합니다. 어느 쪽을 우선했나요?`,`${a.n}·${b.n} 기준별 비교`,'대안 비교');
+  else add(1,'대안끼리 수치 차이가 거의 없습니다. 무엇을 기준으로 골랐나요?','기준별 차이 1% 이내','대안 비교');}
+ if(proc.length<2)add(1,'매스가 왜 이 모양이 됐는지 단계로 보여 줄 수 있나요?',`저장된 과정 단계 ${proc.length}개`,'매스 변형 과정도');
+ // 5) 과제 프로그램
+ if(req.list.length){const R0=reqStatus();const short=R0.rows.filter(r=>r.st==='rev'||r.st==='nv').sort((u,v)=>(v.need-v.got)-(u.need-u.got));
+  if(R0.gross>R0.maxFA+0.5)add(3,'요구 연면적이 이 대지의 용적률 상한보다 큽니다. 무엇을 줄이거나 지하로 보낼 건가요?',`요구 ${f1(R0.gross)}㎡ · 상한 ${f1(R0.maxFA)}㎡`,'과제 프로그램 검토');
+  else if(short.length){const r=short[0];add(2,r.st==='nv'?`${r.n}이(가) 아직 배치되지 않았습니다. 몇 층에 둘 건가요?`:`${r.n}이(가) 요구보다 ${f1(r.need-r.got)}㎡ 작습니다. 줄인 이유가 있나요?`,`요구 실 충족 ${R0.ok} / ${R0.n}`,'층별 프로그램, 분해 액소');}}
+ return Q.sort((u,v)=>v.sev-u.sev).slice(0,7);}
+function renderCQ(){const L=critQs();const el=$('#cqList');el.innerHTML=L.length?L.map(x=>`<li data-sev="${x.sev}"><b>${esc(x.q)}</b><span>근거: ${esc(x.why)}</span><em>보여 줄 도면: ${esc(x.show)}</em></li>`).join(''):'<li><b>지금 안에서는 뽑을 질문이 없습니다.</b><span>매스를 올리고 대안을 저장하면 질문이 생깁니다.</span></li>';return L;}
+function bookCQ(dpi,meta){const W=420,H=297,k=dpi/25.4,mm=v=>v*k;const cv=document.createElement('canvas');cv.width=Math.round(W*k);cv.height=Math.round(H*k);const c=cv.getContext('2d');
+ c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);const F=(w,sz,mono)=>`${w} ${mm(sz)}px ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;
+ c.fillStyle='#5f6672';c.font=F(400,4.2,true);c.fillText(`WEEK ${meta.week} · ${meta.i} / ${meta.n}`,mm(16),mm(24));
+ c.fillStyle='#16181d';c.font=F(300,11);c.fillText('나올 만한 질문',mm(16),mm(44));c.fillRect(mm(16),mm(50),mm(W-32),Math.max(1,mm(0.4)));
+ const L=critQs();let y=66;L.forEach((x,i)=>{if(y>H-26)return;c.fillStyle=x.sev>=3?'#c8372d':'#0f62fe';c.font=F(600,5,true);c.fillText(String(i+1).padStart(2,'0'),mm(16),mm(y));
+  c.fillStyle='#16181d';c.font=F(500,5.6);const ql=wrapText(c,x.q,mm(W-170)).slice(0,2);ql.forEach((t,j)=>c.fillText(t,mm(30),mm(y+j*7.4)));
+  c.font=F(400,3.8);c.fillStyle='#5f6672';c.fillText('근거  '+x.why,mm(W-130),mm(y));c.fillText('보여 줄 도면  '+x.show,mm(W-130),mm(y+6));
+  y+=Math.max(ql.length*7.4,12)+8;c.fillStyle='#e3e5e9';c.fillRect(mm(30),mm(y-7),mm(W-46),Math.max(1,mm(0.25)));});
+ if(!L.length){c.font=F(400,6);c.fillStyle='#5f6672';c.fillText('지금 안에서는 뽑을 질문이 없습니다.',mm(16),mm(70));}
+ c.font=F(400,3.4);c.fillStyle='#8a9099';c.fillText('부지랩이 지금 안의 법규 판정·경사·일조·대안 수치에서 뽑은 예상 질문입니다. 실제 크리틱 질문과 다를 수 있습니다.',mm(16),mm(H-12));return cv;}
+$('#cqRun').onclick=()=>{const L=renderCQ();toast(L.length?`질문 ${L.length}개를 뽑았습니다.`:'뽑을 질문이 없습니다.');};
+$('#cqBook').onchange=e=>{board.cqBook=e.target.checked;commit();};
+window.__critQs=critQs;
+
 // ---------- 제출 양식: 크리틱 북(A3 가로 여러 쪽) · 공모 요강 맞춤 ----------
 const ANA_K=['plan','sheet','diag','sun','syn','slope','aspect','elev'],DES_K=['m3d','axo','sec','proc','cmp','req'];
 const capDpi=(W,H,d)=>Math.min(d,Math.floor(Math.sqrt(16.5e6/((W/25.4)*(H/25.4)))));
@@ -1945,10 +2003,10 @@ function bookQs(dpi,meta){const W=420,H=297,k=dpi/25.4,mm=v=>v*k;const cv=docume
 async function buildBook(dpi){const week=board.week||1,title=board.title||'크리틱';const D=[420,297];dpi=capDpi(420,297,dpi);
  const spec=[['cover'],['p',['diag','sun','slope'],'대지는 어떤가',false],['p',['m3d'],'얼마나 지을 수 있나',true]];
  if(slots.some(Boolean))spec.push(['p',['cmp'],'어느 안으로 갈까',false]);
- spec.push(['p',proc.length?['proc','sec']:['axo','sec'],proc.length?'어떻게 여기까지 왔나':'매스와 단면',false]);spec.push(['qs']);
+ spec.push(['p',proc.length?['proc','sec']:['axo','sec'],proc.length?'어떻게 여기까지 왔나':'매스와 단면',false]);if(board.cqBook!==false)spec.push(['cq']);spec.push(['qs']);
  const n=spec.length,meta={week,title,n};const pages=[];
  for(let i=0;i<n;i++){const sp=spec[i];let cv;
-  if(sp[0]==='cover')cv=bookCover(dpi,meta);else if(sp[0]==='qs')cv=bookQs(dpi,{...meta,i:i+1});
+  if(sp[0]==='cover')cv=bookCover(dpi,meta);else if(sp[0]==='qs')cv=bookQs(dpi,{...meta,i:i+1});else if(sp[0]==='cq')cv=bookCQ(dpi,{...meta,i:i+1});
   else cv=renderBoard(dpi,false,{dim:D,panels:sp[1],title:sp[2],noSide:!sp[3],ks:0.8,label:'A3 크리틱 북',kicker:`WEEK ${week} · ${i+1} / ${n}`}).cv;
   pages.push({cv,W:D[0],H:D[1]});await new Promise(r=>setTimeout(r,0));}
  return pages;}
