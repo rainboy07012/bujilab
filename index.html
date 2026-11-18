@@ -63,6 +63,7 @@ select,.btn{font:inherit;border:1px solid var(--line);border-radius:2px;padding:
 .rfgrid{columns:3 160px;column-gap:10px;margin-top:12px}.rfgrid figure{break-inside:avoid;margin:0 0 10px;border:1px solid var(--line);background:var(--surface)}.rfgrid img{display:block;width:100%}.rfgrid figcaption{display:flex;gap:4px;padding:4px}.rfgrid input{flex:1;min-width:0;border:0;border-bottom:1px solid var(--field-line);background:transparent;font:inherit;font-size:12px;padding:3px 2px;color:var(--ink)}.rfgrid button{border:0;background:none;color:var(--mut);cursor:pointer}
 .rfgrid:empty::before{content:'사례 사진이나 스케치를 올려 모아 두세요. 캡션(건물명·건축가·메모)을 달 수 있고, A3 한 장으로 뽑을 수 있습니다.';color:var(--mut);font-size:12.5px}
 #vmodel canvas{display:block}#vmodel .dtool{z-index:2}
+.flcard{position:absolute;right:12px;top:96px;z-index:3;width:252px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:2px;box-shadow:0 6px 20px rgba(0,0,0,.14);padding:12px 14px 14px;font-size:12.5px;line-height:1.5}.flcard h4{margin:0;font-size:15px;font-weight:600;display:flex;align-items:baseline;justify-content:space-between;gap:8px}.flcard h4 small{font-size:12px;font-weight:400;color:var(--mut)}.flcard canvas{display:block;width:100%;margin:10px 0 8px;background:#fafbfc;border:1px solid var(--line)}.flcard table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.flcard td{padding:2px 0}.flcard td:last-child{text-align:right}.flcard td i{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:1px}.flcard .flnav{display:flex;gap:6px;margin-top:10px}.flcard .flnav .btn{flex:1}.flcard .flsum{color:var(--mut);margin-top:4px}
 .pxcard{position:absolute;left:12px;bottom:12px;z-index:3;background:#fffdf6;color:#16181d;border:2px solid #16181d;box-shadow:4px 4px 0 #16181d;padding:9px 12px 10px;font-size:12.5px;line-height:1.55;min-width:180px;max-width:280px}.pxcard b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}.pxcard dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.pxcard dt{color:#6a6f78}.pxcard dd{margin:0}.pxcard i{display:inline-block;width:9px;height:9px;margin-right:5px;vertical-align:0;border:1px solid #16181d}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
 #v3d{background:var(--hair)}
 #v3d canvas{display:block}
@@ -399,7 +400,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <button class="btn sm" id="axoB" title="화이트 모델·그림자 누적·지형 단층 액소를 패널용 이미지로">다이어그램 뷰</button>
   </div>
  </div>
- <div class="pane" id="vmodel"><div class="pxcard" id="pxCard" hidden role="status" aria-live="polite"></div>
+ <div class="pane" id="vmodel"><div class="pxcard" id="pxCard" hidden role="status" aria-live="polite"></div><div class="flcard" id="flCard" hidden role="region" aria-label="층 정보"></div>
   <div class="dtool">
    <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="land">조경 일러스트</button><button data-s="night">야경</button><button data-s="pixel" title="도트 그래픽으로 그린 동네 디오라마 · 차와 사람이 움직이고, 건물을 누르면 정보가 뜹니다">픽셀 동네</button></div>
    <label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
@@ -951,7 +952,12 @@ function build(ms){drop(ms.grp);clearLabels(ms);const g=new THREE.Group();const 
  const mat=()=>ms.tex?new THREE.MeshLambertMaterial({map:texMap(ms.tex),color:s?0xdfe7fb:0xffffff}):new THREE.MeshLambertMaterial({color:s?MS.sel:MS.mass});const em=()=>new THREE.LineBasicMaterial({color:s?0x2f5bd3:0x16181d});const fm=()=>new THREE.LineBasicMaterial({color:s?0x9db3ea:0xd3d7dd});
  const inner=new THREE.Group();
  const k=Math.min(VF,ms.floors);
- if(!EXP&&!VF){localParts(ms).forEach(p=>{const yb=p.f0===0?Math.min(gs.min,lv)-0.05:lv+p.f0*FH;const pg=boxPart(p.x1-p.x0,p.z1-p.z0,yb,lv+p.f1*FH,mat(),em(),fm(),lv);pg.position.set((p.x0+p.x1)/2,0,(p.z0+p.z1)/2);if(ms.tex)uvMeters(pg,(p.x0+p.x1)/2,(p.z0+p.z1)/2);inner.add(pg);});}
+ if(!EXP&&!VF){localParts(ms).forEach(p=>{const yb=p.f0===0?Math.min(gs.min,lv)-0.05:lv+p.f0*FH;const pg=boxPart(p.x1-p.x0,p.z1-p.z0,yb,lv+p.f1*FH,mat(),em(),fm(),lv);pg.position.set((p.x0+p.x1)/2,0,(p.z0+p.z1)/2);if(ms.tex)uvMeters(pg,(p.x0+p.x1)/2,(p.z0+p.z1)/2);inner.add(pg);});
+  if(MS.win){const lit=[],dim=[];let hs=ms.id*7919+3;const hr=()=>{hs=(hs*48271)%2147483647;return hs/2147483647;};
+   localParts(ms).forEach(p=>{[[p.x0,p.z1,p.x1,p.z1,0,1],[p.x1,p.z1,p.x1,p.z0,1,0],[p.x1,p.z0,p.x0,p.z0,0,-1],[p.x0,p.z0,p.x0,p.z1,-1,0]].forEach(([ax,az,bx,bz,nx,nz])=>{const L=Math.hypot(bx-ax,bz-az),n=Math.floor(L/2.6);if(n<1)return;const tx=(bx-ax)/L,tz=(bz-az)/L;
+    for(let f=p.f0;f<p.f1;f++){if(ms.shape==='pil'&&f===0)continue;const row=hr()<0.22;for(let k=0;k<n;k++){const u=(k+0.5)*L/n;(row||hr()<0.42?lit:dim).push([ax+tx*u+nx*0.04,lv+f*FH+1.5,az+tz*u+nz*0.04,Math.atan2(nx,nz)]);}}});});
+   const M4=new THREE.Matrix4(),Q4=new THREE.Quaternion(),P4=new THREE.Vector3(),O4=new THREE.Vector3(1,1,1),Y4=new THREE.Vector3(0,1,0);
+   [[lit,MS.win],[dim,0x2a3757]].forEach(([A,c])=>{if(!A.length)return;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1.5,1.4),new THREE.MeshBasicMaterial({color:c,toneMapped:false}),A.length);A.forEach((w,i)=>{Q4.setFromAxisAngle(Y4,w[3]);M4.compose(P4.set(w[0],w[1],w[2]),Q4,O4);im.setMatrixAt(i,M4);});im.userData.winM=1;inner.add(im);});}}
  else{const GAP=2.6;const ghostM=new THREE.MeshBasicMaterial({color:0x9db3ea,transparent:true,opacity:0.07,depthWrite:false}),ghostE=new THREE.LineBasicMaterial({color:0xb9c6e6,transparent:true,opacity:.6});
   for(let f=1;f<=ms.floors;f++){const base=lv+(f-1)*FH+(EXP?(f-1)*GAP:0);const parts=localParts(ms).filter(p=>f>p.f0&&f<=p.f1);
    const show=EXP||f===k;
@@ -1164,7 +1170,7 @@ function syncRoadUI(){$('#rdSV').textContent=road.s.toFixed(1)+'m';$('#rdWV').te
 // ---------- floor view / explode / programs ----------
 function focusSel(){if(!sel)return;const lv=massLevel(sel);ctr.target.set(sel.x,lv+(EXP?sel.floors*2.6:sel.floors*1.2),sel.z);cam.position.set(sel.x+26,lv+30,sel.z+34);}
 function syncVF(){const mx=Math.max(1,...masses.map(m=>m.floors));if(VF>mx)VF=mx;const s=$('#vf');if(s.options.length!==mx+1){s.innerHTML='<option value="0">전체</option>'+Array.from({length:mx},(_,i)=>`<option value="${i+1}">${i+1}층</option>`).join('');}s.value=VF;}
-$('#vf').onchange=e=>{const was=VF||EXP;VF=+e.target.value;masses.forEach(build);updateUI();if(VF&&!was)focusSel();if(VF&&!EXP)toast(`${VF}층 평면을 보여줍니다. 위층은 반투명으로 표시됩니다.`);};
+$('#vf').onchange=e=>{const was=VF||EXP;VF=+e.target.value;if(FLS&&!VF){FLS=null;$('#flCard').hidden=true;}masses.forEach(build);updateUI();if(VF&&!was)focusSel();if(VF&&!EXP)toast(`${VF}층 평면을 보여줍니다. 위층은 반투명으로 표시됩니다.`);};
 $('#exT').onchange=e=>{const was=VF||EXP;EXP=e.target.checked;masses.forEach(build);updateUI();if(EXP&&!was)focusSel();};
 $('#topV').onclick=()=>{const tg=ctr.target;cam.position.set(tg.x,120,tg.z+0.01);};
 function ensureProg(ms,f){ms.prog=ms.prog||{};if(!ms.prog[f])ms.prog[f]=progFor(ms,f).map(o=>({...o}));return ms.prog[f];}
@@ -1207,8 +1213,8 @@ R.domElement.addEventListener('pointermove',e=>{
  if(mode==='measure'&&mA){const q=groundPt(e);if(q)drawMeasurePreview(snapTo(q));}});
 R.domElement.addEventListener('pointerup',e=>{
  if(rotDrag){const mv=rotDrag.moved;rotDrag=null;ctr.enabled=true;if(mv){commit();toast(`회전 ${sel?sel.rot:0}°`);}return;}
- if(drag){const mv=drag.moved;drag=null;ctr.enabled=true;if(mv)commit();return;}
- if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;if(curPane==='vmodel'&&MS.pix){pixPickAt(e);return;}const q=groundPt(e);if(!q)return;
+ if(drag){const mv=drag.moved;drag=null;ctr.enabled=true;if(mv)commit();else if(curPane==='vmodel'&&!MS.pix)flPick(e);return;}
+ if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;if(curPane==='vmodel'&&MS.pix){pixPickAt(e);return;}if(curPane==='vmodel'&&FLS){flOff();return;}const q=groundPt(e);if(!q)return;
  if(mode==='plot'||mode==='land')addDraft([sn(q[0]),sn(q[1])]);else if(mode==='measure')addMeasure(snapTo(q));});
 let draft=null,draftHover=null,draftObj=null;
 function drawDraft(){if(draftObj){drop(draftObj);draftObj=null;}$('#plotN').textContent=$('#landN').textContent=(draft?draft.length:0)+'점';const DC=mode==='land'?0x3f8f55:0x2f5bd3;if(!draft||!draft.length)return;
@@ -3178,7 +3184,7 @@ txUI();rfRender();
 // ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
 let mvStyle='draw',mvPrev='base',mvSpinOn=false;
 function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();pixApply();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
-function mvLeave(){expClear();pixClear();$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;R.setPixelRatio(PR0);R.domElement.style.imageRendering='';resize();}
+function mvLeave(){expClear();pixClear();if(FLS){FLS=null;$('#flCard').hidden=true;}$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;R.setPixelRatio(PR0);R.domElement.style.imageRendering='';resize();}
 // ---------- 픽셀 동네: 저해상도 렌더 + 용도 색 + 움직이는 차·사람 + 건물 카드 ----------
 const PXU=[0xf6c453,0xf08a4b,0xe0566a,0x5d8fe0,0xb9a6d8],PXM={},PR0=Math.min(devicePixelRatio,2);
 function pixMat(c){const k=c.u!=null&&PXU[c.u]!=null?c.u:(c.fl>=5?2:Math.abs(Math.round((c.x0||0)*7+(c.z0||0)*3))%3);return PXM[k]||(PXM[k]=new THREE.MeshLambertMaterial({color:PXU[k]}));}
@@ -3220,10 +3226,36 @@ function pixPickAt(e){setPt(e);const h=ctxG&&ray.intersectObjects(ctxG.children,
  const row=(k,v,sw)=>{const t=document.createElement('dt');t.textContent=k;const d=document.createElement('dd');if(sw!=null){const i=document.createElement('i');i.style.background='#'+PXU[sw].toString(16).padStart(6,'0');d.append(i);}d.append(v);dl.append(t,d);};
  const ui=c.u!=null&&BUSE[c.u]?c.u:null;row('용도',ui!=null?BUSE[ui][0]:'정보 없음',ui);if(c.fl)row('층수',c.fl+'층');row('높이',f1(c.h)+'m');if(c.yr)row('사용승인',c.yr+'년');row('위치',`대지에서 ${dir}쪽 ${Math.round(dd)}m`);
  card.append(nm,dl);card.hidden=false;}
+// ---------- 층 클릭: 그 층만 따서 평면을 보여 주고 카메라를 옮김 ----------
+var FLY=null,FLS=null;
+function flyTo(tg,ps,ms){FLY={t0:performance.now(),d:ms||650,a:[ctr.target.clone(),cam.position.clone()],b:[tg,ps]};}
+function flyTick(){if(!FLY)return;const k=Math.min(1,(performance.now()-FLY.t0)/FLY.d),e=1-Math.pow(1-k,3);ctr.target.lerpVectors(FLY.a[0],FLY.b[0],e);cam.position.lerpVectors(FLY.a[1],FLY.b[1],e);if(k>=1)FLY=null;}
+function flSet(ms,f){f=Math.max(1,Math.min(ms.floors,f));FLS={ms,f};if(sel!==ms)select(ms);syncVF();VF=f;$('#vf').value=f;masses.forEach(build);updateUI();
+ const lv=massLevel(ms),y=lv+(f-1)*FH,tg=new THREE.Vector3(ms.x,y+1,ms.z),r=Math.max(ms.w||12,ms.d||12),h=new THREE.Vector3().subVectors(cam.position,ctr.target);h.y=0;if(h.lengthSq()<1)h.set(1,0,1);h.normalize();
+ flyTo(tg,tg.clone().addScaledVector(h,r*1.6+18).add(new THREE.Vector3(0,r*1.4+16,0)));flCard();}
+function flOff(){FLS=null;$('#flCard').hidden=true;if(VF){VF=0;syncVF();masses.forEach(build);updateUI();}}
+function flPick(e){setPt(e);const ms=[];masses.forEach(m=>m.grp&&m.grp.traverse(o=>{if(o.isMesh&&!o.userData.winM)ms.push(o);}));const h=ray.intersectObjects(ms,false).find(x=>x.object.userData.ms);
+ if(!h){if(FLS)flOff();return;}const m=h.object.userData.ms;const f=Math.floor((h.point.y-massLevel(m))/FH)+1;flSet(m,f);}
+function flCard(){if(!FLS)return;const{ms,f}=FLS,card=$('#flCard'),L=layoutFloor(ms,f),A=floorArea(ms,f),use=ms.uses&&ms.uses[f-1]||'';
+ card.innerHTML='';const h=document.createElement('h4');h.textContent=`${f}층`;const sm=document.createElement('small');sm.textContent=`${ms.name} · 총 ${ms.floors}층`;h.append(sm);
+ const cv=document.createElement('canvas');const W=224,H=150,pr=2;cv.width=W*pr;cv.height=H*pr;cv.style.height=H+'px';const x=cv.getContext('2d');x.scale(pr,pr);
+ const ps=localParts(ms).filter(p=>f>p.f0&&f<=p.f1);if(ps.length){const X0=Math.min(...ps.map(p=>p.x0)),X1=Math.max(...ps.map(p=>p.x1)),Z0=Math.min(...ps.map(p=>p.z0)),Z1=Math.max(...ps.map(p=>p.z1));
+  const sc=Math.min((W-36)/(X1-X0||1),(H-34)/(Z1-Z0||1)),ox=(W-(X1-X0)*sc)/2,oz=(H-(Z1-Z0)*sc)/2+4,tx=v=>ox+(v-X0)*sc,tz=v=>oz+(v-Z0)*sc;
+  L.blocks.forEach(b=>{x.fillStyle=b.rest?'#eef0f2':b.c;x.fillRect(tx(b.x0),tz(b.z0),(b.x1-b.x0)*sc,(b.z1-b.z0)*sc);x.strokeStyle='rgba(22,24,29,.35)';x.lineWidth=0.6;x.strokeRect(tx(b.x0),tz(b.z0),(b.x1-b.x0)*sc,(b.z1-b.z0)*sc);
+   const bw=(b.x1-b.x0)*sc,bh=(b.z1-b.z0)*sc;if(!b.rest&&bw>26&&bh>13){x.fillStyle=b.core?'#fff':'#16181d';x.font='500 10px "IBM Plex Sans KR",sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(b.core?'코어':b.n,tx((b.x0+b.x1)/2),tz((b.z0+b.z1)/2),bw-4);}});
+  x.strokeStyle='#16181d';x.lineWidth=1.4;ps.forEach(p=>x.strokeRect(tx(p.x0),tz(p.z0),(p.x1-p.x0)*sc,(p.z1-p.z0)*sc));
+  x.fillStyle='#6a6f78';x.font='10px "IBM Plex Mono",monospace';x.textAlign='center';x.textBaseline='alphabetic';x.fillText(f1(X1-X0)+'m',W/2,oz-5);x.save();x.translate(ox-6,H/2+4);x.rotate(-Math.PI/2);x.fillText(f1(Z1-Z0)+'m',0,0);x.restore();}
+ const t=document.createElement('table');const row=(k,v,c)=>{const tr=document.createElement('tr');const a=document.createElement('td');if(c){const i=document.createElement('i');i.style.background=c;a.append(i);}a.append(k);const b=document.createElement('td');b.textContent=v;tr.append(a,b);t.append(tr);};
+ Object.entries(L.blocks.filter(b=>!b.rest).reduce((m,b)=>{const k=b.core?'코어':b.n;m[k]=m[k]||{a:0,c:b.c};m[k].a+=(b.x1-b.x0)*(b.z1-b.z0);return m;},{})).forEach(([k,v])=>row(k,f1(v.a)+'㎡',v.c));
+ if(L.over>0.5)row('넘친 면적',f1(L.over)+'㎡','#c8372d');
+ const su=document.createElement('div');su.className='flsum';su.textContent=`${use?use+' · ':''}바닥면적 ${f1(A)}㎡ · 바닥 높이 +${f1((f-1)*FH)}m`;
+ const nav=document.createElement('div');nav.className='flnav';const bt=(tx,fn,dis)=>{const b=document.createElement('button');b.className='btn sm';b.textContent=tx;b.disabled=!!dis;b.onclick=fn;nav.append(b);};
+ bt('아래층',()=>flSet(ms,f-1),f<=1);bt('위층',()=>flSet(ms,f+1),f>=ms.floors);bt('전체 보기',flOff);
+ card.append(h,cv,t,su,nav);card.hidden=false;}
 function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.'):'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
 $$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();pixClear();setMatStyle(mvStyle,true);if(ex)expBuild();pixApply();if(mvStyle==='pixel'&&!CROP.shape){CROP.shape='circle';cropSave();}}});
 $('#mvSpin').onchange=e=>{ctr.autoRotate=e.target.checked;ctr.autoRotateSpeed=0.6;};
-window.__mv={cam,ctr,get life(){return LIFE;}};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
+window.__mv={cam,ctr,get life(){return LIFE;},get masses(){return masses;},massLevel:m=>massLevel(m),FH};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
 
 // ---------- 선화·야경 표현: 선 색·빛·배경, 나무 선, 켜진 창 ----------
 function styleLights(){const hemi=S.children.find(o=>o.isHemisphereLight);if(!LBASE)LBASE={h:hemi?hemi.intensity:1.35,hc:hemi?hemi.color.getHex():0xffffff,s:sun.intensity};
@@ -3359,6 +3391,6 @@ let inMain=false;{const rr=R.render.bind(R);R.render=(sc,c)=>{if(!inMain){R.shad
 function shTick(){if(!sun.position.equals(shSun)){shSun.copy(sun.position);shDirty=true;}if(shDirty||WIRE!==wireOn){R.shadowMap.needsUpdate=true;shDirty=false;}}
 let WIRE=false,wireOn=false;$('#wireT').onchange=e=>{WIRE=e.target.checked;};
 function wireApply(){if(!WIRE&&!wireOn)return;S.traverse(o=>{if(o.isMesh&&o.parent&&o.parent!==S&&o.parent.children.some(c=>c.isLineSegments))o.visible=!WIRE;});wireOn=WIRE;}
-(function loop(){requestAnimationFrame(loop);ctr.update();if(LIFE)lifeTick();shTick();wireApply();updRot();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){renderMain();updLabels();}})();
+(function loop(){requestAnimationFrame(loop);if(FLY)flyTick();ctr.update();if(LIFE)lifeTick();shTick();wireApply();updRot();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){renderMain();updLabels();}})();
 </script>
 </body></html>
