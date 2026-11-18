@@ -505,7 +505,8 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    </div>
    <div class="bform">
     <div class="bfh">공모 제출용 <span>요강 규격 맞춤</span></div>
-    <label class="f">제출 양식<select id="bComp"><option value="a2x2">A2 가로 2쪽 → A1 한 장 (건축문화대상류)</option><option value="a1v">A1 세로 한 장 (아이디어 공모)</option><option value="a1h">A1 가로 한 장</option></select></label>
+    <label class="f">제출 양식<select id="bComp"><option value="a2x2">A2 가로 2쪽 → A1 한 장 (건축문화대상류)</option><option value="a1v">A1 세로 한 장 (아이디어 공모)</option><option value="a1h">A1 가로 한 장</option><option value="land">조경 공모 A1 가로 (분석·SWOT·뷰)</option></select></label>
+    <p class="note" id="bCompLandN" hidden>대표 이미지·뷰는 아래 포트폴리오의 "내 이미지"를 씁니다(첫 장이 대표). 없으면 지금 3D 화면으로 채웁니다. 설계 개념·유지 관리 칸은 설계 전략 메모를 씁니다.</p>
     <label class="f">접수번호 (비우면 빈 칸으로 둡니다)<input type="text" id="bTag" placeholder="가-001" maxlength="12"></label>
     <label class="tg"><input type="checkbox" id="bAnon" checked>이름·스튜디오 숨기기 (익명 심사)</label>
     <div class="row"><button class="btn" id="bCompPv">미리보기</button><button class="btn pri" id="bCompPdf">공모용 PDF</button></div>
@@ -1831,7 +1832,7 @@ $('#pcPng').onclick=()=>exportProc('png');$('#packB').onclick=exportPack;$('#pac
 // ---------- board (A3/A2/A1) ----------
 const PAPER={A3:[420,297],A2:[594,420],A1:[841,594]};
 let board={paper:'A2',dpi:150,sc:'auto',layout:null,title:'대지 분석 및 매스 스터디',name:'',studio:'',note:'',panels:['diag','sun','slope','aspect','syn','m3d','sec']};
-function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#cqBook').checked=board.cqBook!==false;$('#pfText').value=board.pfText||'';$('#pfYear').value=board.pfYear||'';$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
+function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bCompLandN').hidden=(board.comp||'a2x2')!=='land';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#cqBook').checked=board.cqBook!==false;$('#pfText').value=board.pfText||'';$('#pfYear').value=board.pfYear||'';$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
  $$('#bPanels input').forEach(i=>i.checked=board.panels.includes(i.value));}
 let bTimer=null;const bLater=()=>{clearTimeout(bTimer);bTimer=setTimeout(()=>{if(curPane==='vboard')previewBoard();},350);};
 $$('#bPaper button').forEach(b=>b.onclick=()=>{board.paper=b.dataset.p;syncBoardUI();commit();bLater();});
@@ -2106,8 +2107,53 @@ async function buildBook(dpi){const week=board.week||1,title=board.title||'크�
   else cv=renderBoard(dpi,false,{dim:D,panels:sp[1],title:sp[2],noSide:!sp[3],ks:0.8,label:'A3 크리틱 북',kicker:`WEEK ${week} · ${i+1} / ${n}`}).cv;
   pages.push({cv,W:D[0],H:D[1]});await new Promise(r=>setTimeout(r,0));}
  return pages;}
+
+// ---------- SWOT 초안: 대지 수치에서 강점·약점·기회·위협을 뽑음 ----------
+function swotDraft(){const M=lastM||metrics();const I=(()=>{try{return synInfo();}catch(e){return null;}})();const S=[],W=[],O=[],T=[];const pc=k=>I&&I.tot?I.A[k]/I.tot:0;
+ if(I&&I.tot){if(pc(0)>=0.25)S.push(`평탄하고 볕 드는 땅 ${fmtPct(I.A[0],I.tot)} — 외부공간 확보에 유리`);if(I.h4/I.tot>=0.5)S.push(`동지 4시간 이상 일조 ${fmtPct(I.h4,I.tot)}`);
+  const st=pc(3)+pc(4);if(st>=0.15)W.push(`경사 15% 이상 ${fmtPct(I.A[3]+I.A[4],I.tot)} — 단차 처리 필요`);if(pc(2)>=0.15)W.push(`동지 일조 2시간 미만 ${fmtPct(I.A[2],I.tot)}`);
+  if(I.F.length){const m=I.F[0];if(m.w>=12)S.push(`${m.side} ${m.w}m 도로에 접해 접근·노출이 좋음`);else if(m.w<6)W.push(`접도 ${m.side} ${m.w}m — 차량 진입·주차 제약`);if(m.w>=20)T.push(`${m.w}m 대로변 소음·매연`);}}
+ const c0=centroidOf(plot);const near=(L,r)=>L.filter(q=>{const c=ringC(q);return Math.hypot(c[0]-c0[0],c[1]-c0[1])<r;});
+ const gN=near(greenPolys(),120),wN=near(SITE&&SITE.waters||[],150);if(gN.length)O.push(`반경 120m 안 공원·녹지 ${gN.length}곳 — 녹지 연결축 가능`);if(wN.length)O.push('주변 하천·수변 — 수변 경관·생태 연계');
+ const old=CTXP.filter(c=>c.yr&&c.yr<1990).length,yrN=CTXP.filter(c=>c.yr).length;if(yrN>=8&&old/yrN>=0.35)O.push(`주변 건물 ${Math.round(old/yrN*100)}%가 1990년 이전 — 재생·정비 수요`);
+ const hi=CTXP.filter(c=>Math.hypot((c.x0+c.x1)/2-c0[0],(c.z0+c.z1)/2-c0[1])<45&&c.h>=M.hmax*2&&c.h>=20).length;if(hi)T.push(`45m 안 고층 ${hi}동 — 그림자·조망 간섭`);
+ const u=M.far/zone.f;if(u<0.6)O.push(`용적률 여유 ${Math.round((1-u)*100)}% — 규모 확장 여지`);if(M.sunOk===false)W.push('정북 일조사선 제약');
+ if(SITE&&(SITE.zoneConflict||SITE.zoneUnknown))T.push('용도지역 확인 필요');if(SITE&&SITE.ovl&&SITE.ovl.some(o=>o.st==='hit'&&/지구단위/.test(o.lb||'')))T.push('지구단위계획구역 — 지침 확인 필요');
+ if(!S.length)S.push('대지 형태가 단순해 배치 자유도 높음');if(!W.length)W.push('뚜렷한 물리적 약점 적음 — 프로그램으로 차별화 필요');if(!O.length)O.push('주변 생활권 수요를 담을 공공 공간 기회');if(!T.length)T.push('주변 개발에 따른 조망·일조 변화 가능성');
+ return{S:S.slice(0,3),W:W.slice(0,3),O:O.slice(0,3),T:T.slice(0,3)};}
+// ---------- 조경 공모 A1 가로: 왼쪽 대표 이미지+마스터플랜 / 오른쪽 분석 줄·논리 줄·뷰 / 아래 운영 ----------
+function buildLandComp(dpi){const W=841,H=594;dpi=capDpi(W,H,dpi);const k=dpi/25.4,mm=v=>v*k;const cv=document.createElement('canvas');cv.width=Math.round(W*k);cv.height=Math.round(H*k);const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);
+ const F=(w,sz,mono)=>`${w} ${mm(sz)}px ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;const anon=board.anon!==false;
+ const cap=(t,x,y)=>{c.fillStyle='#16181d';c.font=F(600,3.6);c.fillText(t,mm(x),mm(y));};
+ const pan=(key,x,y,w,h,t)=>{cap(t,x,y-2);c.drawImage(pfPanel(key,w,h,dpi),mm(x),mm(y),mm(w),mm(h));c.strokeStyle='#d6d9de';c.lineWidth=Math.max(1,mm(0.2));c.strokeRect(mm(x),mm(y),mm(w),mm(h));};
+ const img=(src,x,y,w,h,cover)=>{if(src)pfFit(c,mm,src,x,y,w,h,cover);else{c.fillStyle='#f3f4f6';c.fillRect(mm(x),mm(y),mm(w),mm(h));}};
+ const shot=(w,h)=>shot3D(Math.round(w*dpi/25.4),Math.round(h*dpi/25.4));
+ // 왼쪽: 대표 이미지 + 제목 + 개념 문장 / 마스터플랜
+ const L={x:12,w:252};img(pfImgs[0]?pfImgs[0].im:shot(L.w,318),L.x,12,L.w,318,true);
+ c.fillStyle='rgba(255,255,255,.88)';c.fillRect(mm(L.x),mm(12+318-74),mm(L.w),mm(74));c.fillStyle='#16181d';c.font=F(300,16);const ttl=board.title&&board.title!=='대지 분석 및 매스 스터디'?board.title:(req.title||'대상지 조경 계획');c.fillText(ttl,mm(L.x+8),mm(12+318-50));
+ c.font=F(400,3.9);c.fillStyle='#393939';wrapText(c,(board.note||'설계 전략 메모에 적은 개념 문장이 여기에 들어갑니다.').trim(),mm(L.w-16)).slice(0,5).forEach((t,i)=>c.fillText(t,mm(L.x+8),mm(12+318-38+i*6.2)));
+ pan('plan',L.x,348,L.w,232,'MASTER PLAN · 배치도');
+ // 오른쪽 분석 줄: 대지·교통 / 경사 / 일조 / 향 / SWOT
+ const R0=274,RW=W-12-R0,gx=4;const cw=(RW-gx*4)/5,rh=108,ry=20;
+ [['diag','대상지 · 교통'],['slope','경사'],['sun','동지 일조'],['aspect','향']].forEach(([kk,t],i)=>pan(kk,R0+i*(cw+gx),ry,cw,rh,t));
+ {const x=R0+4*(cw+gx),y=ry;cap('SWOT 분석',x,y-2);const sw=swotDraft();const hw=(cw-2)/2,hh=(rh-2)/2;[['S','강점','#1f8a4c',sw.S],['W','약점','#c8372d',sw.W],['O','기회','#2f5bd3',sw.O],['T','위협','#8a5a00',sw.T]].forEach(([K,nm,col,L2],i)=>{const bx=x+(i%2)*(hw+2),by=y+Math.floor(i/2)*(hh+2);c.fillStyle='#f6f7f9';c.fillRect(mm(bx),mm(by),mm(hw),mm(hh));c.fillStyle=col;c.font=F(700,7,true);c.fillText(K,mm(bx+2.5),mm(by+8.5));c.font=F(600,3);c.fillText(nm,mm(bx+9),mm(by+7.8));
+   c.fillStyle='#393939';c.font=F(400,2.9);let yy=by+14;L2.forEach(t=>wrapText(c,'· '+t,mm(hw-4)).slice(0,3).forEach(s2=>{if(yy<by+hh-1.5){c.fillText(s2,mm(bx+2.5),mm(yy));yy+=4;}}));});}
+ // 논리 줄: 개념(문장) / 단면 / 종합
+ const ly=ry+rh+14,lh=112;{const x=R0,w=150;cap('CONCEPT · 설계 개념',x,ly-2);c.fillStyle='#f6f7f9';c.fillRect(mm(x),mm(ly),mm(w),mm(lh));c.fillStyle='#16181d';c.font=F(400,4);let yy=ly+10;
+  const lines=(board.note||'').trim()?wrapText(c,board.note.trim(),mm(w-12)).slice(0,14):['개념 다이어그램이나 스케치를','이 칸에 붙이거나, 설계 전략 메모에','개념 문장을 적으세요.'];lines.forEach(t=>{c.fillText(t,mm(x+6),mm(yy));yy+=6.4;});}
+ pan('sec',R0+154,ly,RW-154-154,lh,'SECTION · 단면');pan('syn',W-12-150,ly,150,lh,'분석 종합 · 설계 시사점');
+ // 아래 줄: 분해 액소 / 뷰 3장
+ const by=ly+lh+14,bh=H-12-by-26;pan('axo',R0,by,170,bh,'ISOMETRIC · 화이트 모델');
+ const vx=R0+176,vw=(RW-176-gx*2)/3;cap('VIEWS',vx,by-2);for(let i=0;i<3;i++){const im=pfImgs[i+1];img(im?im.im:null,vx+i*(vw+gx),by,vw,bh,true);if(!im){c.fillStyle='#9aa1aa';c.font=F(400,3.4);c.fillText('투시도 (내 이미지)',mm(vx+i*(vw+gx)+4),mm(by+bh/2));}}
+ // 운영·관리 띠 + 바닥글
+ const fy=H-12-18;c.fillStyle='#16181d';c.fillRect(mm(R0),mm(fy),mm(RW),Math.max(1,mm(0.35)));c.font=F(600,3.6);c.fillText('유지 관리 · 운영',mm(R0),mm(fy+6.5));c.font=F(400,3.2);c.fillStyle='#5f6672';
+ c.fillText(`${SITE?SITE.addr:'가상 대지'} · ${zone.n} · 대지 ${f1((lastM||metrics()).A)}㎡${anon?'':' · '+(board.name||'')}`,mm(R0+44),mm(fy+6.5));c.fillText('운영 계획·관리 주체·유지관리 주기를 이 띠에 적으세요 (설계 전략 메모 뒷부분을 써도 됩니다).',mm(R0+44),mm(fy+12.5));
+ if(board.tag!==undefined){const tx=W-12-30,ty=4;c.strokeStyle='#16181d';c.lineWidth=Math.max(1,mm(0.35));c.strokeRect(mm(tx),mm(ty),mm(30),mm(10));c.textAlign='center';c.fillStyle=board.tag?'#16181d':'#a0a6b0';c.font=board.tag?F(600,5,true):F(400,2.6);c.fillText(board.tag||'접수번호',mm(tx+15),mm(ty+(board.tag?6.8:6.1)));c.textAlign='left';}
+ return{cv,W,H};}
+window.__swot=swotDraft;
+
 function compPanels(list,def){const P=board.panels.filter(k=>list.includes(k));return P.length?P:def;}
-async function buildComp(dpi){const kind=board.comp||'a2x2',anon=board.anon!==false,tag=board.tag||'';
+async function buildComp(dpi){const kind=board.comp||'a2x2',anon=board.anon!==false,tag=board.tag||'';if(kind==='land')return buildLandComp(dpi);
  if(kind==='a1v'||kind==='a1h'){const D=kind==='a1v'?[594,841]:[841,594];dpi=capDpi(D[0],D[1],dpi);const r=renderBoard(dpi,false,{dim:D,anon,tag,label:kind==='a1v'?'A1 세로 (공모)':'A1 가로 (공모)',panels:board.panels});return{cv:r.cv,W:D[0],H:D[1]};}
  dpi=capDpi(594,841,dpi);const k=dpi/25.4;
  const a=renderBoard(dpi,false,{dim:[594,420],anon,tag,kicker:'1 / 2 · 대지와 근거',label:'A2 1쪽',panels:compPanels(ANA_K,['diag','sun','slope'])}).cv;
@@ -2122,7 +2168,7 @@ function showPages(pages){const box=$('.bprev');const avail=Math.max(300,box.cli
 $('#bWeek').onchange=e=>{board.week=Math.max(1,+e.target.value||1);commit();};
 $('#bQs').oninput=e=>{board.qs=e.target.value;};$('#bQs').onchange=commit;
 $('#bQAuto').onclick=()=>{board.qs=autoQs();$('#bQs').value=board.qs;commit();};
-$('#bComp').onchange=e=>{board.comp=e.target.value;commit();};$('#bTag').oninput=e=>{board.tag=e.target.value.trim();};$('#bTag').onchange=commit;$('#bAnon').onchange=e=>{board.anon=e.target.checked;commit();};
+$('#bComp').onchange=e=>{board.comp=e.target.value;$('#bCompLandN').hidden=board.comp!=='land';commit();};$('#bTag').oninput=e=>{board.tag=e.target.value.trim();};$('#bTag').onchange=commit;$('#bAnon').onchange=e=>{board.anon=e.target.checked;commit();};
 $('#bBookPv').onclick=async()=>{toast('크리틱 북 미리보기를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));showPages(await buildBook(60));};
 $('#bBook').onclick=async()=>{toast('크리틱 북을 만드는 중입니다. 쪽수만큼 몇 초 걸립니다…');await new Promise(r=>setTimeout(r,60));
  const pages=await buildBook(board.dpi||150);await offer(`bujilab_critique_W${board.week||1}_${stamp()}.pdf`,await pdfFromPages(pages,(board.title||'크리틱')+` · WEEK ${board.week||1}`));};
