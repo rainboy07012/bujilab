@@ -399,7 +399,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <label class="tg">영역 <select id="mvCrop" aria-label="영역 자르기"><option value="">전체</option><option value="rect">사각형</option><option value="circle">원</option></select></label>
    <label class="tg" id="mvSizeL" hidden>크기 <input type="range" id="mvSize" min="40" max="200" step="10" value="120" style="width:90px"> <b id="mvSizeV" class="mono">120m</b></label>
    <label class="tg" id="mvRotL" hidden>회전 <input type="range" id="mvRot" min="-45" max="45" step="1" value="0" style="width:80px"> <b id="mvRotV" class="mono">0°</b></label>
-   <button class="btn sm" id="mvPng">이미지 저장</button><button class="btn sm" id="mvObj" title="자른 영역만 OBJ로">OBJ</button><button class="btn sm" id="mvDxf" title="자른 영역만 3D DXF로">DXF</button>
+   <button class="btn sm" id="mvPng">이미지 저장</button><button class="btn sm" id="mvObj" title="자른 영역만 OBJ로">OBJ</button><button class="btn sm" id="mvDxf" title="자른 영역만 3D DXF로">DXF</button><button class="btn sm" id="mv3dm" title="자른 영역만 라이노 3DM으로">3DM</button>
    <span class="note" id="mvInfo"></span>
   </div>
  </div>
@@ -584,6 +584,10 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <button class="btn" data-xp="dxf3">3D DXF</button>
    <button class="btn" data-xp="obj">3D OBJ</button>
    <button class="btn" data-xp="stl" title="3D 프린터로 대지 모형을 뽑는 파일">3D 프린트 STL</button>
+   <button class="btn" data-xp="3dm" title="라이노에서 바로 여는 파일 (레이어: 매스·주변 건물·지형·대지)">Rhino 3DM</button>
+   <button class="btn" data-xp="dae" title="스케치업에서 가져오기(Import)로 여는 콜라다 파일">SketchUp용 DAE</button>
+   <button class="btn" data-xp="cnt" title="등고선만 높이값을 넣어 CAD로 (1m 간격, 5m 계곡선 레이어 분리)">등고선 DXF</button>
+   <button class="btn" data-xp="kml" title="구글어스에서 대지·매스·주변 건물을 실제 위치에 띄움(실제 주소에서만)">구글어스 KML</button>
    <button class="btn pri" id="packB" title="분석도·시트·배치도·다이어그램 뷰·과정도·표·CAD를 각각 파일로 묶음" style="grid-column:1/-1">출력 묶음 ZIP (모든 도면·표 따로)</button>
   </div>
   <p class="note" style="margin-top:8px">DXF는 AutoCAD·Rhino·SketchUp Pro, OBJ는 Rhino·Blender 등에서 열 수 있습니다. 단위는 m이고, STL만 고른 축척의 mm입니다. 렌더는 내보낸 파일로 이어서 작업하세요.</p>
@@ -1017,7 +1021,7 @@ thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
 // ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
 const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
-const GATED='#pfPdf,#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
+const GATED='[data-xp="3dm"],[data-xp=dae],#pfPdf,#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
 const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
 function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
 let planPending=null;
@@ -2773,6 +2777,37 @@ function diagSVG(mode,style){const W=900,H=900,half=46;const{rec,cv}=svgCanvas(W
  const sc=W/(half*2);curTone=dstyleG;return rec.toString(W/sc*2,H/sc*2,'부지랩 '+({base:'대지 분석',slope:'경사분석도',elev:'표고분석도',aspect:'향분석도',sunh:'일조시간도',syn:'분석 종합'}[mode])+' · 1:500');}
 function secSVG(){const W=1200,H=520;const{rec,cv}=svgCanvas(W,H);drawSec({board:1,cv,W,H,pr:1});return rec.toString(W*0.26,H*0.26,'부지랩 단면');}
 async function canvasBlob(cv){return new Promise(r=>cv.toBlob(r,'image/png'));}
+// ---------- 추가 내보내기: Rhino 3DM · SketchUp용 DAE · 등고선 DXF · 구글어스 KML ----------
+const R3DM='https://cdn.jsdelivr.net/npm/rhino3dm@8.35.0/rhino3dm.min.js';
+function xpObjects(){const L=[];massBoxes().forEach(b=>L.push({ly:'MASS',name:'mass_'+b.name,faces:boxFaces(b)}));ctxBoxes().forEach(b=>L.push({ly:'CONTEXT',name:b.name,faces:boxFaces(b)}));farBoxes().forEach(b=>L.push({ly:'CONTEXT_FAR',name:b.name,faces:boxFaces(b)}));
+ if(typeof elevG!=='undefined'&&elevG){const m=elevG.children.find(o=>o.isMesh);if(m){const a=m.geometry.attributes.position.array,f=[];for(let i=0;i<a.length;i+=9)f.push([[a[i],a[i+1],a[i+2]],[a[i+3],a[i+4],a[i+5]],[a[i+6],a[i+7],a[i+8]]]);L.push({ly:'ELEVATED_ROAD',name:'elevated',faces:f});}}
+ L.push({ly:'TERRAIN',name:'terrain',faces:terrainQuads()});return L;}
+const XCOL={MASS:[47,91,211],CONTEXT:[150,155,162],CONTEXT_FAR:[190,193,198],ELEVATED_ROAD:[120,124,130],TERRAIN:[170,160,140],PLOT:[200,55,45],CONTOUR:[140,130,110]};
+async function make3DM(){await loadScript(R3DM);const r=await window.rhino3dm();const doc=new r.File3dm();try{doc.settings().modelUnitSystem=r.UnitSystem.Meters;}catch(e){}
+ const LI={};const layer=n=>{if(LI[n]!=null)return LI[n];const l=new r.Layer();l.name=n;const c=XCOL[n]||[120,120,120];l.color={r:c[0],g:c[1],b:c[2],a:255};return LI[n]=doc.layers().add(l);};
+ const Z=p=>[p[0],-p[2],p[1]];// 부지랩(Y-up, z=남) → 라이노(Z-up, y=북)
+ xpObjects().forEach(o=>{const m=new r.Mesh();const V=m.vertices(),Fc=m.faces();o.faces.forEach(f=>{const b=V.count;f.forEach(p=>V.add(...Z(p)));if(f.length===4)Fc.addQuadFace(b,b+1,b+2,b+3);else for(let k=1;k<f.length-1;k++)Fc.addTriFace(b,b+k,b+k+1);});
+  try{m.normals().computeNormals();m.compact();}catch(e){}const at=new r.ObjectAttributes();at.layerIndex=layer(o.ly);at.name=o.name;doc.objects().add(m,at);});
+ {const pl=new r.Polyline(0);plot.forEach(q=>pl.add(q[0],-q[1],G(q[0],q[1])+0.05));pl.add(plot[0][0],-plot[0][1],G(plot[0][0],plot[0][1])+0.05);const at=new r.ObjectAttributes();at.layerIndex=layer('PLOT');at.name='plot';doc.objects().add(pl.toNurbsCurve(),at);}
+ const at=new r.ObjectAttributes();at.layerIndex=layer('CONTOUR');CONT.forEach(sg=>{const lc=new r.LineCurve([sg.a[0],-sg.a[1],sg.lv],[sg.b[0],-sg.b[1],sg.lv]);doc.objects().add(lc,at);});
+ return new Blob([doc.toByteArray()],{type:'application/octet-stream'});}
+function makeDAE(){const O=xpObjects();const esc2=t=>String(t).replace(/[<>&"]/g,'_');let geo='',nodes='',mats='',effs='';const used=new Set();
+ O.forEach((o,i)=>{const P=[],T=[];o.faces.forEach(f=>{const b=P.length/3;f.forEach(p=>P.push(+p[0].toFixed(3),+p[1].toFixed(3),+p[2].toFixed(3)));for(let k=1;k<f.length-1;k++)T.push(b,b+k,b+k+1);});if(!T.length)return;used.add(o.ly);const id='g'+i;
+  geo+=`<geometry id="${id}" name="${esc2(o.name)}"><mesh><source id="${id}-p"><float_array id="${id}-pa" count="${P.length}">${P.join(' ')}</float_array><technique_common><accessor source="#${id}-pa" count="${P.length/3}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source><vertices id="${id}-v"><input semantic="POSITION" source="#${id}-p"/></vertices><triangles material="m_${o.ly}" count="${T.length/3}"><input semantic="VERTEX" source="#${id}-v" offset="0"/><p>${T.join(' ')}</p></triangles></mesh></geometry>`;
+  nodes+=`<node id="n${i}" name="${esc2(o.name)}"><instance_geometry url="#${id}"><bind_material><technique_common><instance_material symbol="m_${o.ly}" target="#mat_${o.ly}"/></technique_common></bind_material></instance_geometry></node>`;});
+ used.forEach(ly=>{const c=(XCOL[ly]||[200,200,200]).map(v=>(v/255).toFixed(3)).join(' ');effs+=`<effect id="e_${ly}"><profile_COMMON><technique sid="c"><lambert><diffuse><color>${c} 1</color></diffuse></lambert></technique></profile_COMMON></effect>`;mats+=`<material id="mat_${ly}" name="${ly}"><instance_effect url="#e_${ly}"/></material>`;});
+ return `<?xml version="1.0" encoding="utf-8"?>\n<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1"><asset><contributor><authoring_tool>BUJILAB</authoring_tool></contributor><unit name="meter" meter="1"/><up_axis>Y_UP</up_axis></asset><library_effects>${effs}</library_effects><library_materials>${mats}</library_materials><library_geometries>${geo}</library_geometries><library_visual_scenes><visual_scene id="s" name="bujilab">${nodes}</visual_scene></library_visual_scenes><scene><instance_visual_scene url="#s"/></scene></COLLADA>\n`;}
+function contourDXF(){const E=[];CONT.forEach(sg=>E.push(...dLine(Math.round(sg.lv)%5===0?'CONTOUR_MAJOR':'CONTOUR_MINOR',sg.a,sg.b,sg.lv)));E.push(...dPoly('PLOT',plot,true,0));
+ return dxfDoc([['CONTOUR_MAJOR',30],['CONTOUR_MINOR',8],['PLOT',5]],E);}
+function makeKML(){if(!SITE||!SITE.origin)return null;const[lon0,lat0]=SITE.origin,kx=111320*Math.cos(lat0*Math.PI/180),kz=110574;const ll=q=>`${(lon0+q[0]/kx).toFixed(7)},${(lat0-q[1]/kz).toFixed(7)}`;const esc2=t=>String(t).replace(/[<>&]/g,'_');
+ const ring=(P,h)=>{const Q=[...P,P[0]];return Q.map(q=>ll(q)+','+(h||0).toFixed(2)).join(' ');};
+ const pm=(nm,st,P,h)=>`<Placemark><name>${esc2(nm)}</name><styleUrl>#${st}</styleUrl><Polygon>${h?'<extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>':'<tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode>'}<outerBoundaryIs><LinearRing><coordinates>${ring(P,h)}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`;
+ let b='';b+=`<Folder><name>대지</name>${pm(SITE.addr||'대지','plot',plot,0)}</Folder>`;
+ b+='<Folder><name>계획 매스</name>';masses.forEach(m=>worldParts(m).forEach((p,i)=>{b+=pm(`${m.name} ${i+1}`,'mass',p.poly,Math.max(1,p.hRel));}));b+='</Folder>';
+ b+='<Folder><name>주변 건물</name>';CTXP.forEach((c,i)=>{if(c.poly&&cropKeep(c))b+=pm(c.nm||'건물 '+(i+1),'ctx',c.poly,Math.max(1,c.h));});b+='</Folder>';
+ const sty=(id,line,fill)=>`<Style id="${id}"><LineStyle><color>${line}</color><width>2</width></LineStyle><PolyStyle><color>${fill}</color></PolyStyle></Style>`;
+ return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>부지랩 · ${esc2(SITE.addr||'')}</name>${sty('plot','ff2d37c8','4d2d37c8')}${sty('mass','ffd35b2f','ccf7c9a9')}${sty('ctx','ff9aa0a8','99f2f2f2')}${b}</Document></kml>\n`;}
+
 $$('[data-xp]').forEach(b=>b.onclick=async()=>{const k=b.dataset.xp;const base=`bujilab_${stamp()}`;
  if(k==='png'){let cv=null,nm='';if(curPane==='v3d'){R.render(S,cam);cv=R.domElement;nm='3d';}else if(curPane==='vdiag'){drawDiag();cv=dcv;nm='diagram';}else if(curPane==='vsec'){drawSec();cv=scv;nm='section';}
   if(!cv){toast('3D 매스·분석 다이어그램·단면 탭에서 PNG로 저장할 수 있습니다.');return;}offer(`${base}_${nm}.png`,await canvasBlob(cv));}
@@ -2784,7 +2819,11 @@ $$('[data-xp]').forEach(b=>b.onclick=async()=>{const k=b.dataset.xp;const base=`
  else if(k==='dxf2')offer(`${base}_siteplan.dxf`,sitePlanDXF());
  else if(k==='dxf3')offer(`${base}_model3d.dxf`,model3DDXF());
  else if(k==='obj')offer(`${base}_model.obj`,modelOBJ());
- else if(k==='stl')stlOpen();});
+ else if(k==='stl')stlOpen();
+ else if(k==='3dm'){toast('Rhino 3DM을 만드는 중입니다… 처음에는 변환 도구를 내려받느라 몇 초 걸립니다.');try{offer(`${base}_model.3dm`,await make3DM());}catch(e){toast('3DM을 만들지 못했습니다(인터넷 연결 필요). OBJ나 DXF로 받으세요.');}}
+ else if(k==='dae')offer(`${base}_model_sketchup.dae`,makeDAE());
+ else if(k==='cnt'){if(!CONT.length){toast('등고선이 없습니다. 실제 지형을 불러온 대지에서 쓸 수 있습니다.');return;}offer(`${base}_contours.dxf`,contourDXF());}
+ else if(k==='kml'){const t=makeKML();if(!t){toast('구글어스 KML은 실제 주소로 불러온 대지에서만 만들 수 있습니다.');return;}offer(`${base}_googleearth.kml`,t);}});
 // ---------- 브이월드 실제 대지 ----------
 // 브이월드는 CORS를 허용하지 않아 JSONP(callback)로 호출한다. domain = 키 발급 때 등록한 서비스 URL.
 // ▼▼ 배포 설정: 웹에 올릴 때 여기만 채우면 학생은 키 없이 바로 씁니다 ▼▼
@@ -2841,8 +2880,9 @@ async function loadRealSite(query,pick){
   const plotL=cleanRing(ring0.map(P));if(plotL.length<3){toast('필지 도형이 올바르지 않습니다.');return;}
   step('용도지역·주변 건물·도로를 불러오는 중…');
   const dl=80/(111320*Math.cos(c0[1]*Math.PI/180)),dt=80/110574,BOX=`BOX(${c0[0]-dl},${c0[1]-dt},${c0[0]+dl},${c0[1]+dt})`;
+  const linksP=vwData('LT_L_MOCTLINK',BOX).catch(()=>[]);
   const [uq,bld,lots,ovl,zs,binfo,ned]=await Promise.all([vwData('LT_C_UQ111',`POINT(${c0[0]} ${c0[1]})`,5).catch(()=>[]),vwData('LT_C_SPBD',BOX).catch(e=>{throw e;}),vwData('LP_PA_CBND_BUBUN',BOX).catch(()=>[]),Promise.all(OVL.map(([d,lb])=>vwData(d,`POINT(${c0[0]} ${c0[1]})`,5).then(fs=>({d,lb,st:fs.length?'hit':'none',ns:[...new Set(fs.map(f=>{const p=f.properties||{};return String(p.uname||p.dgm_nm||p.UNAME||lb).trim();}))]})).catch(e=>({d,lb,st:'err',ns:[],m:e.message})))),Promise.all(['LT_C_UQ111','LT_C_UQ112','LT_C_UQ113','LT_C_UQ114'].map(d=>vwData(d,BOX,100).catch(()=>[]))).then(a=>a.flat()),vwData('LT_C_BLDGINFO',BOX).catch(()=>[]),nedLand(pr0.pnu)]);
-  const links=await vwData('LT_L_MOCTLINK',BOX).catch(()=>[]);
+  const links=await linksP;
   const uname0=uq[0]&&uq[0].properties&&(uq[0].properties.uname||uq[0].properties.UNAME)||'';const zkOf=n=>(ZMAP.find(([k])=>String(n||'').includes(k))||[])[1]||null;const zkA=zkOf(uname0),zkB=ned?zkOf(ned.z1)||zkOf(ned.z2):null;const zk=zkA||zkB;const uname=uname0||(ned&&(ned.z1||ned.z2))||'';const zoneUnknown=!zk;const zoneConflict=!!(zkA&&zkB&&zkA!==zkB);
   const inPlot=(q)=>{const c=ringC(q);return pip(c[0],c[1],plotL);};
   USEKEY=findUseKey(bld);
@@ -2990,7 +3030,7 @@ function cropApply(){drop(cropG);cropG=null;const P=curPane==='vmodel'?cropPoly(
 function cropUI(){$('#mvCrop').value=CROP.shape;$('#mvSize').value=CROP.size;$('#mvSizeV').textContent=CROP.size+'m';$('#mvRot').value=CROP.rot;$('#mvRotV').textContent=CROP.rot+'°';$('#mvSizeL').hidden=!CROP.shape;$('#mvRotL').hidden=CROP.shape!=='rect';}
 const cropSave=()=>{try{localStorage.setItem('bujilab.crop',JSON.stringify(CROP));}catch(e){}cropUI();cropApply();if(expG)expBuild();if($('#spT').checked)buildSunPath();};
 $('#mvCrop').onchange=e=>{CROP.shape=e.target.value;cropSave();};$('#mvSize').oninput=e=>{CROP.size=+e.target.value;cropSave();};$('#mvRot').oninput=e=>{CROP.rot=+e.target.value;cropSave();};
-$('#mvObj').onclick=()=>document.querySelector('[data-xp=obj]').click();$('#mvDxf').onclick=()=>document.querySelector('[data-xp=dxf3]').click();
+$('#mvObj').onclick=()=>document.querySelector('[data-xp=obj]').click();$('#mv3dm').onclick=()=>document.querySelector('[data-xp="3dm"]').click();$('#mvDxf').onclick=()=>document.querySelector('[data-xp=dxf3]').click();
 cropUI();
 
 
