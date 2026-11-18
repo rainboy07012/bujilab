@@ -55,6 +55,13 @@ select,.btn{font:inherit;border:1px solid var(--line);border-radius:2px;padding:
 .tab.on{color:var(--ink);border-bottom-color:var(--acc)}
 .pane{flex:1;position:relative;overflow:hidden;display:none;min-height:0}
 .pane.on{display:block}
+#vlib{overflow:auto;background:var(--hair)}.libwrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;padding:16px;align-items:start}@media(max-width:1000px){.libwrap{grid-template-columns:1fr}}
+.libwrap section{background:var(--surface);border:1px solid var(--line);padding:16px}.libwrap h4{margin:0 0 12px;font-size:14px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.txpat{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;margin-bottom:12px}.txpat button{border:1px solid var(--line);background:var(--surface);padding:4px;cursor:pointer;font:inherit;font-size:11.5px;color:var(--ink);text-align:left}.txpat button canvas{display:block;width:100%;aspect-ratio:1;margin-bottom:3px}.txpat button.on{outline:2px solid var(--acc);outline-offset:-2px}
+.txgrid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:14px}@media(max-width:700px){.txgrid{grid-template-columns:1fr}}#txCv{width:100%;aspect-ratio:1;display:block;border:1px solid var(--line)}
+.txset{display:flex;flex-direction:column;gap:9px}.txset label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut)}.txset label.f span{display:flex;gap:6px;align-items:center}.txset input[type=range]{flex:1}.txset .row{display:flex;gap:6px;flex-wrap:wrap}.txset input[type=color]{width:56px;height:28px;padding:0;border:1px solid var(--line)}
+.rfgrid{columns:3 160px;column-gap:10px;margin-top:12px}.rfgrid figure{break-inside:avoid;margin:0 0 10px;border:1px solid var(--line);background:var(--surface)}.rfgrid img{display:block;width:100%}.rfgrid figcaption{display:flex;gap:4px;padding:4px}.rfgrid input{flex:1;min-width:0;border:0;border-bottom:1px solid var(--field-line);background:transparent;font:inherit;font-size:12px;padding:3px 2px;color:var(--ink)}.rfgrid button{border:0;background:none;color:var(--mut);cursor:pointer}
+.rfgrid:empty::before{content:'사례 사진이나 스케치를 올려 모아 두세요. 캡션(건물명·건축가·메모)을 달 수 있고, A3 한 장으로 뽑을 수 있습니다.';color:var(--mut);font-size:12.5px}
 #vmodel canvas{display:block}#vmodel .dtool{z-index:2}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
 #v3d{background:var(--hair)}
 #v3d canvas{display:block}
@@ -347,6 +354,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
   <button class="tab" data-p="vcomp">대안 비교</button>
   <button class="tab" data-p="vproc">변형 과정</button>
   <button class="tab" data-p="vboard">보드 출력</button>
+  <button class="tab" data-p="vlib">재질·레퍼런스</button>
  </div>
  <div class="pane on" id="v3d">
   <div class="tools">
@@ -401,6 +409,32 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <label class="tg" id="mvRotL" hidden>회전 <input type="range" id="mvRot" min="-45" max="45" step="1" value="0" style="width:80px"> <b id="mvRotV" class="mono">0°</b></label>
    <button class="btn sm" id="mvPng">이미지 저장</button><button class="btn sm" id="mvObj" title="자른 영역만 OBJ로">OBJ</button><button class="btn sm" id="mvDxf" title="자른 영역만 3D DXF로">DXF</button><button class="btn sm" id="mv3dm" title="자른 영역만 라이노 3DM으로">3DM</button>
    <span class="note" id="mvInfo"></span>
+  </div>
+ </div>
+ <div class="pane" id="vlib">
+  <div class="libwrap">
+   <section class="libtex">
+    <h4>재질 텍스처 <span class="note">이음매 없이 반복되는 타일을 실제 크기(mm)로 만듭니다</span></h4>
+    <div class="txpat" id="txPat"></div>
+    <div class="txgrid">
+     <canvas id="txCv" aria-label="재질 미리보기"></canvas>
+     <div class="txset">
+      <label class="f">단위 가로 <span><input type="range" id="txW" min="40" max="1800" step="10"> <b id="txWv" class="mono"></b></span></label>
+      <label class="f">단위 세로 <span><input type="range" id="txH" min="20" max="1200" step="5"> <b id="txHv" class="mono"></b></span></label>
+      <label class="f">줄눈 <span><input type="range" id="txJ" min="0" max="30" step="1"> <b id="txJv" class="mono"></b></span></label>
+      <label class="f">색 편차 <span><input type="range" id="txV" min="0" max="40" step="1"> <b id="txVv" class="mono"></b></span></label>
+      <div class="row"><label class="f">재료색 <input type="color" id="txC1"></label><label class="f">줄눈색 <input type="color" id="txC2"></label></div>
+      <p class="note" id="txInfo"></p>
+      <div class="row"><button class="btn pri" id="txSel">선택 매스에 입히기</button><button class="btn" id="txAll">모든 매스에</button></div>
+      <div class="row"><button class="btn" id="txPng">PNG 저장 (타일)</button><button class="btn" id="txClr">재질 지우기</button></div>
+     </div>
+    </div>
+   </section>
+   <section class="libref">
+    <h4>레퍼런스 보드 <span class="note">내가 모은 사례 이미지 · 이 브라우저에만 저장</span></h4>
+    <div class="row"><label class="btn" style="cursor:pointer">이미지 추가<input type="file" id="rfIn" accept="image/*" multiple hidden></label><button class="btn" id="rfPdf">A3 PDF로 저장</button><span class="note" id="rfN"></span></div>
+    <div class="rfgrid" id="rfGrid"></div>
+   </section>
   </div>
  </div>
  <div class="pane" id="vdiag">
@@ -912,10 +946,10 @@ function layoutFloor(ms,f){
  const core=needCore(ms,f)?coreA(ms):0;return{blocks,total,core,used,over,avail:total-core};}
 function clearLabels(ms){(ms.labels||[]).forEach(l=>l.el.remove());ms.labels=[];}
 function build(ms){drop(ms.grp);clearLabels(ms);const g=new THREE.Group();const s=ms===sel;const gs=groundStats(ms);const lv=gs.avg+ms.lev;
- const mat=()=>new THREE.MeshLambertMaterial({color:s?MS.sel:MS.mass});const em=()=>new THREE.LineBasicMaterial({color:s?0x2f5bd3:0x16181d});const fm=()=>new THREE.LineBasicMaterial({color:s?0x9db3ea:0xd3d7dd});
+ const mat=()=>ms.tex?new THREE.MeshLambertMaterial({map:texMap(ms.tex),color:s?0xdfe7fb:0xffffff}):new THREE.MeshLambertMaterial({color:s?MS.sel:MS.mass});const em=()=>new THREE.LineBasicMaterial({color:s?0x2f5bd3:0x16181d});const fm=()=>new THREE.LineBasicMaterial({color:s?0x9db3ea:0xd3d7dd});
  const inner=new THREE.Group();
  const k=Math.min(VF,ms.floors);
- if(!EXP&&!VF){localParts(ms).forEach(p=>{const yb=p.f0===0?Math.min(gs.min,lv)-0.05:lv+p.f0*FH;const pg=boxPart(p.x1-p.x0,p.z1-p.z0,yb,lv+p.f1*FH,mat(),em(),fm(),lv);pg.position.set((p.x0+p.x1)/2,0,(p.z0+p.z1)/2);inner.add(pg);});}
+ if(!EXP&&!VF){localParts(ms).forEach(p=>{const yb=p.f0===0?Math.min(gs.min,lv)-0.05:lv+p.f0*FH;const pg=boxPart(p.x1-p.x0,p.z1-p.z0,yb,lv+p.f1*FH,mat(),em(),fm(),lv);pg.position.set((p.x0+p.x1)/2,0,(p.z0+p.z1)/2);if(ms.tex)uvMeters(pg,(p.x0+p.x1)/2,(p.z0+p.z1)/2);inner.add(pg);});}
  else{const GAP=2.6;const ghostM=new THREE.MeshBasicMaterial({color:0x9db3ea,transparent:true,opacity:0.07,depthWrite:false}),ghostE=new THREE.LineBasicMaterial({color:0xb9c6e6,transparent:true,opacity:.6});
   for(let f=1;f<=ms.floors;f++){const base=lv+(f-1)*FH+(EXP?(f-1)*GAP:0);const parts=localParts(ms).filter(p=>f>p.f0&&f<=p.f1);
    const show=EXP||f===k;
@@ -1021,7 +1055,7 @@ thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
 // ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
 const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
-const GATED='[data-xp="3dm"],[data-xp=dae],#pfPdf,#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
+const GATED='#rfPdf,[data-xp="3dm"],[data-xp=dae],#pfPdf,#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
 const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
 function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
 let planPending=null;
@@ -1064,7 +1098,7 @@ $('#gHide').onclick=()=>{GD.hidden=true;gSave();gRender();dispatchEvent(new Even
 $('#regBasis').addEventListener('toggle',()=>{if($('#regBasis').open)gMark(3);});
 // ---------- history ----------
 const zoneKey=()=>zone.k||Object.keys(ZONES).find(k=>ZONES[k]===zone);
-const snap=()=>JSON.stringify({v:1,site:SITE,proc,board,req,zone:zoneKey(),lands,pkPlan,plot,road,terr:terrKey,ann,masses:masses.map(({id,name,x,z,w,d,floors,setFl,setD,shape,rot,lev,uses,prog})=>({id,name,x,z,w,d,floors,setFl,setD,shape,rot,lev,uses,prog})),sel:sel?sel.id:null});
+const snap=()=>JSON.stringify({v:1,site:SITE,proc,board,req,zone:zoneKey(),lands,pkPlan,plot,road,terr:terrKey,ann,masses:masses.map(({id,name,x,z,w,d,floors,setFl,setD,shape,rot,lev,uses,prog,tex})=>({id,name,x,z,w,d,floors,setFl,setD,shape,rot,lev,uses,prog,tex})),sel:sel?sel.id:null});
 let hist=[],hi=-1;
 function commit(){const s=snap();if(hist[hi]===s)return;setTimeout(gTick,0);if(typeof curPane!=='undefined'&&curPane==='vreq'&&!document.activeElement?.closest?.('#reqRows'))setTimeout(drawReq,0);hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>100)hist.shift();hi=hist.length-1;updHist();if(!autosaveOn&&hist.length>1&&$('#restoreBar').classList.contains('on')){$('#restoreBar').classList.remove('on');autosaveOn=true;}if(autosaveOn){try{localStorage.setItem(LSKEY,s);}catch(e){if(!commit.warned){commit.warned=1;toast('작업이 커서 브라우저 자동 저장이 안 됩니다. 위쪽 "저장" 버튼으로 파일로 저장하세요.');}}}}
 window.__bjl={site:()=>SITE,size:()=>snap().length};
@@ -3084,6 +3118,60 @@ function expBuild(){expClear();if(!$('#mvExp').checked||curPane!=='vmodel')retur
  S.add(expG);}
 function expClear(){if(expG){drop(expG);expG=null;}if(expHid){expHid.forEach(o=>o.visible=true);expHid=null;}}
 $('#mvExp').onchange=()=>{expBuild();if($('#mvExp').checked)toast('레이어 분해: 지형 · 도로·물 · 녹지 · 주변 건물 · 계획 매스');};
+
+
+// ---------- 재질 텍스처: 패턴을 실제 크기(m)로 그려 이음매 없이 반복 ----------
+const TXP=[{k:'brick',n:'벽돌 러닝본드',w:190,h:57,j:10,c1:'#a8553a',c2:'#d9d2c7',v:18},{k:'stack',n:'타일 스택본드',w:300,h:300,j:4,c1:'#e7e4dc',c2:'#bdb8ae',v:6},{k:'ashlar',n:'석재 랜덤',w:600,h:300,j:6,c1:'#c9c2b4',c2:'#8f8a80',v:14},
+ {k:'wood',n:'목재 판재',w:120,h:1200,j:3,c1:'#b0845a',c2:'#6e5038',v:16},{k:'louver',n:'수직 루버',w:150,h:1000,j:60,c1:'#8a8f96',c2:'#2f3338',v:4},{k:'concrete',n:'노출콘크리트',w:1200,h:600,j:2,c1:'#b9b8b3',c2:'#8c8b86',v:8},
+ {k:'panel',n:'금속 패널',w:900,h:450,j:12,c1:'#d4d7db',c2:'#5b6068',v:5},{k:'basket',n:'바스켓위브',w:200,h:100,j:4,c1:'#a07450',c2:'#5e4532',v:14}];
+let TX={...TXP[0]};
+function texCanvas(o,px=1024){const c=document.createElement('canvas');c.width=c.height=px;const g=c.getContext('2d');const W=o.w/1000,H=o.h/1000,J=o.j/1000;let q=7;const r=()=>{q=(q*16807)%2147483647;return q/2147483647;};
+ const tint=(hex,v)=>{const n=parseInt(hex.slice(1),16),R=n>>16,G2=n>>8&255,B=n&255,d=(r()-.5)*2*v;const f=x=>Math.max(0,Math.min(255,Math.round(x+d)));return`rgb(${f(R)},${f(G2)},${f(B)})`;};
+ // 타일 한 장의 실제 크기(m): 반복 주기
+ const T={brick:[W+J,2*(H+J)],stack:[W+J,H+J],ashlar:[(W+J)*2,(H+J)*3],wood:[(W+J)*4,(H+J)],louver:[W+J,H],concrete:[W,H],panel:[W+J,H+J],basket:[2*(W+J),2*(W+J)]}[o.k];
+ // 정사각 캔버스에 맞도록 주기의 정수배로 늘림
+ const nx=Math.max(1,Math.round(Math.max(T[0],T[1])/T[0])),ny=Math.max(1,Math.round(Math.max(T[0],T[1])/T[1]));const TW=T[0]*nx,TH=T[1]*ny,sx=px/TW,sy=px/TH;
+ g.fillStyle=o.c2;g.fillRect(0,0,px,px);const R=(x,y,w,h,col)=>{g.fillStyle=col;const X=((x%TW)+TW)%TW;for(const ox of[0,-TW])for(const oy of[0,-TH])g.fillRect((X+ox)*sx,((y%TH+TH)%TH+oy)*sy,w*sx,h*sy);};
+ if(o.k==='brick'){for(let row=0;row*(H+J)<TH-1e-6;row++)for(let x=(row%2?-(W+J)/2:0);x<TW;x+=W+J)R(x,row*(H+J),W,H,tint(o.c1,o.v));}
+ else if(o.k==='stack'||o.k==='panel'){for(let y=0;y<TH-1e-6;y+=H+J)for(let x=0;x<TW-1e-6;x+=W+J)R(x,y,W,H,tint(o.c1,o.v));}
+ else if(o.k==='ashlar'){for(let y=0,row=0;y<TH-1e-6;y+=H+J,row++){let x=row*0.37*W%(W+J);x-=W+J;while(x<TW){const w=W*(0.5+r()*0.9);R(x,y,w,H,tint(o.c1,o.v));x+=w+J;}}}
+ else if(o.k==='wood'){for(let x=0;x<TW-1e-6;x+=W+J){const off=r()*H;for(let y=-H;y<TH;y+=H+J)R(x,y+off,W,H,tint(o.c1,o.v));}g.globalAlpha=0.12;g.strokeStyle='#3b2a1c';for(let k=0;k<px/3;k++){const x=r()*px;g.beginPath();g.moveTo(x,0);g.lineTo(x+(r()-.5)*6,px);g.stroke();}g.globalAlpha=1;}
+ else if(o.k==='louver'){g.fillStyle=o.c2;g.fillRect(0,0,px,px);for(let x=0;x<TW-1e-6;x+=W+J){R(x,0,J*0.0+W*0.45,TH,tint(o.c1,o.v));g.fillStyle='rgba(255,255,255,.18)';g.fillRect(x*sx,0,W*0.1*sx,px);}}
+ else if(o.k==='concrete'){g.fillStyle=o.c1;g.fillRect(0,0,px,px);for(let k=0;k<9000;k++){g.fillStyle=`rgba(${r()<.5?0:255},${r()<.5?0:255},${r()<.5?0:255},${0.03+r()*0.04})`;g.fillRect(r()*px,r()*px,1+r()*2.5,1+r()*2.5);}
+  g.fillStyle=o.c2;g.fillRect(0,0,px,Math.max(1,J*sy));g.fillRect(0,0,Math.max(1,J*sx),px);for(const fx of[0.2,0.5,0.8])for(const fy of[0.25,0.75]){g.beginPath();g.arc(fx*px,fy*px,Math.max(2,0.012*sx),0,6.3);g.fill();}}
+ else if(o.k==='basket'){const Q=W+J,n2=Math.max(1,Math.round(W/(H+J)));const hh=(Q-J*n2)/n2;for(let i=0;i*Q<TW-1e-6;i++)for(let j=0;j*Q<TH-1e-6;j++){for(let k2=0;k2<n2;k2++){if((i+j)%2)R(i*Q,j*Q+k2*(hh+J),W,hh,tint(o.c1,o.v));else R(i*Q+k2*(hh+J),j*Q,hh,W,tint(o.c1,o.v));}}}
+ return{c,tw:TW,th:TH};}
+const TXC={};function texMap(o){const key=JSON.stringify(o);if(TXC[key])return TXC[key];const{c,tw,th}=texCanvas(o,512);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1/tw,1/th);t.anisotropy=8;return TXC[key]=t;}
+// 박스 면마다 UV를 실제 좌표(m)로: 수평면 x·z, 벽 가로·높이
+function uvMeters(grp,ox,oz){grp.traverse(o=>{if(!o.isMesh)return;const g=o.geometry,P=g.attributes.position,N=g.attributes.normal;if(!N)return;const uv=new Float32Array(P.count*2);
+ for(let i=0;i<P.count;i++){const x=P.getX(i)+ox,y=P.getY(i),z=P.getZ(i)+oz,nx=Math.abs(N.getX(i)),ny=Math.abs(N.getY(i));if(ny>0.5){uv[i*2]=x;uv[i*2+1]=z;}else if(nx>0.5){uv[i*2]=z;uv[i*2+1]=y;}else{uv[i*2]=x;uv[i*2+1]=y;}}
+ g.setAttribute('uv',new THREE.BufferAttribute(uv,2));});}
+function txDraw(){const{c,tw,th}=texCanvas(TX,1024);const cv=$('#txCv');cv.width=cv.height=1024;const g=cv.getContext('2d');const n=Math.min(12,Math.max(2,Math.ceil(1.2/Math.max(tw,th))));const cs=1024/n;for(let i=0;i<n;i++)for(let j=0;j<n;j++)g.drawImage(c,i*cs,j*cs,cs+0.5,cs+0.5);
+ $('#txInfo').textContent=`타일 한 장 = ${Math.round(tw*1000)} × ${Math.round(th*1000)} mm · 미리보기 약 ${(Math.max(tw,th)*n).toFixed(1)}m 폭`;}
+function txUI(){[['txW','w','mm'],['txH','h','mm'],['txJ','j','mm'],['txV','v','']].forEach(([id,k,u])=>{$('#'+id).value=TX[k];$('#'+id+'v').textContent=TX[k]+u;});$('#txC1').value=TX.c1;$('#txC2').value=TX.c2;$$('#txPat button').forEach(b=>b.classList.toggle('on',b.dataset.k===TX.k));txDraw();}
+$('#txPat').innerHTML='';TXP.forEach(pp=>{const b=document.createElement('button');b.dataset.k=pp.k;b.type='button';const cv=texCanvas(pp,128).c;b.append(cv,document.createTextNode(pp.n));b.onclick=()=>{TX={...pp};txUI();};$('#txPat').append(b);});
+[['txW','w'],['txH','h'],['txJ','j'],['txV','v']].forEach(([id,k])=>{$('#'+id).oninput=e=>{TX[k]=+e.target.value;txUI();};});$('#txC1').oninput=e=>{TX.c1=e.target.value;txDraw();};$('#txC2').oninput=e=>{TX.c2=e.target.value;txDraw();};
+const txApply=L=>{L.forEach(m=>{m.tex={...TX};delete m.tex.n;build(m);});commit();toast(`${L.length}개 매스에 "${TXP.find(p=>p.k===TX.k).n}" 재질을 입혔습니다. 3D 매스·모델 뷰에서 보입니다.`);};
+$('#txSel').onclick=()=>{if(!sel){toast('먼저 3D 매스 탭에서 매스를 고르세요.');return;}txApply([sel]);};$('#txAll').onclick=()=>txApply(masses);
+$('#txClr').onclick=()=>{masses.forEach(m=>{delete m.tex;build(m);});commit();toast('매스 재질을 지웠습니다.');};
+$('#txPng').onclick=async()=>{const{c,tw,th}=texCanvas(TX,2048);offer(`bujilab_texture_${TX.k}_${Math.round(tw*1000)}x${Math.round(th*1000)}mm.png`,await canvasBlob(c));};
+// ---------- 레퍼런스 보드: 이미지 + 캡션, IndexedDB에 저장 ----------
+const RFDB=(()=>{let db=null;const open=()=>db?Promise.resolve(db):new Promise((res,rej)=>{const r=indexedDB.open('bujilab.ref',1);r.onupgradeneeded=()=>r.result.createObjectStore('r',{keyPath:'id'});r.onsuccess=()=>{db=r.result;res(db);};r.onerror=()=>rej(r.error);});
+ const tx=async(m,f)=>{const d=await open();return new Promise((res,rej)=>{const t=d.transaction('r',m);const q=f(t.objectStore('r'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});};
+ return{all:async()=>((await tx('readonly',st=>st.getAll()))||[]).sort((a,b)=>a.o-b.o),put:v=>tx('readwrite',st=>st.put(v)),del:id=>tx('readwrite',st=>st.delete(id))};})();
+const RFU={};
+async function rfRender(){let L=[];try{L=await RFDB.all();}catch(e){}const el=$('#rfGrid');el.innerHTML='';$('#rfN').textContent=L.length?`${L.length}장`:'';
+ L.forEach(r=>{if(!RFU[r.id])RFU[r.id]=URL.createObjectURL(r.blob);const f=document.createElement('figure');const im=new Image();im.src=RFU[r.id];im.alt=r.cap||'레퍼런스 이미지';const fc=document.createElement('figcaption');const inp=document.createElement('input');inp.value=r.cap||'';inp.placeholder='건물명 · 건축가 · 메모';inp.onchange=async()=>{r.cap=inp.value;await RFDB.put(r);};
+  const del=document.createElement('button');del.textContent='✕';del.title='빼기';del.setAttribute('aria-label','빼기');del.onclick=async()=>{await RFDB.del(r.id);URL.revokeObjectURL(RFU[r.id]);delete RFU[r.id];rfRender();};fc.append(inp,del);f.append(im,fc);el.append(f);});return L;}
+$('#rfIn').onchange=async e=>{const L=await RFDB.all().catch(()=>[]);let o=L.length?Math.max(...L.map(x=>x.o))+1:0;for(const f of [...e.target.files].slice(0,40)){try{const bm=await createImageBitmap(f);const k=Math.min(1,1600/Math.max(bm.width,bm.height));const c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.88));await RFDB.put({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),o:o++,blob,cap:f.name.replace(/\.[^.]+$/,''),w:c.width,h:c.height});}catch(err){}}e.target.value='';await rfRender();toast('레퍼런스에 추가했습니다.');};
+$('#rfPdf').onclick=async()=>{const L=await rfRender();if(!L.length){toast('먼저 이미지를 추가하세요.');return;}toast('레퍼런스 보드 PDF를 만드는 중입니다…');const dpi=150,W=420,H=297,k=dpi/25.4,mm=v=>v*k;const pages=[];const per=6;
+ for(let p0=0;p0<L.length;p0+=per){const cv=document.createElement('canvas');cv.width=Math.round(W*k);cv.height=Math.round(H*k);const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.fillStyle='#16181d';c.font=`300 ${mm(9)}px "IBM Plex Sans KR",sans-serif`;c.fillText('레퍼런스',mm(14),mm(22));
+  c.font=`400 ${mm(3.2)}px "IBM Plex Sans KR",sans-serif`;c.fillStyle='#5f6672';c.fillText(`${board.title||''}${board.name?' · '+board.name:''}`,mm(60),mm(22));const cw=(W-28-2*8)/3,ch=(H-36-14-8)/2;
+  for(let i=0;i<per&&p0+i<L.length;i++){const r=L[p0+i];const bm=await createImageBitmap(r.blob);const x=14+(i%3)*(cw+8),y=32+Math.floor(i/3)*(ch+8);pfFit(c,mm,bm,x,y,cw,ch-8,false);c.fillStyle='#16181d';c.font=`400 ${mm(3.2)}px "IBM Plex Sans KR",sans-serif`;c.fillText(String(p0+i+1).padStart(2,'0')+'  '+(r.cap||''),mm(x),mm(y+ch-2));}
+  pages.push({cv,W,H});}
+ offer(`bujilab_references_${stamp()}.pdf`,await pdfFromPages(pages,'레퍼런스 보드'));};
+txUI();rfRender();
 
 // ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
 let mvStyle='draw',mvPrev='base',mvSpinOn=false;
