@@ -62,7 +62,8 @@ select,.btn{font:inherit;border:1px solid var(--line);border-radius:2px;padding:
 .txset{display:flex;flex-direction:column;gap:9px}.txset label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut)}.txset label.f span{display:flex;gap:6px;align-items:center}.txset input[type=range]{flex:1}.txset .row{display:flex;gap:6px;flex-wrap:wrap}.txset input[type=color]{width:56px;height:28px;padding:0;border:1px solid var(--line)}
 .rfgrid{columns:3 160px;column-gap:10px;margin-top:12px}.rfgrid figure{break-inside:avoid;margin:0 0 10px;border:1px solid var(--line);background:var(--surface)}.rfgrid img{display:block;width:100%}.rfgrid figcaption{display:flex;gap:4px;padding:4px}.rfgrid input{flex:1;min-width:0;border:0;border-bottom:1px solid var(--field-line);background:transparent;font:inherit;font-size:12px;padding:3px 2px;color:var(--ink)}.rfgrid button{border:0;background:none;color:var(--mut);cursor:pointer}
 .rfgrid:empty::before{content:'사례 사진이나 스케치를 올려 모아 두세요. 캡션(건물명·건축가·메모)을 달 수 있고, A3 한 장으로 뽑을 수 있습니다.';color:var(--mut);font-size:12.5px}
-#vmodel canvas{display:block}#vmodel .dtool{z-index:2}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
+#vmodel canvas{display:block}#vmodel .dtool{z-index:2}
+.pxcard{position:absolute;left:12px;bottom:12px;z-index:3;background:#fffdf6;color:#16181d;border:2px solid #16181d;box-shadow:4px 4px 0 #16181d;padding:9px 12px 10px;font-size:12.5px;line-height:1.55;min-width:180px;max-width:280px}.pxcard b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}.pxcard dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.pxcard dt{color:#6a6f78}.pxcard dd{margin:0}.pxcard i{display:inline-block;width:9px;height:9px;margin-right:5px;vertical-align:0;border:1px solid #16181d}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
 #v3d{background:var(--hair)}
 #v3d canvas{display:block}
 #v3d.plot canvas,#v3d.measure canvas{cursor:crosshair}
@@ -398,9 +399,9 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <button class="btn sm" id="axoB" title="화이트 모델·그림자 누적·지형 단층 액소를 패널용 이미지로">다이어그램 뷰</button>
   </div>
  </div>
- <div class="pane" id="vmodel">
+ <div class="pane" id="vmodel"><div class="pxcard" id="pxCard" hidden role="status" aria-live="polite"></div>
   <div class="dtool">
-   <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="land">조경 일러스트</button><button data-s="night">야경</button></div>
+   <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="land">조경 일러스트</button><button data-s="night">야경</button><button data-s="pixel" title="도트 그래픽으로 그린 동네 디오라마 · 차와 사람이 움직이고, 건물을 누르면 정보가 뜹니다">픽셀 동네</button></div>
    <label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
    <label class="tg"><input type="checkbox" id="mvSp">태양 궤적</label>
    <label class="tg" title="지형·도로와 물·녹지·주변 건물·계획 매스를 층층이 띄워 보여 줍니다"><input type="checkbox" id="mvExp">레이어 분해</label>
@@ -700,7 +701,8 @@ let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES,FAR=null,farG=null,REF=null;
 const MSTY={base:{road:0xc9ccd1,green:0xd3dfd2,ground:0xe2e4e7,gG:'#e2e4e7',gGr:'#d3dfd2',gRd:'#c9ccd1',ctx:0xfafafa,mass:0xffffff,sel:0xc9d7f7,tree:0x9fb8a0,far:0xf4f5f7},white:{road:0xe6e6e3,green:0xecefe9,ground:0xf4f4f2,gG:'#f4f4f2',gGr:'#ecefe9',gRd:'#e6e6e3',ctx:0xffffff,mass:0xffffff,sel:0xdfe7fb,tree:0xf2f2ef,far:0xfbfbfa},wood:{road:0xc2b190,green:0xc6bb92,ground:0xd6c5a5,gG:'#d6c5a5',gGr:'#c6bb92',gRd:'#c2b190',ctx:0xf4eadb,mass:0x9c7350,sel:0xb98c63,tree:0xa8b388,far:0xeee2cc},clay:{road:0xcbc2b6,green:0xcdc9b6,ground:0xd9d0c5,gG:'#d9d0c5',gGr:'#cdc9b6',gRd:'#cbc2b6',ctx:0xebe4da,mass:0xc29275,sel:0xd3a68a,tree:0xb6b99e,far:0xebe5dc},
  draw:{road:0xf3f3f1,green:0xf4f6f1,ground:0xffffff,gG:'#ffffff',gGr:'#f3f6ee',gRd:'#f1f1ef',ink:'#3a3f47',gW:'#e3edf3',ctx:0xffffff,mass:0xffffff,sel:0xe4ebfb,tree:0xffffff,far:0xffffff,edge:0x23262c,floor:0xb4b9c1,bg:0xffffff,hemi:2.55,sun:0.42,line:0x30343b},
  land:{road:0xc3c5c8,green:0xd2e0b6,ground:0xede1c9,gG:'#ede1c9',gGr:'#d3e1b6',gRd:'#c4c6c9',gW:'#a9c3d2',ctx:0xffffff,mass:0xffffff,sel:0xe8eefb,tree:0x8fb27a,far:0xf4f1ea,edge:0xd2d4d6,floor:0xf3f3f3,bg:0xf2eee5,hemi:2.15,sun:1.05,illus:1},
- night:{road:0x1d2436,green:0x18231f,ground:0x141a29,gG:'#141a29',gGr:'#17221e',gRd:'#1e2538',ink:'#55627d',gW:'#1a2a40',ctx:0x161d2e,mass:0x233256,sel:0x2d4176,tree:0x152019,far:0x141a29,edge:0xc9d3e8,floor:0x323d57,bg:0x0d1220,hemi:0.42,sun:0.22,line:0xd6deee,win:0xffc56a}};let MS=MSTY.base;
+ pixel:{road:0x6a6e78,green:0x79c25a,ground:0xa6d47f,gG:'#a6d47f',gGr:'#79c25a',gRd:'#6a6e78',gW:'#4fa6e0',ctx:0xf1e4cb,mass:0xfff8e8,sel:0xffd84d,tree:0x3f8f3a,far:0xe9dcc2,edge:0x23262c,floor:0xd8ccb3,bg:0x8fcdf0,hemi:2.1,sun:1.35,illus:1,pix:1},
+night:{road:0x1d2436,green:0x18231f,ground:0x141a29,gG:'#141a29',gGr:'#17221e',gRd:'#1e2538',ink:'#55627d',gW:'#1a2a40',ctx:0x161d2e,mass:0x233256,sel:0x2d4176,tree:0x152019,far:0x141a29,edge:0xc9d3e8,floor:0x323d57,bg:0x0d1220,hemi:0.42,sun:0.22,line:0xd6deee,win:0xffc56a}};let MS=MSTY.base;
 const roadPolys=()=>SITE?SITE.roads:roadRects().map(rectPoly);
 const greenPolys=()=>SITE?SITE.greens:GREENS.map(rectPoly);
 function setSiteData(s){SITE=s||null;SUNH={};SUNK=null;if(!SITE){lay.photo=0;const a=document.querySelector('#photoT');if(a)a.checked=false;const b=document.querySelector('.lay input[data-l=photo]');if(b)b.checked=false;}
@@ -793,8 +795,8 @@ function buildTerrain(){[groundM,cntG,roadsG,greensG,treesG,ctxG].forEach(drop);
  buildRoads();
  greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,MS.green)));S.add(greensG);
  treesG=treeGroup(TREES);treesG.visible=$('#treeT').checked;S.add(treesG);
- ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
-  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();buildElev();buildDeco();if(typeof buildSunPath==='function'&&$('#spT').checked)setTimeout(buildSunPath,0);}
+ ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,MS.pix?pixMat(c):ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
+  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,MS.pix?pixMat(c):ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();buildElev();buildDeco();buildLife();if(typeof buildSunPath==='function'&&$('#spT').checked)setTimeout(buildSunPath,0);}
 
 // ---------- 조경 일러스트 나무: 캔버스로 그린 나무(옆모습 2장 교차 + 위에서 본 수관 1장) ----------
 const ILLT=(()=>{let cache=null;return()=>{if(cache)return cache;const G3=[['#6f9a5c','#8db474','#a9c98c'],['#5d8a55','#7da86a','#9cc184'],['#86ad6a','#a3c486','#bfd8a2']];
@@ -1206,7 +1208,7 @@ R.domElement.addEventListener('pointermove',e=>{
 R.domElement.addEventListener('pointerup',e=>{
  if(rotDrag){const mv=rotDrag.moved;rotDrag=null;ctr.enabled=true;if(mv){commit();toast(`회전 ${sel?sel.rot:0}°`);}return;}
  if(drag){const mv=drag.moved;drag=null;ctr.enabled=true;if(mv)commit();return;}
- if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;const q=groundPt(e);if(!q)return;
+ if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;if(curPane==='vmodel'&&MS.pix){pixPickAt(e);return;}const q=groundPt(e);if(!q)return;
  if(mode==='plot'||mode==='land')addDraft([sn(q[0]),sn(q[1])]);else if(mode==='measure')addMeasure(snapTo(q));});
 let draft=null,draftHover=null,draftObj=null;
 function drawDraft(){if(draftObj){drop(draftObj);draftObj=null;}$('#plotN').textContent=$('#landN').textContent=(draft?draft.length:0)+'점';const DC=mode==='land'?0x3f8f55:0x2f5bd3;if(!draft||!draft.length)return;
@@ -3175,12 +3177,53 @@ txUI();rfRender();
 
 // ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
 let mvStyle='draw',mvPrev='base',mvSpinOn=false;
-function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
-function mvLeave(){expClear();$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;}
+function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();pixApply();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
+function mvLeave(){expClear();pixClear();$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;R.setPixelRatio(PR0);R.domElement.style.imageRendering='';resize();}
+// ---------- 픽셀 동네: 저해상도 렌더 + 용도 색 + 움직이는 차·사람 + 건물 카드 ----------
+const PXU=[0xf6c453,0xf08a4b,0xe0566a,0x5d8fe0,0xb9a6d8],PXM={},PR0=Math.min(devicePixelRatio,2);
+function pixMat(c){const k=c.u!=null&&PXU[c.u]!=null?c.u:(c.fl>=5?2:Math.abs(Math.round((c.x0||0)*7+(c.z0||0)*3))%3);return PXM[k]||(PXM[k]=new THREE.MeshLambertMaterial({color:PXU[k]}));}
+function pixApply(){const on=curPane==='vmodel'&&mvStyle==='pixel';const w=host.clientWidth||800;R.setPixelRatio(on?(w>700?1/3:1/2):PR0);R.domElement.style.imageRendering=on?'pixelated':'';resize();if(!on)pixClear();}
+var LIFE=null,pxPick=null;
+function lifeDrop(){if(!LIFE)return;S.remove(LIFE.g);LIFE.g.traverse(o=>{if(o.geometry)o.geometry.dispose();});LIFE=null;}
+function buildLife(){lifeDrop();if(!MS.pix)return;let sd=31;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
+ const RP=roadPolys(),lim=SITE?150:72,lanes=[],walks=[];
+ RP.forEach(q=>{for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<14)continue;const tx=(b[0]-a[0])/L,tz=(b[1]-a[1])/L;let nx=tz,nz=-tx;const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;if(!pip(mx+nx*0.6,mz+nz*0.6,q)){nx=-nx;nz=-nz;}
+  const seg=(off,rev,arr,ok)=>{const ax=a[0]+tx*3+nx*off,az=a[1]+tz*3+nz*off,bx=b[0]-tx*3+nx*off,bz=b[1]-tz*3+nz*off;if(!ok(ax,az)||!ok(bx,bz)||!ok((ax+bx)/2,(az+bz)/2))return;if(Math.hypot(ax,az)>lim&&Math.hypot(bx,bz)>lim)return;arr.push(rev?[bx,bz,ax,az]:[ax,az,bx,bz]);};
+  const inR=(x,z)=>pip(x,z,q)&&!pip(x,z,plot);seg(2.2,false,lanes,inR);seg(5.2,true,lanes,inR);
+  const outR=(x,z)=>!RP.some(r=>pip(x,z,r))&&!CTXP.some(c=>pip(x,z,c.poly||[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]))&&!pip(x,z,plot);seg(-1.3,rnd()<.5,walks,outR);seg(0.7,rnd()<.5,walks,inR);}});
+ const g=new THREE.Group();g.name='life';const box=(w,h,d,y)=>{const ge=new THREE.BoxGeometry(w,h,d);ge.translate(0,y,0);return ge;};
+ const CARC=[0xe8453c,0x2f6fe0,0xffffff,0xf2c230,0x2c2f36,0x3fae6a,0xf28b2f];
+ const nc=Math.min(70,lanes.length*3),np=Math.min(160,walks.length*4);
+ const body=new THREE.InstancedMesh(box(1.8,0.9,4.2,0.75),new THREE.MeshLambertMaterial(),Math.max(1,nc)),cab=new THREE.InstancedMesh(box(1.6,0.7,2.1,1.55),new THREE.MeshLambertMaterial({color:0xdfeaf2}),Math.max(1,nc));
+ const ppl=new THREE.InstancedMesh(box(0.55,1.7,0.45,0.85),new THREE.MeshLambertMaterial(),Math.max(1,np));
+ [body,cab,ppl].forEach(m=>{m.castShadow=true;m.frustumCulled=false;m.count=0;g.add(m);});
+ const ag=[],col=new THREE.Color();
+ for(let i=0;i<nc&&lanes.length;i++){const k=Math.floor(rnd()*lanes.length);ag.push({m:0,p:lanes[k],t:rnd(),v:5+rnd()*5,i});body.setColorAt(i,col.setHex(CARC[i%CARC.length]));}
+ const PPC=[0xe84a5f,0x3b6fd8,0xf5c242,0x41a46b,0x8a5cc2,0xff8a3d,0x2c2f36];
+ for(let i=0;i<np&&walks.length;i++){const k=Math.floor(rnd()*walks.length);ag.push({m:1,p:walks[k],t:rnd(),v:1+rnd()*0.7,i,ph:rnd()*6});ppl.setColorAt(i,col.setHex(PPC[i%PPC.length]));}
+ body.count=cab.count=Math.min(nc,lanes.length?nc:0);ppl.count=walks.length?np:0;
+ [body,ppl].forEach(m=>{if(m.instanceColor)m.instanceColor.needsUpdate=true;});
+ S.add(g);LIFE={g,body,cab,ppl,ag,t0:performance.now()};lifeTick(true);}
+const _lm=new THREE.Matrix4(),_lq=new THREE.Quaternion(),_lp=new THREE.Vector3(),_ls=new THREE.Vector3(1,1,1),_ly=new THREE.Vector3(0,1,0);
+function lifeTick(force){if(!LIFE)return;const now=performance.now(),dt=Math.min(0.1,(now-LIFE.t0)/1000);LIFE.t0=now;if(!force&&curPane!=='vmodel')return;
+ for(const a of LIFE.ag){const[ax,az,bx,bz]=a.p,L=Math.hypot(bx-ax,bz-az)||1;a.t+=a.v*dt/L;if(a.t>1)a.t-=1;const x=ax+(bx-ax)*a.t,z=az+(bz-az)*a.t;
+  _lq.setFromAxisAngle(_ly,Math.atan2(bx-ax,bz-az));const bob=a.m?Math.abs(Math.sin(now/170+a.ph))*0.12:0;_lp.set(x,G(x,z)+bob,z);_lm.compose(_lp,_lq,_ls);
+  if(a.m){LIFE.ppl.setMatrixAt(a.i,_lm);}else{LIFE.body.setMatrixAt(a.i,_lm);LIFE.cab.setMatrixAt(a.i,_lm);}}
+ LIFE.body.instanceMatrix.needsUpdate=LIFE.cab.instanceMatrix.needsUpdate=LIFE.ppl.instanceMatrix.needsUpdate=true;}
+const DIR8=['북','북동','동','남동','남','남서','서','북서'];
+function pixClear(){if(pxPick){pxPick.o.material=pxPick.m;pxPick=null;}const c=$('#pxCard');if(c)c.hidden=true;}
+function pixPickAt(e){setPt(e);const h=ctxG&&ray.intersectObjects(ctxG.children,true).find(x=>x.object.isMesh&&x.object.userData.ci!=null);pixClear();if(!h)return;
+ const c=CTXP[h.object.userData.ci];if(!c)return;const o=h.object;pxPick={o,m:o.material};o.material=new THREE.MeshLambertMaterial({color:0xfff27a,emissive:0x5a4a00});
+ const b=bbox(c.poly||[[c.x0,c.z0],[c.x1,c.z1]]),cx=(b.x0+b.x1)/2,cz=(b.z0+b.z1)/2,pc=centroidOf(plot),dx=cx-pc[0],dz=cz-pc[1],dd=Math.hypot(dx,dz);
+ const az=((Math.atan2(dx,-dz)*180/Math.PI)+360)%360,dir=DIR8[Math.round(az/45)%8];
+ const card=$('#pxCard');card.innerHTML='';const nm=document.createElement('b');nm.textContent=c.nm||(SITE?'이름 없는 건물':'가상 주변 건물');const dl=document.createElement('dl');
+ const row=(k,v,sw)=>{const t=document.createElement('dt');t.textContent=k;const d=document.createElement('dd');if(sw!=null){const i=document.createElement('i');i.style.background='#'+PXU[sw].toString(16).padStart(6,'0');d.append(i);}d.append(v);dl.append(t,d);};
+ const ui=c.u!=null&&BUSE[c.u]?c.u:null;row('용도',ui!=null?BUSE[ui][0]:'정보 없음',ui);if(c.fl)row('층수',c.fl+'층');row('높이',f1(c.h)+'m');if(c.yr)row('사용승인',c.yr+'년');row('위치',`대지에서 ${dir}쪽 ${Math.round(dd)}m`);
+ card.append(nm,dl);card.hidden=false;}
 function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.'):'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
-$$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();setMatStyle(mvStyle,true);if(ex)expBuild();}});
+$$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();pixClear();setMatStyle(mvStyle,true);if(ex)expBuild();pixApply();if(mvStyle==='pixel'&&!CROP.shape){CROP.shape='circle';cropSave();}}});
 $('#mvSpin').onchange=e=>{ctr.autoRotate=e.target.checked;ctr.autoRotateSpeed=0.6;};
-window.__mv={cam,ctr};$('#mvPng').onclick=async()=>{renderMain();offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(R.domElement));};
+window.__mv={cam,ctr,get life(){return LIFE;}};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
 
 // ---------- 선화·야경 표현: 선 색·빛·배경, 나무 선, 켜진 창 ----------
 function styleLights(){const hemi=S.children.find(o=>o.isHemisphereLight);if(!LBASE)LBASE={h:hemi?hemi.intensity:1.35,hc:hemi?hemi.color.getHex():0xffffff,s:sun.intensity};
@@ -3210,7 +3253,7 @@ function buildDeco(){drop(decoG);decoG=null;if(!MS.line&&!MS.illus)return;decoG=
  if(MS.line)lamps.forEach(([x,z,dx,dz])=>{const y=G(x,z);dp.push(V3(x,y,z),V3(x,y+6,z),V3(x,y+6,z),V3(x+dx*1.2,y+6.2,z+dz*1.2));});
  if(MS.win&&lamps.length){const g=new THREE.BufferGeometry().setFromPoints(lamps.map(([x,z,dx,dz])=>V3(x+dx*1.2,G(x,z)+6.05,z+dz*1.2)));decoG.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffe2a8,size:0.9,sizeAttenuation:true,toneMapped:false})));}
  // 차: 도로 안, 가까운 경계와 나란히 (차선 1.5~5m 안쪽)
- const CB=[];RP.forEach(q=>{const bb=bbox(q),A=polyArea(q);const n=Math.min(14,Math.floor(A/160));let tries=0,got=0;while(got<n&&tries<n*30){tries++;const x=bb.x0+rnd()*(bb.x1-bb.x0),z=bb.z0+rnd()*(bb.z1-bb.z0);if(!pip(x,z,q)||Math.hypot(x,z)>(SITE?140:70)||pip(x,z,PL))continue;
+ const CB=[];RP.forEach(q=>{const bb=bbox(q),A=polyArea(q);const n=MS.pix?0:Math.min(14,Math.floor(A/160));let tries=0,got=0;while(got<n&&tries<n*30){tries++;const x=bb.x0+rnd()*(bb.x1-bb.x0),z=bb.z0+rnd()*(bb.z1-bb.z0);if(!pip(x,z,q)||Math.hypot(x,z)>(SITE?140:70)||pip(x,z,PL))continue;
   let best=null,bd=1e9;for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<1)continue;const t=Math.max(0,Math.min(1,((x-a[0])*(b[0]-a[0])+(z-a[1])*(b[1]-a[1]))/(L*L)));const d=Math.hypot(a[0]+(b[0]-a[0])*t-x,a[1]+(b[1]-a[1])*t-z);if(d<bd){bd=d;best=[(b[0]-a[0])/L,(b[1]-a[1])/L];}}
   if(!best||bd<1.4||bd>5.5||CB.some(c=>Math.hypot(c[0]-x,c[1]-z)<6))continue;CB.push([x,z,Math.atan2(best[0],best[1])]);got++;}});
  if(CB.length){const body=new THREE.BoxGeometry(1.8,1.1,4.3);body.translate(0,0.75,0);const cab=new THREE.BoxGeometry(1.6,0.7,2.2);cab.translate(0,1.65,-0.2);
@@ -3316,6 +3359,6 @@ let inMain=false;{const rr=R.render.bind(R);R.render=(sc,c)=>{if(!inMain){R.shad
 function shTick(){if(!sun.position.equals(shSun)){shSun.copy(sun.position);shDirty=true;}if(shDirty||WIRE!==wireOn){R.shadowMap.needsUpdate=true;shDirty=false;}}
 let WIRE=false,wireOn=false;$('#wireT').onchange=e=>{WIRE=e.target.checked;};
 function wireApply(){if(!WIRE&&!wireOn)return;S.traverse(o=>{if(o.isMesh&&o.parent&&o.parent!==S&&o.parent.children.some(c=>c.isLineSegments))o.visible=!WIRE;});wireOn=WIRE;}
-(function loop(){requestAnimationFrame(loop);ctr.update();shTick();wireApply();updRot();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){renderMain();updLabels();}})();
+(function loop(){requestAnimationFrame(loop);ctr.update();if(LIFE)lifeTick();shTick();wireApply();updRot();cmpEl.style.transform=`rotate(${ctr.getAzimuthalAngle()}rad)`;if(host.clientWidth){renderMain();updLabels();}})();
 </script>
 </body></html>
