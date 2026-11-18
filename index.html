@@ -55,6 +55,7 @@ select,.btn{font:inherit;border:1px solid var(--line);border-radius:2px;padding:
 .tab.on{color:var(--ink);border-bottom-color:var(--acc)}
 .pane{flex:1;position:relative;overflow:hidden;display:none;min-height:0}
 .pane.on{display:block}
+#vmodel canvas{display:block}#vmodel .dtool{z-index:2}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
 #v3d{background:var(--hair)}
 #v3d canvas{display:block}
 #v3d.plot canvas,#v3d.measure canvas{cursor:crosshair}
@@ -148,6 +149,9 @@ html[data-plan=free] .gated::after{content:'';display:inline-block;width:11px;he
 .bset label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
 .bset div.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
 .bform{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}.bfh{font-weight:600;font-size:13px;color:var(--ink)}.bfh span{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}.bform .note{margin:0}
+.pflist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:12.5px}.pflist:empty::before{content:'담은 프로젝트가 없습니다.';color:var(--mut)}
+.pflist li{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)}.pflist li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pflist li em{font-style:normal;color:var(--mut);font-size:11.5px}.pflist button{border:0;background:none;color:var(--mut);cursor:pointer;padding:2px 5px;font:inherit}.pflist button:hover{color:var(--ink)}
+.bset input[type=file]{font-size:12px}
 .cqlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:cq}.cqlist:empty{display:none}
 .cqlist li{counter-increment:cq;display:grid;grid-template-columns:22px 1fr;gap:2px 8px;font-size:12.5px;line-height:1.5}
 .cqlist li::before{content:counter(cq,decimal-leading-zero);font:600 11px var(--mono,'IBM Plex Mono',monospace);color:var(--acc);grid-row:1/4;padding-top:2px}
@@ -335,6 +339,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
 <section id="view">
  <div class="tabs" role="tablist">
   <button class="tab on" data-p="v3d">3D 매스</button>
+  <button class="tab" data-p="vmodel">모델 뷰</button>
   <button class="tab" data-p="vdiag">분석 다이어그램</button>
   <button class="tab" data-p="vsec">단면</button>
   <button class="tab" data-p="vreq">과제 프로그램</button>
@@ -384,6 +389,14 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <button class="btn sm" id="axoB" title="화이트 모델·그림자 누적·지형 단층 액소를 패널용 이미지로">다이어그램 뷰</button>
   </div>
  </div>
+ <div class="pane" id="vmodel">
+  <div class="dtool">
+   <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="night">야경</button></div>
+   <label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
+   <button class="btn sm" id="mvPng">이미지 저장</button>
+   <span class="note" id="mvInfo"></span>
+  </div>
+ </div>
  <div class="pane" id="vdiag">
   <canvas id="dcv"></canvas>
   <input id="memoIn" placeholder="메모 입력 후 Enter" aria-label="메모 내용">
@@ -420,6 +433,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <div class="seg" id="saxis"><button data-x="ns" class="on">남북 단면</button><button data-x="ew">동서 단면</button></div>
    <div class="lay"><label class="tg">단면 위치 <input type="range" id="spos" min="-30" max="30" step="0.5" value="0" aria-label="단면 위치" style="width:140px;accent-color:var(--acc)"> <b id="sposV" class="mono">0.0m</b></label></div>
    <button class="btn sm" id="sToSel">선택 매스 중심으로</button>
+   <label class="tg"><input type="checkbox" id="secEnt" checked>사람·나무</label>
   </div>
  </div>
  <div class="pane" id="vreq">
@@ -488,6 +502,16 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
     <label class="f">접수번호 (비우면 빈 칸으로 둡니다)<input type="text" id="bTag" placeholder="가-001" maxlength="12"></label>
     <label class="tg"><input type="checkbox" id="bAnon" checked>이름·스튜디오 숨기기 (익명 심사)</label>
     <div class="row"><button class="btn" id="bCompPv">미리보기</button><button class="btn pri" id="bCompPdf">공모용 PDF</button></div>
+   </div>
+   <div class="bform">
+    <div class="bfh">포트폴리오 <span>프로젝트마다 쪽을 담아 두고 한 권으로</span></div>
+    <p class="note">지금 프로젝트를 대표 이미지 · 대지 · 매스 과정 · 도면 쪽으로 정리합니다. 렌더·평면 같은 내 이미지를 올리면 같이 들어갑니다(올린 이미지는 이 화면에서만 쓰고 저장하지 않습니다).</p>
+    <label class="f">프로젝트 설명 (3~5줄)<textarea id="pfText" rows="3" placeholder="예: 경사 12% 북향 비탈에 열람실을 계단처럼 앉혀 남쪽 볕을 받게 했다."></textarea></label>
+    <label class="f">학기 · 연도<input type="text" id="pfYear" placeholder="2026 2학기 · 설계스튜디오3"></label>
+    <div class="f">내 이미지 (첫 장이 대표 이미지)<input type="file" id="pfImg" accept="image/*" multiple><span id="pfImgN" class="note"></span></div>
+    <div class="row"><button class="btn" id="pfPv">미리보기</button><button class="btn" id="pfAdd">포트폴리오에 담기</button></div>
+    <ol class="pflist" id="pfList"></ol>
+    <div class="row"><label class="f" style="flex:1">용지<select id="pfPaper"><option value="A3">A3 가로</option><option value="A4">A4 가로</option></select></label><button class="btn pri" id="pfPdf" style="align-self:end">포트폴리오 PDF</button></div>
    </div>
    <div class="baudit" id="bAudit" aria-live="polite"></div>
    <p class="bnote">현재 작업 상태(매스, 대지, 시각, 분석 결과)가 그대로 들어갑니다. 3D 매스는 지금 3D 화면의 시점으로 찍힙니다. A1 인쇄용은 만드는 데 몇 초 걸릴 수 있습니다.</p>
@@ -627,7 +651,9 @@ const DEMO_CTXP=CTX.flat().map(c=>({...c,poly:rectPoly(c)}));
 const DEMO_TREES=[];GREENS.forEach(r=>{for(let i=0;i<14;i++)DEMO_TREES.push([r.x0+2+rnd()*(r.x1-r.x0-4),r.z0+2+rnd()*(r.z1-r.z0-4),1.4+rnd()*0.8]);});
 // 대지 출처: SITE=null 이면 데모, 아니면 브이월드에서 불러온 실제 대지(로컬 좌표 m, 북=-z)
 let SITE=null,CTXP=DEMO_CTXP,TREES=DEMO_TREES,FAR=null,farG=null,REF=null;
-const MSTY={base:{road:0xc9ccd1,green:0xd3dfd2,ground:0xe2e4e7,gG:'#e2e4e7',gGr:'#d3dfd2',gRd:'#c9ccd1',ctx:0xfafafa,mass:0xffffff,sel:0xc9d7f7,tree:0x9fb8a0,far:0xf4f5f7},white:{road:0xe6e6e3,green:0xecefe9,ground:0xf4f4f2,gG:'#f4f4f2',gGr:'#ecefe9',gRd:'#e6e6e3',ctx:0xffffff,mass:0xffffff,sel:0xdfe7fb,tree:0xf2f2ef,far:0xfbfbfa},wood:{road:0xc2b190,green:0xc6bb92,ground:0xd6c5a5,gG:'#d6c5a5',gGr:'#c6bb92',gRd:'#c2b190',ctx:0xf4eadb,mass:0x9c7350,sel:0xb98c63,tree:0xa8b388,far:0xeee2cc},clay:{road:0xcbc2b6,green:0xcdc9b6,ground:0xd9d0c5,gG:'#d9d0c5',gGr:'#cdc9b6',gRd:'#cbc2b6',ctx:0xebe4da,mass:0xc29275,sel:0xd3a68a,tree:0xb6b99e,far:0xebe5dc}};let MS=MSTY.base;
+const MSTY={base:{road:0xc9ccd1,green:0xd3dfd2,ground:0xe2e4e7,gG:'#e2e4e7',gGr:'#d3dfd2',gRd:'#c9ccd1',ctx:0xfafafa,mass:0xffffff,sel:0xc9d7f7,tree:0x9fb8a0,far:0xf4f5f7},white:{road:0xe6e6e3,green:0xecefe9,ground:0xf4f4f2,gG:'#f4f4f2',gGr:'#ecefe9',gRd:'#e6e6e3',ctx:0xffffff,mass:0xffffff,sel:0xdfe7fb,tree:0xf2f2ef,far:0xfbfbfa},wood:{road:0xc2b190,green:0xc6bb92,ground:0xd6c5a5,gG:'#d6c5a5',gGr:'#c6bb92',gRd:'#c2b190',ctx:0xf4eadb,mass:0x9c7350,sel:0xb98c63,tree:0xa8b388,far:0xeee2cc},clay:{road:0xcbc2b6,green:0xcdc9b6,ground:0xd9d0c5,gG:'#d9d0c5',gGr:'#cdc9b6',gRd:'#cbc2b6',ctx:0xebe4da,mass:0xc29275,sel:0xd3a68a,tree:0xb6b99e,far:0xebe5dc},
+ draw:{road:0xf3f3f1,green:0xf4f6f1,ground:0xffffff,gG:'#ffffff',gGr:'#f3f6ee',gRd:'#f1f1ef',ink:'#3a3f47',ctx:0xffffff,mass:0xffffff,sel:0xe4ebfb,tree:0xffffff,far:0xffffff,edge:0x23262c,floor:0xb4b9c1,bg:0xffffff,hemi:2.55,sun:0.42,line:0x30343b},
+ night:{road:0x1d2436,green:0x18231f,ground:0x141a29,gG:'#141a29',gGr:'#17221e',gRd:'#1e2538',ink:'#55627d',ctx:0x161d2e,mass:0x233256,sel:0x2d4176,tree:0x152019,far:0x141a29,edge:0xc9d3e8,floor:0x323d57,bg:0x0d1220,hemi:0.42,sun:0.22,line:0xd6deee,win:0xffc56a}};let MS=MSTY.base;
 const roadPolys=()=>SITE?SITE.roads:roadRects().map(rectPoly);
 const greenPolys=()=>SITE?SITE.greens:GREENS.map(rectPoly);
 function setSiteData(s){SITE=s||null;SUNH={};SUNK=null;if(!SITE){lay.photo=0;const a=document.querySelector('#photoT');if(a)a.checked=false;const b=document.querySelector('.lay input[data-l=photo]');if(b)b.checked=false;}
@@ -679,7 +705,7 @@ function massesOverlap(list){for(let i=0;i<list.length;i++)for(let j=i+1;j<list.
 const rectsOf=ms=>worldParts(ms).map(p=>({poly:p.poly,h:p.hRel,x0:Math.min(...p.poly.map(q=>q[0])),x1:Math.max(...p.poly.map(q=>q[0])),z0:Math.min(...p.poly.map(q=>q[1])),z1:Math.max(...p.poly.map(q=>q[1]))}));
 
 // ---------- three setup ----------
-const host=$('#v3d');
+let host=$('#v3d');
 const R=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
 R.setPixelRatio(Math.min(devicePixelRatio,2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;host.prepend(R.domElement);
 const S=new THREE.Scene();S.background=new THREE.Color(0xeef0f2);
@@ -695,7 +721,7 @@ function boxPart(w,d,yb,yt,mat,edge,floorMat,floorStart){const g=new THREE.Group
  const pts=[];for(let y=(floorStart??yb)+FH;y<yt-0.01;y+=FH){if(y<=yb+0.01)continue;const a=[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];for(let i=0;i<4;i++){const p=a[i],q=a[(i+1)%4];pts.push(new THREE.Vector3(p[0],y,p[1]),new THREE.Vector3(q[0],y,q[1]));}}
  if(pts.length)g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),floorMat));return g;}
 // terrain-dependent scene parts
-let groundM=null,cntG=null,roadsG=null,greensG=null,treesG=null,ctxG=null;
+let groundM=null,cntG=null,roadsG=null,greensG=null,treesG=null,ctxG=null,decoG=null,LBASE=null;
 const ctxMat=new THREE.MeshLambertMaterial({color:0xfafafa}),treeMat=new THREE.MeshLambertMaterial({color:0x9fb8a0});ctxMat.userData.keep=treeMat.userData.keep=true;
 function drape(r,yoff,col){const w=r.x1-r.x0,d=r.z1-r.z0;const geo=new THREE.PlaneGeometry(w,d,Math.max(1,Math.ceil(w/2)),Math.max(1,Math.ceil(d/2)));geo.rotateX(-Math.PI/2);geo.translate((r.x0+r.x1)/2,0,(r.z0+r.z1)/2);
  const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,G(p.getX(i),p.getZ(i))+yoff);geo.computeVertexNormals();
@@ -721,7 +747,30 @@ function buildTerrain(){[groundM,cntG,roadsG,greensG,treesG,ctxG].forEach(drop);
  greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,MS.green)));S.add(greensG);
  treesG=treeGroup(TREES);treesG.visible=$('#treeT').checked;S.add(treesG);
  ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
-  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();}
+  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();buildElev();buildDeco();}
+// 고가 구조: 데크(두께 1.8m, 하부 6.5m) + 난간 + 22m마다 교각·코핑, 다른 고가 구간과 이어지지 않는 끝은 45m에 걸쳐 지면으로 내려옴
+let elevG=null;
+function buildElev(){drop(elevG);elevG=null;const E=SITE&&SITE.elev;if(!E||!E.length)return;elevG=new THREE.Group();const pos=[],lp=[];const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
+ const ends=E.flatMap(e=>[e.pts[0],e.pts[e.pts.length-1]]);const shared=p=>ends.filter(q=>Math.hypot(q[0]-p[0],q[1]-p[1])<4).length>1;
+ const quad=(a,b,c,d)=>pos.push(...a,...b,...c,...a,...c,...d);
+ E.forEach(e=>{const P=e.pts;const S=[0];for(let i=1;i<P.length;i++)S.push(S[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=S[S.length-1];if(L<3)return;
+  const top=e.t==='003'?3.2:8.3,th=1.8,hw=e.w/2;const r0=shared(P[0])?0:Math.min(45,L*0.45),r1=shared(P[P.length-1])?0:Math.min(45,L*0.45);
+  const H=u=>{let k=1;if(r0&&u<r0)k=u/r0;if(r1&&u>L-r1)k=Math.min(k,(L-u)/r1);return Math.max(0.15,k*top);};
+  const at=u=>{let i=1;while(i<S.length-1&&S[i]<u)i++;const t=(u-S[i-1])/Math.max(1e-6,S[i]-S[i-1]);const a=P[i-1],b=P[i];const dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1;return{x:a[0]+dx*t,z:a[1]+dz*t,nx:-dz/l,nz:dx/l};};
+  const n=Math.max(2,Math.ceil(L/2));let prev=null;
+  for(let k=0;k<=n;k++){const u=L*k/n,o=at(u),gy=G(o.x,o.z),yt=gy+H(u),yb=Math.max(gy,yt-th);const l=[o.x+o.nx*hw,o.z+o.nz*hw],r=[o.x-o.nx*hw,o.z-o.nz*hw];const cur={lt:[l[0],yt,l[1]],rt:[r[0],yt,r[1]],lb:[l[0],yb,l[1]],rb:[r[0],yb,r[1]],lp:[l[0],yt+1.1,l[1]],rp:[r[0],yt+1.1,r[1]]};
+   if(prev){quad(prev.lt,cur.lt,cur.rt,prev.rt);quad(prev.rb,cur.rb,cur.lb,prev.lb);quad(prev.lb,cur.lb,cur.lt,prev.lt);quad(prev.rt,cur.rt,cur.rb,prev.rb);quad(prev.lt,cur.lt,cur.lp,prev.lp);quad(prev.rp,cur.rp,cur.rt,prev.rt);
+    [['lt','lt'],['rt','rt'],['lb','lb'],['rb','rb'],['lp','lp'],['rp','rp']].forEach(([a])=>lp.push(V3(...prev[a]),V3(...cur[a])));}
+   prev=cur;}
+  // 교각: 데크가 4.5m 넘게 뜬 곳만
+  for(let u=11;u<L-6;u+=22){if(H(u)<4.5)continue;const o=at(u),gy=G(o.x,o.z),yb=gy+H(u)-th;const cols=e.w>9?[-hw*0.5,hw*0.5]:[0];
+   cols.forEach(off=>{const cx=o.x+o.nx*off,cz=o.z+o.nz*off,s=0.8;const c4=[[cx-s,cz-s],[cx+s,cz-s],[cx+s,cz+s],[cx-s,cz+s]];for(let i=0;i<4;i++){const a=c4[i],b=c4[(i+1)%4];quad([a[0],gy,a[1]],[b[0],gy,b[1]],[b[0],yb-0.9,b[1]],[a[0],yb-0.9,a[1]]);lp.push(V3(a[0],gy,a[1]),V3(a[0],yb-0.9,a[1]));}});
+   const tx=o.nz,tz=-o.nx,cw=hw*0.9,cd=1.2;const cap=[[o.x+o.nx*cw+tx*cd,o.z+o.nz*cw+tz*cd],[o.x-o.nx*cw+tx*cd,o.z-o.nz*cw+tz*cd],[o.x-o.nx*cw-tx*cd,o.z-o.nz*cw-tz*cd],[o.x+o.nx*cw-tx*cd,o.z+o.nz*cw-tz*cd]];
+   for(let i=0;i<4;i++){const a=cap[i],b=cap[(i+1)%4];quad([a[0],yb-0.9,a[1]],[b[0],yb-0.9,b[1]],[b[0],yb,b[1]],[a[0],yb,a[1]]);lp.push(V3(a[0],yb-0.9,a[1]),V3(b[0],yb-0.9,b[1]));}}});
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:MS.ctx,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;elevG.add(m);
+ if(lp.length)elevG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),EDGE));elevG.visible=$('#ctxT').checked;S.add(elevG);}
+$('#ctxT').addEventListener('change',e=>{if(elevG)elevG.visible=e.target.checked;});
+
 // ---------- 항공사진 (브이월드 WMTS Satellite, 웹메르카토르 z19 타일을 대지 중심 ±80m로 맞춰 붙임) ----------
 let PHOTO=null,photoG=null,photoBusy=false;const PHOTO_E=100;
 const tileXY=(lon,lat,z)=>{const n=2**z,r=lat*Math.PI/180;return[(lon+180)/360*n,(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n];};
@@ -775,6 +824,7 @@ $('#photoT').onchange=e=>setPhoto(e.target.checked);
 // 실제 대지: 도로·공원을 바닥 텍스처에 칠함(지형을 따라 휘어짐)
 function siteGroundTex(GE){const N=1024,cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');const X=v=>(v+GE)/(2*GE)*N;g.fillStyle=MS.gG;g.fillRect(0,0,N,N);
  const fillP=(q,c)=>{g.fillStyle=c;g.beginPath();q.forEach((p,i)=>i?g.lineTo(X(p[0]),X(p[1])):g.moveTo(X(p[0]),X(p[1])));g.closePath();g.fill();};SITE.greens.forEach(q=>fillP(q,MS.gGr));SITE.roads.forEach(q=>fillP(q,MS.gRd));
+ if(MS.ink){g.strokeStyle=MS.ink;g.lineWidth=1.3;[...SITE.roads,...SITE.greens].forEach(q=>{g.beginPath();q.forEach((p,i)=>i?g.lineTo(X(p[0]),X(p[1])):g.moveTo(X(p[0]),X(p[1])));g.closePath();g.stroke();});}
  const tx=new THREE.CanvasTexture(cv);tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=R.capabilities.getMaxAnisotropy();return tx;}
 function buildRoads(){drop(roadsG);roadsG=new THREE.Group();if(SITE){}else roadRects().forEach(r=>roadsG.add(drape(r,0.04,MS.road)));S.add(roadsG);}
 
@@ -935,13 +985,13 @@ function updateUI(){
 // ---------- 다크/라이트 ----------
 function thmApply(t,anim){const h=document.documentElement;if(anim&&!matchMedia('(prefers-reduced-motion: reduce)').matches){h.classList.add('thm-anim');setTimeout(()=>h.classList.remove('thm-anim'),260);}
  h.dataset.theme=t;$('#thmB').setAttribute('aria-pressed',t==='dark');$('#thmB').title=t==='dark'?'라이트 모드로 바꾸기':'다크 모드로 바꾸기';
- try{if(typeof S!=='undefined'&&S){S.background=new THREE.Color(t==='dark'?0x1b1b1d:0xeef0f2);}}catch(e){}}
+ try{if(typeof S!=='undefined'&&S){S.background=new THREE.Color(MS&&MS.bg!=null?MS.bg:(t==='dark'?0x1b1b1d:0xeef0f2));}}catch(e){}}
 $('#thmB').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('bujilab.theme',t);}catch(e){}thmApply(t,true);};
 thmApply(document.documentElement.dataset.theme||'light',false);
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{let t=null;try{t=localStorage.getItem('bujilab.theme');}catch(_){}if(!t)thmApply(e.matches?'dark':'light',true);});}catch(e){}
 // ---------- 무료·학기 패스 (베타: 코드로 학기 패스 켜기, 결제 없음) ----------
 const PLAN_KEY='bujilab.plan.v1',PLAN_CODES=['7bc66f83c26e05bba74f1d7a660ba95fd67c6cfe7b3fe7ae49f3adb048534171'];
-const GATED='#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
+const GATED='#pfPdf,#bBook,#bCompPdf,#bVpdf,#bPdf,#bPng,#bSvg,#packB,#packB2,#psB,#shtB,[data-xp=dxf2],[data-xp=dxf3],[data-xp=obj],[data-xp=stl]';
 const planIsPass=()=>{if(window.__noGate)return true;try{return localStorage.getItem(PLAN_KEY)==='pass';}catch(e){return false;}};
 function planMark(){document.documentElement.dataset.plan=planIsPass()?'pass':'free';document.querySelectorAll(GATED).forEach(b=>b.classList.add('gated'));}
 let planPending=null;
@@ -1454,6 +1504,7 @@ $('#sToSel').onclick=()=>{if(!sel)return;spos=saxis==='ns'?sel.x:sel.z;$('#spos'
 function cutInterval(poly,axis,pos){// returns [t0,t1] along line coordinate where line intersects convex poly
  const ts=[];const L=axis==='ns'?[[pos,-80],[pos,80]]:[[-80,pos],[80,pos]];for(let i=0;i<poly.length;i++){const t=segInt(L[0],L[1],poly[i],poly[(i+1)%poly.length]);if(t!==null)ts.push(-80+160*t);}
  return ts.length>=2?[Math.min(...ts),Math.max(...ts)]:null;}
+let secEnt=true;
 function drawSec(o={}){
  const B=!!o.board,cv=o.cv||scv;const W=o.W??scv.clientWidth,H=o.H??scv.clientHeight;if(!W)return;const pr=o.pr??Math.min(devicePixelRatio,2);cv.width=Math.round(W*pr);cv.height=Math.round(H*pr);const c=cv.getContext('2d');const LY=n=>c.layer&&c.layer(n);LY('배경');c.setTransform(pr,0,0,pr,0,0);
  c.fillStyle='#fff';c.fillRect(0,0,W,H);if(!B)$('#sposV').textContent=spos.toFixed(1)+'m';
@@ -1490,6 +1541,19 @@ function drawSec(o={}){
   if(p.f0===0){c.strokeStyle='#16181d';c.setLineDash([2,2]);c.beginPath();c.moveTo(X(iv[0])-6,Y(lv));c.lineTo(X(iv[1])+6,Y(lv));c.stroke();c.setLineDash([]);
    c.fillStyle='#16181d';c.font='10.5px "IBM Plex Mono",monospace';c.fillText(`1FL ${sgn(lv)}`,X(iv[1])+8,Y(lv)+3);}
   if(p.f1===p.m.floors){c.fillStyle='#2f5bd3';c.font='10.5px "IBM Plex Mono",monospace';c.fillText(`H ${p.hRel.toFixed(1)}m`,X(iv[0]),Y(p.yt)-5);}});
+
+ LY('첨경');// 사람(1.7m)·나무 실루엣: 빈 땅에만, 단면 위치마다 같은 배치
+ if(secEnt){const occ=[];mparts.forEach(p=>{const iv=cutInterval(p.poly,saxis,spos);if(iv)occ.push(iv);});const mocc=occ.slice();CTXP.forEach(cp=>{const iv=cutInterval(cp.poly,saxis,spos);if(iv)occ.push(iv);});
+  const used=[];const free=(a,b)=>a>t0+1&&b<t1-1&&!occ.some(iv=>b>iv[0]-0.3&&a<iv[1]+0.3)&&!used.some(u=>b>u[0]&&a<u[1]);
+  let sd=Math.round(Math.abs(spos)*97+(ns?3:7))+11;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
+  const tree=t=>{const y=g(t),Ht=5+rnd()*3.5,R=Ht*0.27,x=X(t),yb=Y(y);c.strokeStyle='#9aa08f';c.lineWidth=Math.max(1,0.16*sc);c.beginPath();c.moveTo(x,yb);c.lineTo(x,Y(y+Ht*0.55));c.stroke();
+   c.fillStyle='#d3dbc8';[[0,Ht-R,R],[-R*0.62,Ht-R*1.4,R*0.72],[R*0.6,Ht-R*1.3,R*0.78]].forEach(([dx,cy,r])=>{c.beginPath();c.arc(X(t+dx),Y(y+cy),r*sc,0,Math.PI*2);c.fill();});};
+  const person=t=>{const y=g(t),s=1.7*(0.93+rnd()*0.1)*sc,x=X(t),yb=Y(y),w=s*0.12,f=rnd()<.5?1:-1;c.fillStyle='#9aa1aa';
+   c.beginPath();c.arc(x+f*w*0.15,yb-s*0.925,s*0.068,0,Math.PI*2);c.fill();
+   c.beginPath();c.moveTo(x-w,yb-s*0.83);c.lineTo(x+w,yb-s*0.83);c.lineTo(x+w*0.85,yb-s*0.47);c.lineTo(x+w*0.6+f*w*0.3,yb);c.lineTo(x+w*0.15,yb);c.lineTo(x,yb-s*0.44);c.lineTo(x-w*0.15,yb);c.lineTo(x-w*0.6+f*w*0.3,yb);c.lineTo(x-w*0.85,yb-s*0.47);c.closePath();c.fill();};
+  for(let t=t0+3+rnd()*3;t<t1-3;t+=6.5+rnd()*4){const R=2.4;if(rnd()<0.75&&free(t-R,t+R)){used.push([t-R*0.7,t+R*0.7]);tree(t);}}
+  const P=[];mocc.forEach(iv=>{[iv[0]-1.3-rnd(),iv[1]+3.2+rnd()].forEach(t=>P.push(t));});for(let k=0;k<3;k++)P.push(t0+4+rnd()*(t1-t0-8));
+  let n=0;P.forEach(t=>{if(n<6&&free(t-0.45,t+0.45)){used.push([t-0.6,t+0.6]);person(t);n++;}});}
  LY('표제_치수');// ends + title
  c.fillStyle='#16181d';c.font='700 12px "IBM Plex Sans KR",sans-serif';c.textAlign='left';c.fillText(ns?'N (북)':'W (서)',left,H-bot+28);c.textAlign='right';c.fillText(ns?'S (남)':'E (동)',W-right,H-bot+28);c.textAlign='left';
  if(B)return;
@@ -1498,6 +1562,7 @@ function drawSec(o={}){
  c.font='600 12.5px "IBM Plex Sans KR",sans-serif';c.fillText(`단면도 A–A' (${ns?'남북':'동서'}, ${ns?'x':'z'}=${spos.toFixed(1)}m)`,tb.x+66,tb.y+16);
  c.font='11px "IBM Plex Sans KR",sans-serif';c.fillStyle='#6b7280';c.fillText(`${$('#terr').selectedOptions[0].text} · 수직 축척 = 수평 축척`,tb.x+66,tb.y+31);}
 
+$('#secEnt').onchange=e=>{secEnt=e.target.checked;drawSec();if(curPane==='vboard')bLater();};
 // ---------- area table ----------
 function areaRows(){const rows=[];const maxF=Math.max(0,...masses.map(m=>m.floors));
  for(let f=maxF;f>=1;f--)masses.forEach(m=>{if(f<=m.floors)rows.push({f,mass:m.name,use:m.uses[f-1],a:floorArea(m,f)});});return rows;}
@@ -1736,7 +1801,7 @@ $('#pcPng').onclick=()=>exportProc('png');$('#packB').onclick=exportPack;$('#pac
 // ---------- board (A3/A2/A1) ----------
 const PAPER={A3:[420,297],A2:[594,420],A1:[841,594]};
 let board={paper:'A2',dpi:150,sc:'auto',layout:null,title:'대지 분석 및 매스 스터디',name:'',studio:'',note:'',panels:['diag','sun','slope','aspect','syn','m3d','sec']};
-function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#cqBook').checked=board.cqBook!==false;$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
+function syncBoardUI(){$$('#bPaper button').forEach(b=>b.classList.toggle('on',b.dataset.p===board.paper));$('#bDpi').value=board.dpi;$('#bScale').value=board.sc||'auto';$('#bTitle').value=board.title;$('#bWeek').value=board.week||1;$('#bQs').value=board.qs||'';$('#bComp').value=board.comp||'a2x2';$('#bTag').value=board.tag||'';$('#bAnon').checked=board.anon!==false;$('#cqBook').checked=board.cqBook!==false;$('#pfText').value=board.pfText||'';$('#pfYear').value=board.pfYear||'';$('#bName').value=board.name;$('#bStudio').value=board.studio;$('#bNote').value=board.note;
  $$('#bPanels input').forEach(i=>i.checked=board.panels.includes(i.value));}
 let bTimer=null;const bLater=()=>{clearTimeout(bTimer);bTimer=setTimeout(()=>{if(curPane==='vboard')previewBoard();},350);};
 $$('#bPaper button').forEach(b=>b.onclick=()=>{board.paper=b.dataset.p;syncBoardUI();commit();bLater();});
@@ -1766,19 +1831,20 @@ function renderBoard(dpi,vec,o={}){
  const MX=(a,b)=>vec?b:Math.max(a,b);const FS=v=>`${MX(1,mm(v*s)).toFixed(vec?2:1)}px`;const font=(w,sz,mono)=>`${w} ${FS(sz)} ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;
  c.fillStyle='#fff';c.fillRect(0,0,cw,ch);
  const M=lastM||metrics();const RS=regStatus(M,parkingReq(),pkPlan);
- const m=14*s;const gap=6*s;
+ const m=o.bare?0:14*s;const gap=o.bare?0:6*s;
  // header
- const hh=30*s;c.fillStyle='#16181d';c.fillRect(mm(m),mm(m+hh),mm(PW-2*m),mm(0.6*s));
+ const hh=o.bare?0:30*s;if(!o.bare){c.fillStyle='#16181d';c.fillRect(mm(m),mm(m+hh),mm(PW-2*m),mm(0.6*s));
  c.fillStyle='#16181d';c.font=font(700,13);c.textBaseline='alphabetic';c.fillText((o.title??board.title)||'대지 분석',mm(m),mm(m+14*s));
  c.font=font(400,5.2);c.fillStyle='#5f6672';c.fillText(`${o.kicker?o.kicker+' · ':''}${SITE?SITE.addr:'가상 대지'} · ${zone.n} · 대지면적 ${f1(M.A)}㎡ · ${$('#terr').selectedOptions[0].text}`,mm(m),mm(m+24*s));
  c.textAlign='right';if(!o.anon){c.fillStyle='#16181d';c.font=font(600,5.2);c.fillText(board.name||'이름 · 학번',mm(PW-m),mm(m+12*s));}
  c.font=font(400,4.4);c.fillStyle='#5f6672';if(!o.anon)c.fillText(board.studio||'스튜디오 · 과목',mm(PW-m),mm(m+19*s));
  const d=new Date();c.fillText(`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`,mm(PW-m),mm(m+25.5*s));c.textAlign='left';
+ }
  if(o.tag!==undefined){const tx=PW-m-30,ty=m-4;c.strokeStyle='#16181d';c.lineWidth=MX(1,mm(0.35));c.strokeRect(mm(tx),mm(ty),mm(30),mm(10));c.textAlign='center';c.fillStyle=o.tag?'#16181d':'#a0a6b0';c.font=o.tag?`600 ${mm(5)}px "IBM Plex Mono",monospace`:`400 ${mm(2.6)}px "IBM Plex Sans KR",sans-serif`;c.fillText(o.tag||'접수번호',mm(tx+15),mm(ty+(o.tag?6.8:6.1)));c.textAlign='left';}
  // layout
- const top=m+hh+gap*1.5,bottom=PH-m-8*s,bodyH=bottom-top;const rightW=o.noSide?0:(PW-2*m)*(PW<PH?0.32:0.27),leftW=PW-2*m-rightW-(o.noSide?0:gap*2);
+ const top=o.bare?0:m+hh+gap*1.5,bottom=o.bare?PH:PH-m-8*s,bodyH=bottom-top;const rightW=o.noSide?0:(PW-2*m)*(PW<PH?0.32:0.27),leftW=PW-2*m-rightW-(o.noSide?0:gap*2);
  const P=(o.panels||board.panels).filter(x=>PNAME[x]);const n=P.length;const cols=n<=1?1:n<=4?2:3;const rows=MX(1,Math.ceil(n/cols));
- const cellW=(leftW-(cols-1)*gap)/cols,cellH=(bodyH-(rows-1)*gap)/rows,capH=9*s;
+ const cellW=(leftW-(cols-1)*gap)/cols,cellH=(bodyH-(rows-1)*gap)/rows,capH=o.bare?0:9*s;
  const css=96/25.4;const pr=dpi/96;const ks=o.ks||boardScale();
  // 패널 위치: 직접 옮긴 배치(용지 비율로 저장)가 있으면 그것, 없으면 자동 격자
  // 자동 배치: 5~7개면 앞 두 장을 크게(윗줄), 나머지는 3열. 마지막 줄은 남는 칸 없이 폭을 채움
@@ -1789,7 +1855,7 @@ function renderBoard(dpi,vec,o={}){
   const rws=[];for(let i=0;i<n;i+=3)rws.push(P.slice(i,i+3));const h=(bodyH-(rws.length-1)*gap)/rws.length;rws.forEach((r,j)=>rowFill(r,top+j*(h+gap),h));return out;})();
  const rects=P.map((key,i)=>{const L=!o.panels&&!o.dim&&board.layout&&board.layout[key];if(L)return{key,x:L.x*PW,y:L.y*PH,w:L.w*PW,h:L.h*PH};return auto[i];});
  P.forEach((key,i)=>{const RC=rects[i];const x=RC.x,y=RC.y,iw=RC.w,ih=Math.max(10,RC.h-capH);
-  c.fillStyle='#16181d';c.font=font(600,4.6,true);c.fillText(String(i+1).padStart(2,'0'),mm(x),mm(y+5.6*s));c.font=font(600,4.6);c.fillText(PNAME[key]+(key==='diag'||key==='m3d'?'':''),mm(x+9*s),mm(y+5.6*s));
+  if(!o.bare){c.fillStyle='#16181d';c.font=font(600,4.6,true);c.fillText(String(i+1).padStart(2,'0'),mm(x),mm(y+5.6*s));c.font=font(600,4.6);c.fillText(PNAME[key]+(key==='diag'||key==='m3d'?'':''),mm(x+9*s),mm(y+5.6*s));}
   // ks: 도면 안 글자·선 배율(큰 용지일수록 크게). W,H를 줄이고 해상도를 올려 같은 크기로 그림
   // 도면 크기에 따라 글자 배율을 살짝 조정(작은 칸에서 범례가 도면을 가리지 않게)
   const kp=ks*Math.min(1.15,Math.max(0.8,Math.sqrt(iw/s/170)));const W=iw*css/kp,H=ih*css/kp;const rdpi=vec?200:dpi;
@@ -1802,7 +1868,7 @@ function renderBoard(dpi,vec,o={}){
   else if(vec&&dstyleG!=='pixel'){c.beginPanel(`${String(i+1).padStart(2,'0')}_${PNAME[key]}`,x,y+capH,iw,ih);const sub={width:W,height:H,getContext:()=>c};const keep=c.canvas;c.canvas=sub;c.B=[iw/W,0,0,ih/H,x,y+capH];c.setTransform(1,0,0,1,0,0);
    draw(sub,1);c.canvas=keep;c.endPanel();}
   else{const sub=document.createElement('canvas');draw(sub,rdpi/96*kp);c.drawImage(sub,mm(x),mm(y+capH),mm(iw),mm(ih));}
-  c.strokeStyle='#c9ced6';c.lineWidth=MX(1,mm(0.25*s));c.strokeRect(mm(x),mm(y+capH),mm(iw),mm(ih));});
+  if(!o.bare){c.strokeStyle='#c9ced6';c.lineWidth=MX(1,mm(0.25*s));c.strokeRect(mm(x),mm(y+capH),mm(iw),mm(ih));}});
  // right column
  if(!o.noSide){
  let rx=m+leftW+gap*2,ry=top;const RW=rightW,RX0=rx;
@@ -1822,8 +1888,8 @@ function renderBoard(dpi,vec,o={}){
  if(board.note){sec('설계 전략');c.font=font(400,5);c.fillStyle='#16181d';const lines=wrapText(c,board.note,mm(RW));const lh=7.6*s;lines.forEach(L=>{if(ry+lh<bottom){c.fillText(L,mm(rx),mm(ry+4.6*s));ry+=lh;}});}
  }
  // footer
- c.fillStyle='#16181d';c.fillRect(mm(m),mm(PH-m-5*s),mm(PW-2*m),MX(1,mm(0.3*s)));c.font=font(400,3.4);c.fillStyle='#6b7280';
- c.fillText(`부지랩 프로토타입으로 생성 · 법규 수치는 법정 상한과 단순화 기준이며 지자체 조례 확인 필요 · ${o.label||board.paper} ${PW}×${PH}mm`+(SITE?` · 자료: 브이월드(국토교통부) 연속지적도·도로명주소건물·용도지역${PHOTO&&PHOTO.site===SITE.id&&lay.photo?'·항공사진':''}${SITE.dem?' · 표고: Terrain Tiles(Mapzen, AWS Open Data)':''}`:''),mm(m),mm(PH-m));
+ if(!o.bare){c.fillStyle='#16181d';c.fillRect(mm(m),mm(PH-m-5*s),mm(PW-2*m),MX(1,mm(0.3*s)));c.font=font(400,3.4);c.fillStyle='#6b7280';
+ c.fillText(`부지랩 프로토타입으로 생성 · 법규 수치는 법정 상한과 단순화 기준이며 지자체 조례 확인 필요 · ${o.label||board.paper} ${PW}×${PH}mm`+(SITE?` · 자료: 브이월드(국토교통부) 연속지적도·도로명주소건물·용도지역${PHOTO&&PHOTO.site===SITE.id&&lay.photo?'·항공사진':''}${SITE.dem?' · 표고: Terrain Tiles(Mapzen, AWS Open Data)':''}`:''),mm(m),mm(PH-m));}
  if(vec)return{svg:c.toString(PW,PH,board.title||'부지랩 보드'),PW,PH,rects};
  return{cv,PW,PH,rects};}
 // 출력 전 확인: 자료 출처, 법규 판정의 한계, 문장 속 수치와 범례 수치의 일치 여부
@@ -1965,12 +2031,12 @@ const capDpi=(W,H,d)=>Math.min(d,Math.floor(Math.sqrt(16.5e6/((W/25.4)*(H/25.4))
 async function pdfFromPages(pages,title){const enc=new TextEncoder();const chunks=[];let len=0;const offs=[];
  const push=x=>{const b=typeof x==='string'?enc.encode(x):x;chunks.push(b);len+=b.length;};
  const obj=(n,parts)=>{offs[n]=len;push(`${n} 0 obj\n`);(Array.isArray(parts)?parts:[parts]).forEach(push);push('\nendobj\n');};
- const jp=[];for(const p of pages){const b=await new Promise(r=>p.cv.toBlob(r,'image/jpeg',0.92));jp.push(new Uint8Array(await b.arrayBuffer()));}
+ const jp=[];for(const p of pages){if(p.jpg){jp.push(p.jpg);continue;}const b=await new Promise(r=>p.cv.toBlob(r,'image/jpeg',0.92));jp.push(new Uint8Array(await b.arrayBuffer()));}
  push('%PDF-1.4\n');push(new Uint8Array([37,226,227,207,211,10]));const N=pages.length,kid=i=>3+i*3;
  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${pages.map((_,i)=>kid(i)+' 0 R').join(' ')}] /Count ${N} >>`);
  pages.forEach((p,i)=>{const W=(p.W*72/25.4).toFixed(2),H=(p.H*72/25.4).toFixed(2),a=kid(i);
   obj(a,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im0 ${a+1} 0 R >> >> /Contents ${a+2} 0 R >>`);
-  obj(a+1,[`<< /Type /XObject /Subtype /Image /Width ${p.cv.width} /Height ${p.cv.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jp[i].length} >>\nstream\n`,jp[i],'\nendstream']);
+  obj(a+1,[`<< /Type /XObject /Subtype /Image /Width ${p.px?p.px[0]:p.cv.width} /Height ${p.px?p.px[1]:p.cv.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jp[i].length} >>\nstream\n`,jp[i],'\nendstream']);
   const cs=`q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q`;obj(a+2,`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);});
  const info=3+N*3;obj(info,`<< /Title <${utf16hex(title)}> /Producer (BUJILAB) >>`);
  const xref=len;let x=`xref\n0 ${info+1}\n0000000000 65535 f \n`;for(let n=1;n<=info;n++)x+=String(offs[n]).padStart(10,'0')+' 00000 n \n';push(x);
@@ -2033,6 +2099,65 @@ $('#bBook').onclick=async()=>{toast('크리틱 북을 만드는 중입니다. �
 $('#bCompPv').onclick=async()=>{toast('공모용 보드 미리보기를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));showPages([await buildComp(60)]);};
 $('#bCompPdf').onclick=async()=>{toast('공모용 PDF를 만드는 중입니다…');await new Promise(r=>setTimeout(r,60));const p=await buildComp(board.dpi||150);
  await offer(`bujilab_comp_${board.comp||'a2x2'}_${stamp()}.pdf`,await pdfFromPages([p],board.anon!==false?'공모 출품작':(board.title||'부지랩 보드')));};
+
+// ---------- 포트폴리오: 프로젝트별 쪽(A3 가로 비율) → 브라우저(IndexedDB)에 담아 한 권으로 ----------
+const PFDB=(()=>{let db=null;const open=()=>db?Promise.resolve(db):new Promise((res,rej)=>{const r=indexedDB.open('bujilab.pf',1);r.onupgradeneeded=()=>r.result.createObjectStore('p',{keyPath:'id'});r.onsuccess=()=>{db=r.result;res(db);};r.onerror=()=>rej(r.error);});
+ const tx=async(m,f)=>{const d=await open();return new Promise((res,rej)=>{const t=d.transaction('p',m);const q=f(t.objectStore('p'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});};
+ return{all:async()=>((await tx('readonly',st=>st.getAll()))||[]).sort((a,b)=>a.o-b.o),put:v=>tx('readwrite',st=>st.put(v)),del:id=>tx('readwrite',st=>st.delete(id))};})();
+let pfImgs=[];
+$('#pfImg').onchange=async e=>{pfImgs=[];for(const f of [...e.target.files].slice(0,8)){try{const im=await createImageBitmap(f);pfImgs.push({im,name:f.name.replace(/\.[^.]+$/,'')});}catch(err){}}$('#pfImgN').textContent=pfImgs.length?`${pfImgs.length}장 · 대표: ${pfImgs[0].name}`:'';};
+$('#pfText').oninput=e=>{board.pfText=e.target.value;};$('#pfText').onchange=commit;$('#pfYear').oninput=e=>{board.pfYear=e.target.value;};$('#pfYear').onchange=commit;
+const PFW=420,PFH=297;
+function pfCtx(dpi){const k=dpi/25.4,mm=v=>v*k;const cv=document.createElement('canvas');cv.width=Math.round(PFW*k);cv.height=Math.round(PFH*k);const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);
+ const F=(w,sz,mono)=>`${w} ${mm(sz)}px ${mono?'"IBM Plex Mono",monospace':'"IBM Plex Sans KR",sans-serif'}`;return{cv,c,mm,F,k};}
+function pfFit(c,mm,src,x,y,w,h,cover){const sw=src.width,sh=src.height;if(!sw||!sh)return;const r=cover?Math.max(w/sw,h/sh):Math.min(w/sw,h/sh);const dw=sw*r,dh=sh*r;c.save();c.beginPath();c.rect(mm(x),mm(y),mm(w),mm(h));c.clip();c.drawImage(src,mm(x+(w-dw)/2),mm(y+(h-dh)/2),mm(dw),mm(dh));c.restore();}
+const pfPanel=(key,w,h,dpi)=>renderBoard(dpi,false,{dim:[w,h],panels:[key],noSide:true,bare:true,ks:0.75}).cv;
+function pfFoot(P,label,n){const{c,mm,F}=P;c.font=F(400,3,true);c.fillStyle='#8a9099';c.fillText(label,mm(18),mm(PFH-10));c.textAlign='right';c.fillText(String(n).padStart(2,'0'),mm(PFW-18),mm(PFH-10));c.textAlign='left';}
+function pfCap(P,t,x,y){const{c,mm,F}=P;c.font=F(400,3.1);c.fillStyle='#5f6672';c.fillText(t,mm(x),mm(y));}
+function pfPages(dpi){const M=lastM||metrics();const title=board.title&&board.title!=='대지 분석 및 매스 스터디'?board.title:(req.title||board.title||'프로젝트');const lab=`${title}${board.pfYear?' · '+board.pfYear:''}`;const out=[];let n=1;
+ // 1 대표: 왼쪽 글, 오른쪽 대표 이미지(내 이미지 첫 장, 없으면 3D)
+ {const P=pfCtx(dpi),{c,mm,F}=P;const hx=150,hy=18,hw=PFW-hx-18,hh=PFH-36;
+  if(pfImgs[0])pfFit(c,mm,pfImgs[0].im,hx,hy,hw,hh,true);else{const im=shot3D(Math.round(hw*dpi/25.4),Math.round(hh*dpi/25.4));c.drawImage(im,mm(hx),mm(hy),mm(hw),mm(hh));}
+  c.fillStyle='#16181d';c.font=F(300,11);const tl=wrapText(c,title,mm(118)).slice(0,3);tl.forEach((t,i)=>c.fillText(t,mm(18),mm(40+i*14)));let y=40+tl.length*14+4;
+  c.font=F(400,3.6);c.fillStyle='#5f6672';[board.pfYear,board.studio,SITE?SITE.addr:'가상 대지',`${zone.n} · 대지 ${f1(M.A)}㎡`,`연면적 ${f1(M.fa)}㎡ · 지상 ${Math.max(0,...masses.map(q=>q.floors))}층 · 높이 ${M.hmax.toFixed(1)}m`].filter(Boolean).forEach(t=>{c.fillText(t,mm(18),mm(y));y+=6;});
+  const tx=(board.pfText||board.note||'').trim();if(tx){y+=8;c.font=F(400,4);c.fillStyle='#16181d';wrapText(c,tx,mm(118)).slice(0,12).forEach(t=>{c.fillText(t,mm(18),mm(y));y+=6.6;});}
+  pfFoot(P,lab,n++);out.push(P.cv);}
+ // 2 대지 읽기: 큰 대지 분석 + 오른쪽 두 장
+ {const P=pfCtx(dpi),{c,mm,F}=P;c.fillStyle='#16181d';c.font=F(300,7);c.fillText('대지 읽기',mm(18),mm(26));
+  const L=[18,34,246,236],R1=[274,34,128,112],R2=[274,158,128,112];c.drawImage(pfPanel('diag',L[2],L[3],dpi),mm(L[0]),mm(L[1]),mm(L[2]),mm(L[3]));pfCap(P,'대지 분석 · 주변 건물·도로·접도',L[0],L[1]+L[3]+5);
+  c.drawImage(pfPanel('slope',R1[2],R1[3],dpi),mm(R1[0]),mm(R1[1]),mm(R1[2]),mm(R1[3]));pfCap(P,'경사분석',R1[0],R1[1]+R1[3]+5);
+  c.drawImage(pfPanel('sun',R2[2],R2[3]-4,dpi),mm(R2[0]),mm(R2[1]),mm(R2[2]),mm(R2[3]-4));pfCap(P,'동지 일조시간 (09–15시)',R2[0],R2[1]+R2[3]+1);
+  pfFoot(P,lab,n++);out.push(P.cv);}
+ // 3 매스 과정: 위 과정도(또는 대안), 아래 단면·액소
+ {const P=pfCtx(dpi),{c,mm,F}=P;c.fillStyle='#16181d';c.font=F(300,7);c.fillText(proc.length?'매스가 정해진 과정':'매스와 단면',mm(18),mm(26));
+  const top=proc.length?'proc':slots.some(Boolean)?'cmp':'m3d';c.drawImage(pfPanel(top,384,108,dpi),mm(18),mm(34),mm(384),mm(108));pfCap(P,{proc:'매스 변형 과정',cmp:'대안 비교',m3d:'3D 매스와 일조사선'}[top],18,147);
+  c.drawImage(pfPanel('sec',224,112,dpi),mm(18),mm(156),mm(224),mm(112));pfCap(P,'단면 A–A′',18,273);
+  c.drawImage(pfPanel('axo',152,112,dpi),mm(250),mm(156),mm(152),mm(112));pfCap(P,'화이트 모델 액소',250,273);
+  pfFoot(P,lab,n++);out.push(P.cv);}
+ // 4 내 이미지(두 번째 장부터, 최대 4장)
+ const rest=pfImgs.slice(1,5);if(rest.length){const P=pfCtx(dpi),{c,mm,F}=P;c.fillStyle='#16181d';c.font=F(300,7);c.fillText('도면과 이미지',mm(18),mm(26));
+  const G=rest.length===1?[[18,34,384,232]]:rest.length===2?[[18,34,188,232],[214,34,188,232]]:[[18,34,188,112],[214,34,188,112],[18,156,188,112],[214,156,188,112]];
+  rest.forEach((r,i)=>{const g=G[i];if(!g)return;pfFit(c,mm,r.im,g[0],g[1],g[2],g[3],false);pfCap(P,r.name,g[0],g[1]+g[3]+5);});pfFoot(P,lab,n++);out.push(P.cv);}
+ return{title,lab,pages:out};}
+async function pfRefresh(){let L=[];try{L=await PFDB.all();}catch(e){}const el=$('#pfList');el.innerHTML='';L.forEach((p,i)=>{const li=document.createElement('li');li.innerHTML=`<span>${String(i+1).padStart(2,'0')} ${esc(p.title)}</span><em>${p.pages.length}쪽</em><button data-a="up" title="위로" aria-label="위로">↑</button><button data-a="del" title="빼기" aria-label="빼기">✕</button>`;
+ li.querySelector('[data-a=up]').onclick=async()=>{if(!i)return;const a=L[i-1],b=L[i];[a.o,b.o]=[b.o,a.o];await PFDB.put(a);await PFDB.put(b);pfRefresh();};
+ li.querySelector('[data-a=del]').onclick=async()=>{await PFDB.del(p.id);pfRefresh();toast(`${p.title}을(를) 포트폴리오에서 뺐습니다.`);};el.append(li);});return L;}
+$('#pfPv').onclick=async()=>{toast('포트폴리오 쪽 미리보기를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));showPages(pfPages(60).pages.map(cv=>({cv,W:PFW,H:PFH})));};
+$('#pfAdd').onclick=async()=>{toast('이 프로젝트를 포트폴리오에 담는 중입니다…');await new Promise(r=>setTimeout(r,40));const R0=pfPages(150);const pages=[];
+ for(const cv of R0.pages){const b=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.9));pages.push({jpg:new Uint8Array(await b.arrayBuffer()),px:[cv.width,cv.height]});}
+ const L=await pfRefresh();const id=(SITE?SITE.id||SITE.addr:'demo')+'|'+R0.title;const old=L.find(p=>p.id===id);
+ try{await PFDB.put({id,title:R0.title,lab:R0.lab,year:board.pfYear||'',pages,o:old?old.o:(L.length?Math.max(...L.map(p=>p.o))+1:0),ts:Date.now()});}catch(e){toast('브라우저 저장 공간이 부족해 담지 못했습니다.');return;}
+ await pfRefresh();toast(old?`${R0.title} 쪽을 새로 바꿨습니다.`:`${R0.title}을(를) 포트폴리오에 담았습니다 (${pages.length}쪽).`);};
+function pfCover(dpi,L){const P=pfCtx(dpi),{c,mm,F}=P;c.fillStyle='#16181d';c.font=F(300,16);c.fillText('Portfolio',mm(18),mm(120));c.font=F(600,5);c.fillText(board.name||'이름',mm(18),mm(140));
+ c.font=F(400,3.8);c.fillStyle='#5f6672';const ys=L.map(p=>p.year).filter(Boolean);if(ys.length)c.fillText(ys.length>1?`${ys[0]} — ${ys[ys.length-1]}`:ys[0],mm(18),mm(148));
+ let y=60,pg=3;c.font=F(400,3.4,true);c.fillStyle='#8a9099';c.fillText('CONTENTS',mm(250),mm(52));L.forEach((p,i)=>{c.fillStyle='#0f62fe';c.font=F(600,4,true);c.fillText(String(i+1).padStart(2,'0'),mm(250),mm(y));c.fillStyle='#16181d';c.font=F(400,4.6);c.fillText(p.title,mm(262),mm(y));c.font=F(400,3.4,true);c.fillStyle='#8a9099';c.textAlign='right';c.fillText(String(pg).padStart(2,'0'),mm(PFW-18),mm(y));c.textAlign='left';
+  if(p.year){c.font=F(400,3.2);c.fillText(p.year,mm(262),mm(y+5));}y+=14;pg+=p.pages.length;});return P.cv;}
+$('#pfPdf').onclick=async()=>{const L=await pfRefresh();if(!L.length){toast('먼저 "포트폴리오에 담기"로 프로젝트를 담으세요.');return;}toast('포트폴리오 PDF를 만드는 중입니다…');await new Promise(r=>setTimeout(r,40));
+ const A4=$('#pfPaper').value==='A4',W=A4?297:PFW,H=A4?210:PFH;const cv=pfCover(150,L);const pages=[{cv,W,H}];L.forEach(p=>p.pages.forEach(q=>pages.push({jpg:q.jpg,px:q.px,W,H})));
+ await offer(`bujilab_portfolio_${stamp()}.pdf`,await pdfFromPages(pages,`${board.name||''} Portfolio`.trim()));};
+pfRefresh();
+window.__pf=d=>pfPages(d||40);window.__pfAddImg=async(url,name)=>{const im=await createImageBitmap(await (await fetch(url)).blob());pfImgs.push({im,name:name||'img'});};
+
 window.__book=async d=>buildBook(d||40);window.__comp=async(d,k)=>{if(k)board.comp=k;return buildComp(d||40);};window.__pdfPages=pdfFromPages;
 
 // ---------- panes / misc ----------
@@ -2401,8 +2526,8 @@ function drawSugg(){const box=$('#sgBox');if(!box)return;const S=siteSignals();c
 function applyTpl(id){const t=PTPL.find(x=>x.id===id);if(!t)return;const S=siteSignals();const share=20,gross=S.maxFA*SG_RATIO,net=gross/(1+share/100);const had=req.list.length;
  req={title:`${SITE?SITE.addr.split(' ').slice(-2).join(' '):'가상 대지'} ${t.n}`,share,list:t.r.map(([n,ra,fl])=>{let a=Math.max(6,Math.round(net*ra));let q=1;if(/개인실|1인실/.test(n)){q=Math.max(1,Math.round(a/16));a=Math.round(a/q*10)/10;}return{n,a,q,fl:fl&&fl<=Math.max(1,S.floors)?String(fl):''};})};
  commit();drawReq();toast(`${t.n} 프로그램을 넣었습니다(요구 연면적 약 ${Math.round(gross).toLocaleString('ko-KR')}㎡).${had?' 이전 목록은 실행 취소로 되돌릴 수 있습니다.':''} "층별 프로그램에 자동 배치"로 매스와 비교하세요.`);}
-function switchPane(p){curPane=p;$$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===p));$$('.pane').forEach(x=>x.classList.toggle('on',x.id===p));
- if(p==='vdiag')requestAnimationFrame(()=>drawDiag());if(p==='vboard')requestAnimationFrame(previewBoard);if(p==='vproc'){renderProcList();requestAnimationFrame(()=>drawProcess());}if(p==='v3d')resize();if(p==='varea')drawArea();if(p==='vreq'){drawSugg();drawReq();}if(p==='vsec'){if(sel&&!secTouched){spos=saxis==='ns'?sel.x:sel.z;$('#spos').value=spos;}requestAnimationFrame(drawSec);}}
+function switchPane(p){if(p==='vmodel'&&curPane!=='vmodel')mvEnter();else if(p!=='vmodel'&&curPane==='vmodel')mvLeave();curPane=p;$$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===p));$$('.pane').forEach(x=>x.classList.toggle('on',x.id===p));
+ if(p==='vdiag')requestAnimationFrame(()=>drawDiag());if(p==='vboard')requestAnimationFrame(previewBoard);if(p==='vproc'){renderProcList();requestAnimationFrame(()=>drawProcess());}if(p==='v3d'||p==='vmodel')resize();if(p==='varea')drawArea();if(p==='vreq'){drawSugg();drawReq();}if(p==='vsec'){if(sel&&!secTouched){spos=saxis==='ns'?sel.x:sel.z;$('#spos').value=spos;}requestAnimationFrame(drawSec);}}
 let secTouched=false;$('#spos').addEventListener('input',()=>secTouched=true);
 $$('.tab').forEach(t=>t.onclick=()=>switchPane(t.dataset.p));
 // ---------- files: save / open / export ----------
@@ -2641,6 +2766,7 @@ async function loadRealSite(query,pick){
   step('용도지역·주변 건물·도로를 불러오는 중…');
   const dl=80/(111320*Math.cos(c0[1]*Math.PI/180)),dt=80/110574,BOX=`BOX(${c0[0]-dl},${c0[1]-dt},${c0[0]+dl},${c0[1]+dt})`;
   const [uq,bld,lots,ovl,zs,binfo,ned]=await Promise.all([vwData('LT_C_UQ111',`POINT(${c0[0]} ${c0[1]})`,5).catch(()=>[]),vwData('LT_C_SPBD',BOX).catch(e=>{throw e;}),vwData('LP_PA_CBND_BUBUN',BOX).catch(()=>[]),Promise.all(OVL.map(([d,lb])=>vwData(d,`POINT(${c0[0]} ${c0[1]})`,5).then(fs=>({d,lb,st:fs.length?'hit':'none',ns:[...new Set(fs.map(f=>{const p=f.properties||{};return String(p.uname||p.dgm_nm||p.UNAME||lb).trim();}))]})).catch(e=>({d,lb,st:'err',ns:[],m:e.message})))),Promise.all(['LT_C_UQ111','LT_C_UQ112','LT_C_UQ113','LT_C_UQ114'].map(d=>vwData(d,BOX,100).catch(()=>[]))).then(a=>a.flat()),vwData('LT_C_BLDGINFO',BOX).catch(()=>[]),nedLand(pr0.pnu)]);
+  const links=await vwData('LT_L_MOCTLINK',BOX).catch(()=>[]);
   const uname0=uq[0]&&uq[0].properties&&(uq[0].properties.uname||uq[0].properties.UNAME)||'';const zkOf=n=>(ZMAP.find(([k])=>String(n||'').includes(k))||[])[1]||null;const zkA=zkOf(uname0),zkB=ned?zkOf(ned.z1)||zkOf(ned.z2):null;const zk=zkA||zkB;const uname=uname0||(ned&&(ned.z1||ned.z2))||'';const zoneUnknown=!zk;const zoneConflict=!!(zkA&&zkB&&zkA!==zkB);
   const inPlot=(q)=>{const c=ringC(q);return pip(c[0],c[1],plotL);};
   USEKEY=findUseKey(bld);
@@ -2654,7 +2780,9 @@ async function loadRealSite(query,pick){
   const lotsL=[];lots.forEach(f=>{const p=f.properties||{};if(p.pnu&&p.pnu===pr0.pnu)return;rings(f.geometry).forEach(r=>{const q=clipSq(cleanRing(r.map(P)),82);if(q.length>=3)lotsL.push({poly:q,j:String(p.jibun||'').replace(/\s+/g,'')});});});
   const zonesL=[];zs.forEach(f=>{const p=f.properties||{};const n=String(p.uname||p.UNAME||p.dgm_nm||'').trim();if(!n)return;rings(f.geometry).forEach(r=>{const q=clipSq(r.map(P),82);if(q.length>=3&&polyArea(q)>1)zonesL.push({poly:q.map(v=>[Math.round(v[0]*10)/10,Math.round(v[1]*10)/10]),n});});});zonesL.sort((a,b)=>polyArea(b.poly)-polyArea(a.poly));
   step('지형(표고)을 불러오는 중…');let dem=null;try{dem=await fetchDEM(c0);}catch(e){dem=null;}
-  const site={id:'vw:'+(pr0.pnu||(c0[0].toFixed(6)+','+c0[1].toFixed(6))),addr:pr0.addr||h.addr,jibun:pr0.jibun||'',pnu:pr0.pnu||'',uname,origin:c0,ctx,roads,greens,lots:lotsL,zones:zonesL,bkeys,useKey:USEKEY,ovl,jiga:+pr0.jiga||0,jigaYm:[pr0.gosi_year,pr0.gosi_month].filter(Boolean).join('.'),dem,fetched:new Date().toISOString().slice(0,10),areaGeo:Math.round(polyArea(plotL)*100)/100,offA:ned&&ned.area>0?ned.area:0,ned:ned||null,zoneUnknown,zoneConflict:zoneConflict?{a:uname0,b:ned.z1}:null};
+  const elev=[];links.forEach(f=>{const pp=f.properties||{};const g=k=>{const kk=Object.keys(pp).find(x=>x.toLowerCase()===k);return kk?String(pp[kk]).trim():'';};const rt=g('road_type'),rk=g('road_rank');if(rt!=='001'&&rt!=='003')return;const G0=f.geometry;if(!G0)return;
+   const Ls=G0.type==='LineString'?[G0.coordinates]:G0.type==='MultiLineString'?G0.coordinates:[];Ls.forEach(L=>{const q=L.map(P).filter((v,i,a)=>!i||Math.hypot(v[0]-a[i-1][0],v[1]-a[i-1][1])>0.3);if(q.length>=2)elev.push({pts:q,t:rt,rk,nm:g('road_name'),w:rk==='101'||rk==='102'?10:rk==='103'||rk==='104'?8:6.5});});});
+  const site={elev,linkN:links.length,id:'vw:'+(pr0.pnu||(c0[0].toFixed(6)+','+c0[1].toFixed(6))),addr:pr0.addr||h.addr,jibun:pr0.jibun||'',pnu:pr0.pnu||'',uname,origin:c0,ctx,roads,greens,lots:lotsL,zones:zonesL,bkeys,useKey:USEKEY,ovl,jiga:+pr0.jiga||0,jigaYm:[pr0.gosi_year,pr0.gosi_month].filter(Boolean).join('.'),dem,fetched:new Date().toISOString().slice(0,10),areaGeo:Math.round(polyArea(plotL)*100)/100,offA:ned&&ned.area>0?ned.area:0,ned:ned||null,zoneUnknown,zoneConflict:zoneConflict?{a:uname0,b:ned.z1}:null};
   // 상태 만들기: 매스 1개를 대지 중앙에, 지형은 평지(표고 미연동)
   const st=JSON.parse(snap());const bb=bbox(plotL),pc=ringC(plotL);const tmpl=st.masses[0]||{id:1,name:'매스 A',floors:3,setFl:0,setD:0,shape:'box',rot:0,lev:0,uses:{},prog:null};
   const w=Math.max(4,Math.min(20,Math.round((bb.x1-bb.x0)*0.5))),d=Math.max(4,Math.min(16,Math.round((bb.z1-bb.z0)*0.45)));
@@ -2730,7 +2858,7 @@ function treeGroup(T){const g=new THREE.Group();if(!T.length)return g;const geo=
  const im=new THREE.InstancedMesh(geo,treeMat,T.length),it=new THREE.InstancedMesh(trunk,tm,T.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3();
  T.forEach(([x,z,r],i)=>{const y=G(x,z);M.compose(V.set(x,y+r+1.4,z),Q,new THREE.Vector3(r,r*1.05,r));im.setMatrixAt(i,M);M.compose(V.set(x,y+0.9,z),Q,new THREE.Vector3(1,1.8,1));it.setMatrixAt(i,M);});
  im.castShadow=true;it.castShadow=true;g.add(im,it);return g;}
-$('#treeT').onchange=e=>{if(treesG)treesG.visible=e.target.checked;};
+$('#treeT').onchange=e=>{if(treesG)treesG.visible=e.target.checked&&!MS.line;};
 // ---------- 넓은 주변 범위: 3D 보기·3D 내보내기 전용 (분석은 160m 안) ----------
 async function vwDataPaged(data,box,maxPages=3){const all=[];for(let pg=1;pg<=maxPages;pg++){let r=null;try{r=vwOk(await vwJsonp('data',{service:'data',request:'GetFeature',version:'2.0',data,geomFilter:box,geometry:'true',attribute:'true',crs:'EPSG:4326',size:'1000',page:String(pg)}));}catch(e){if(pg===1&&!all.length)throw e;break;}
   const f=r&&r.result&&r.result.featureCollection?r.result.featureCollection.features||[]:[];all.push(...f);if(f.length<1000)break;}return all;}
@@ -2762,8 +2890,74 @@ function farBoxes(){return FAR?FAR.ctx.map((c,i)=>{const g=c.poly.map(q=>G(q[0],
 $('#farSel').onchange=e=>loadFar(+e.target.value);
 window.__S=()=>S;window.__perf=()=>{R.info.autoReset=false;R.info.reset();renderMain();const r={calls:R.info.render.calls,tris:R.info.render.triangles,geo:R.info.memory.geometries,tex:R.info.memory.textures};R.info.autoReset=true;return r;};window.__far=()=>FAR?{R:FAR.R,n:FAR.ctx.length,polys:FAR.ctx.map(c=>c.poly)}:null;window.__trees=()=>TREES;window.__farMesh=()=>!!(farG&&farG.parent);
 // ---------- 모형 재료·모형 음영(AO) ----------
-function setMatStyle(k){MS=MSTY[k]||MSTY.base;ctxMat.color.setHex(MS.ctx);treeMat.color.setHex(MS.tree);try{localStorage.setItem('bujilab.mat',k);}catch(e){}buildTerrain();masses.forEach(build);if(FAR)buildFar();if(REF)refApply();}
+function setMatStyle(k,tmp){MS=MSTY[k]||MSTY.base;ctxMat.color.setHex(MS.ctx);styleLights();treeMat.color.setHex(MS.tree);if(!tmp)try{localStorage.setItem('bujilab.mat',k);}catch(e){}buildTerrain();masses.forEach(build);if(FAR)buildFar();if(REF)refApply();}
 $('#matSel').onchange=e=>setMatStyle(e.target.value);
+// ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
+let mvStyle='draw',mvPrev='base',mvSpinOn=false;
+function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();}
+function mvLeave(){ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);}
+function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.'):'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
+$$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel')setMatStyle(mvStyle,true);});
+$('#mvSpin').onchange=e=>{ctr.autoRotate=e.target.checked;ctr.autoRotateSpeed=0.6;};
+window.__mv={cam,ctr};$('#mvPng').onclick=async()=>{renderMain();offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(R.domElement));};
+
+// ---------- 선화·야경 표현: 선 색·빛·배경, 나무 선, 켜진 창 ----------
+function styleLights(){const hemi=S.children.find(o=>o.isHemisphereLight);if(!LBASE)LBASE={h:hemi?hemi.intensity:1.35,hc:hemi?hemi.color.getHex():0xffffff,s:sun.intensity};
+ if(hemi){hemi.intensity=MS.hemi??LBASE.h;hemi.color.setHex(MS===MSTY.night?0x8494b8:LBASE.hc);}sun.intensity=MS.sun??LBASE.s;
+ EDGE.color.setHex(MS.edge??0x8a9099);FLOOR.color.setHex(MS.floor??0xdde1e6);
+ const t=document.documentElement.dataset.theme;S.background=new THREE.Color(MS.bg!=null?MS.bg:(t==='dark'?0x1b1b1d:0xeef0f2));}
+function buildDeco(){drop(decoG);decoG=null;if(!MS.line)return;decoG=new THREE.Group();
+ // ---- 거리 모델링(데이터에서 자동): 가로수·가로등·차·옥상 설비 ----
+ const tp=[],dp=[],lamps=[];let sd=97;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
+ const RP=roadPolys(),BP=CTXP.map(c=>c.poly||[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]),inAny=(L,x,z)=>L.some(q=>pip(x,z,q)),PL=plot;
+ const blocked=(x,z,pad)=>inAny(RP,x,z)||BP.some(q=>pip(x,z,q)||[[pad,0],[-pad,0],[0,pad],[0,-pad]].some(([a,b])=>pip(x+a,z+b,q)))||pip(x,z,PL)||Math.hypot(x,z)>(SITE?150:72);
+ // 가로수·가로등: 도로 경계를 따라 바깥(보도) 쪽에
+ const ST=[];RP.forEach(q=>{for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<6)continue;const tx=(b[0]-a[0])/L,tz=(b[1]-a[1])/L;let nx=tz,nz=-tx;const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;if(pip(mx+nx*0.5,mz+nz*0.5,q)){nx=-nx;nz=-nz;}
+  for(let u=4+rnd()*3;u<L-3;u+=7.5+rnd()*2){const x=a[0]+tx*u+nx*1.6,z=a[1]+tz*u+nz*1.6;if(ST.length<700&&!blocked(x,z,1.2)&&!ST.some(t=>Math.abs(t[0]-x)<4&&Math.abs(t[1]-z)<4))ST.push([x,z,1.5+rnd()*0.8]);}
+  for(let u=10;u<L-4;u+=24){const x=a[0]+tx*u+nx*0.7,z=a[1]+tz*u+nz*0.7;if(lamps.length<220&&!blocked(x,z,0.3))lamps.push([x,z,-nx,-nz]);}}});
+ // 나무 선: 줄기 → 가지 3단(분기·위로 휘기) → 끝마다 잎 고리
+ const ALL=[...TREES.map(t=>[...t,0]),...ST.map(t=>[...t,1])];let det=0;
+ const branch=(p,d,len,dep)=>{const e=p.clone().addScaledVector(d,len);tp.push(p,e);if(dep===0){const n=4,rl=0.32+rnd()*0.18;for(let k=0;k<2;k++){const ax=V3(rnd()-.5,rnd()*.4,rnd()-.5).normalize(),u=V3(0,1,0).cross(ax).normalize(),v=ax.clone().cross(u);const c=e.clone().addScaledVector(V3(rnd()-.5,rnd()-.5,rnd()-.5),0.5);let pv=null;for(let i=0;i<=n;i++){const t=i/n*6.283;const q=c.clone().addScaledVector(u,Math.cos(t)*rl).addScaledVector(v,Math.sin(t)*rl*0.7);if(pv)tp.push(pv,q);pv=q;}}return;}
+  const kids=2+(rnd()<.45?1:0);for(let k=0;k<kids;k++){const az=rnd()*6.283,tilt=0.35+rnd()*0.45;const nd=d.clone().multiplyScalar(0.55).add(V3(Math.cos(az)*tilt,0.55+rnd()*0.3,Math.sin(az)*tilt)).normalize();branch(e,nd,len*(0.62+rnd()*0.14),dep-1);}};
+ ALL.forEach(([x,z,r])=>{const y=G(x,z);if(det<900){det++;const th=1.6+r*0.5;tp.push(V3(x,y,z),V3(x,y+th,z));branch(V3(x,y+th,z),V3(0,1,0),r*0.85,3);}
+  else{const cy=y+r+1.4;tp.push(V3(x,y,z),V3(x,cy-r*0.2,z));for(let l=0;l<2;l++){const ax=V3(rnd()-.5,rnd()-.5,rnd()-.5).normalize(),u=V3(1,0,0).cross(ax).normalize(),v=ax.clone().cross(u);let pv=null;for(let i=0;i<=12;i++){const t=i/12*6.283;const q=V3(x,cy,z).addScaledVector(u,Math.cos(t)*r).addScaledVector(v,Math.sin(t)*r);if(pv)tp.push(pv,q);pv=q;}}}});
+ if(tp.length){const tl=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tp),new THREE.LineBasicMaterial({color:MS===MSTY.night?MS.line:0x6f8466,transparent:true,opacity:MS===MSTY.night?0.7:0.75}));tl.visible=$('#treeT').checked;tl.userData.tree=1;decoG.add(tl);}
+ if(treesG)treesG.visible=false;
+ // 가로등: 기둥 6m + 팔 1.2m, 야경엔 불빛
+ lamps.forEach(([x,z,dx,dz])=>{const y=G(x,z);dp.push(V3(x,y,z),V3(x,y+6,z),V3(x,y+6,z),V3(x+dx*1.2,y+6.2,z+dz*1.2));});
+ if(MS.win&&lamps.length){const g=new THREE.BufferGeometry().setFromPoints(lamps.map(([x,z,dx,dz])=>V3(x+dx*1.2,G(x,z)+6.05,z+dz*1.2)));decoG.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffe2a8,size:0.9,sizeAttenuation:true,toneMapped:false})));}
+ // 차: 도로 안, 가까운 경계와 나란히 (차선 1.5~5m 안쪽)
+ const CB=[];RP.forEach(q=>{const bb=bbox(q),A=polyArea(q);const n=Math.min(14,Math.floor(A/160));let tries=0,got=0;while(got<n&&tries<n*30){tries++;const x=bb.x0+rnd()*(bb.x1-bb.x0),z=bb.z0+rnd()*(bb.z1-bb.z0);if(!pip(x,z,q)||Math.hypot(x,z)>(SITE?140:70)||pip(x,z,PL))continue;
+  let best=null,bd=1e9;for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<1)continue;const t=Math.max(0,Math.min(1,((x-a[0])*(b[0]-a[0])+(z-a[1])*(b[1]-a[1]))/(L*L)));const d=Math.hypot(a[0]+(b[0]-a[0])*t-x,a[1]+(b[1]-a[1])*t-z);if(d<bd){bd=d;best=[(b[0]-a[0])/L,(b[1]-a[1])/L];}}
+  if(!best||bd<1.4||bd>5.5||CB.some(c=>Math.hypot(c[0]-x,c[1]-z)<6))continue;CB.push([x,z,Math.atan2(best[0],best[1])]);got++;}});
+ if(CB.length){const body=new THREE.BoxGeometry(1.8,1.1,4.3);body.translate(0,0.75,0);const cab=new THREE.BoxGeometry(1.6,0.7,2.2);cab.translate(0,1.65,-0.2);
+  const fillM=new THREE.MeshLambertMaterial({color:MS.ctx});const ib=new THREE.InstancedMesh(body,fillM,CB.length),ic=new THREE.InstancedMesh(cab,fillM,CB.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler(),one=new THREE.Vector3(1,1,1),P=new THREE.Vector3();
+  const eb=new THREE.EdgesGeometry(body).attributes.position.array,ec=new THREE.EdgesGeometry(cab).attributes.position.array;
+  CB.forEach(([x,z,rot],i)=>{const y=G(x,z);Q.setFromEuler(E.set(0,rot,0));M.compose(P.set(x,y,z),Q,one);ib.setMatrixAt(i,M);ic.setMatrixAt(i,M);[eb,ec].forEach(A=>{for(let k=0;k<A.length;k+=3)dp.push(V3(A[k],A[k+1],A[k+2]).applyMatrix4(M));});});
+  ib.castShadow=ic.castShadow=true;decoG.add(ib,ic);}
+ // 옥상: 파라펫 선(+0.9m)과 실외기·물탱크 상자
+ const rb=[];(SITE?CTXP:CTXP.map(c=>({...c,poly:[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]}))).forEach(c=>{const P=c.poly;if(Math.hypot((c.x0+c.x1)/2,(c.z0+c.z1)/2)>(SITE?150:72))return;const gs=P.map(q=>G(q[0],q[1])),top=gs.reduce((a,b)=>a+b,0)/gs.length+c.h;
+  for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];dp.push(V3(a[0],top+0.9,a[1]),V3(b[0],top+0.9,b[1]),V3(a[0],top,a[1]),V3(a[0],top+0.9,a[1]));}
+  const bb=bbox(P),A=polyArea(P),n=A>120?1+Math.floor(rnd()*3):A>50?1:0;for(let k=0;k<n;k++){for(let t=0;t<8;t++){const w=1.2+rnd()*1.8,d=1+rnd()*1.6,h=0.9+rnd()*1.6,x=bb.x0+w/2+0.6+rnd()*Math.max(0,bb.x1-bb.x0-w-1.2),z=bb.z0+d/2+0.6+rnd()*Math.max(0,bb.z1-bb.z0-d-1.2);
+   if([[x-w/2,z-d/2],[x+w/2,z-d/2],[x+w/2,z+d/2],[x-w/2,z+d/2]].every(q=>pip(q[0],q[1],P))){rb.push([x,top,z,w,h,d]);break;}}}});
+ if(rb.length){const bx=new THREE.BoxGeometry(1,1,1);bx.translate(0,0.5,0);const im=new THREE.InstancedMesh(bx,ctxMat,rb.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),P=new THREE.Vector3(),SC=new THREE.Vector3();const eg=new THREE.EdgesGeometry(bx).attributes.position.array;
+  rb.forEach(([x,y,z,w,h,d],i)=>{M.compose(P.set(x,y,z),Q,SC.set(w,h,d));im.setMatrixAt(i,M);for(let k=0;k<eg.length;k+=3)dp.push(V3(eg[k],eg[k+1],eg[k+2]).applyMatrix4(M));});im.castShadow=true;im.userData.win=1;im.visible=$('#ctxT').checked;decoG.add(im);}
+ if(dp.length){const dl=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(dp),EDGE);dl.userData.keepMat=1;decoG.add(dl);}
+ // 창: 선화는 모든 창 윤곽, 야경은 윤곽(흐리게) + 일부 창에 불 (층고 3m, 창 간격 3.2m)
+ {const W=[];const B=SITE?CTXP.map(c=>{const gs=c.poly.map(q=>G(q[0],q[1]));return{P:c.poly,y0:gs.reduce((a,b)=>a+b,0)/gs.length,h:c.h};}):CTXP.map(c=>{const P=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]];const cs=P.map(q=>G(q[0],q[1]));return{P,y0:cs.reduce((a,b)=>a+b)/4,h:c.h};});
+  let hs=13;const hr=()=>{hs=(hs*48271)%2147483647;return hs/2147483647;};
+  B.forEach(b=>{const nf=Math.max(1,Math.floor(b.h/FH));const lit=0.16+hr()*0.4;
+   for(let i=0;i<b.P.length;i++){const a=b.P[i],c=b.P[(i+1)%b.P.length],L=Math.hypot(c[0]-a[0],c[1]-a[1]);if(L<2.5)continue;const n=Math.floor(L/3.2);const tx=(c[0]-a[0])/L,tz=(c[1]-a[1])/L;let nx=tz,nz=-tx;
+    const mx=(a[0]+c[0])/2,mz=(a[1]+c[1])/2;if(pip(mx+nx*0.4,mz+nz*0.4,b.P)){nx=-nx;nz=-nz;}
+    for(let f=0;f<nf;f++)for(let k=0;k<n;k++){if(W.length>30000)return;const u=(k+0.5)*L/n;W.push([a[0]+tx*u+nx*0.05,b.y0+f*FH+1.55,a[1]+tz*u+nz*0.05,tx,tz,nx,nz,hr()<lit]);}}});
+  if(W.length){const lp=[];W.forEach(w=>{const hw=0.7,hh=0.68;const c=(s1,s2)=>new THREE.Vector3(w[0]+w[3]*hw*s1,w[1]+hh*s2,w[2]+w[4]*hw*s1);const p=[c(-1,-1),c(1,-1),c(1,1),c(-1,1)];for(let i=0;i<4;i++)lp.push(p[i],p[(i+1)%4]);});
+   const wl=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:MS===MSTY.night?0x3c4866:0x8e949c,transparent:true,opacity:MS===MSTY.night?0.8:0.7}));wl.userData.win=1;wl.visible=$('#ctxT').checked;decoG.add(wl);
+   const LW=MS.win?W.filter(w=>w[7]):[];if(LW.length){const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1.4,1.36),new THREE.MeshBasicMaterial({color:MS.win,side:THREE.DoubleSide,toneMapped:false}),LW.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler(),one=new THREE.Vector3(1,1,1),P=new THREE.Vector3();
+    LW.forEach((w,i)=>{Q.setFromEuler(E.set(0,Math.atan2(w[5],w[6]),0));M.compose(P.set(w[0]+w[5]*0.01,w[1],w[2]+w[6]*0.01),Q,one);im.setMatrixAt(i,M);});im.userData.win=1;im.visible=$('#ctxT').checked;decoG.add(im);}}}
+ S.add(decoG);}
+$('#treeT').addEventListener('change',e=>{decoG&&decoG.children.forEach(o=>{if(o.userData.tree)o.visible=e.target.checked;});});
+$('#ctxT').addEventListener('change',e=>{decoG&&decoG.children.forEach(o=>{if(o.userData.win)o.visible=e.target.checked;});});
+
 let AO=null,aoOn=false,aoBusy=false;
 async function aoInit(){if(AO||aoBusy)return AO;aoBusy=true;try{const [{EffectComposer},{RenderPass},{SSAOPass},{OutputPass}]=await Promise.all(['EffectComposer','RenderPass','SSAOPass','OutputPass'].map(n=>import(`three/addons/postprocessing/${n}.js`)));
   const sz=R.getSize(new THREE.Vector2());const c=new EffectComposer(R);c.addPass(new RenderPass(S,cam));const ss=new SSAOPass(S,cam,sz.x,sz.y);ss.kernelRadius=6;ss.minDistance=0.0004;ss.maxDistance=0.02;c.addPass(ss);c.addPass(new OutputPass());
@@ -2773,7 +2967,7 @@ function renderMain(){inMain=true;try{renderMain0();}finally{inMain=false;}}
 function renderMain0(){if(aoOn&&AO&&!WIRE){const sz=R.getSize(new THREE.Vector2()),pr=R.getPixelRatio();if(sz.x!==AO.w||sz.y!==AO.h||pr!==AO.pr){AO.c.setPixelRatio(pr);AO.c.setSize(sz.x,sz.y);AO.w=sz.x;AO.h=sz.y;AO.pr=pr;}AO.c.render();}else R.render(S,cam);}
 // 그림자: 바깥 바이어스로 줄무늬(acne) 제거, 고성능 기기는 4096
 sun.shadow.normalBias=0.03;sun.shadow.bias=-0.0002;if(R.capabilities.maxTextureSize>=8192&&!matchMedia('(pointer: coarse)').matches){sun.shadow.mapSize.set(4096,4096);}
-(function(){let k='base',a=null;try{k=localStorage.getItem('bujilab.mat')||'base';a=localStorage.getItem('bujilab.ao');}catch(e){}if(MSTY[k]&&k!=='base'){$('#matSel').value=k;setMatStyle(k);}
+(function(){let k='base',a=null;try{k=localStorage.getItem('bujilab.mat')||'base';a=localStorage.getItem('bujilab.ao');}catch(e){}if(MSTY[k]&&k!=='base'&&k!=='draw'&&k!=='night'){$('#matSel').value=k;setMatStyle(k);}
  const def=a==null?!matchMedia('(pointer: coarse)').matches:a==='1';if(def){$('#aoT').checked=true;setTimeout(()=>{if(window.__noAO){$('#aoT').checked=false;return;}aoOn=true;aoInit();},0);}})();
 // ---------- 내 모델 불러오기 (glTF·GLB·OBJ): 3D 보기·그림자·3D 캡처·OBJ 내보내기에 포함 ----------
 function refBox(o){const b=new THREE.Box3().setFromObject(o);return b;}
