@@ -373,6 +373,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
    <label class="tg">시각 <input type="range" id="hour" min="8" max="17" step="0.25" value="12" aria-label="시각"> <b id="hourV" class="mono">12:00</b></label>
    <button class="btn sm" id="tlB" type="button" aria-pressed="false" title="8시부터 17시까지 그림자 움직임을 재생합니다">그림자 재생</button>
    <label class="tg"><input type="checkbox" id="envT" checked> 일조사선</label>
+   <label class="tg" title="하지·춘추분·동지 태양 궤적과 시각, 방위 링을 대지 위 반구로 그립니다"><input type="checkbox" id="spT"> 태양 궤적</label>
    <label class="tg"><input type="checkbox" id="ctxT" checked> 주변 건물</label>
    <label class="tg" title="브이월드 항공사진을 바닥에 깔기(실제 대지에서만)"><input type="checkbox" id="photoT"> 항공사진</label>
    <label class="tg" id="roofW" style="display:none" title="주변 건물 지붕에도 사진을 입힘. 항공사진은 건물이 비스듬히 찍혀 지붕과 어긋날 수 있음"><input type="checkbox" id="roofT"> 지붕에도</label>
@@ -393,6 +394,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
   <div class="dtool">
    <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="land">조경 일러스트</button><button data-s="night">야경</button></div>
    <label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
+   <label class="tg"><input type="checkbox" id="mvSp">태양 궤적</label>
    <label class="tg">영역 <select id="mvCrop" aria-label="영역 자르기"><option value="">전체</option><option value="rect">사각형</option><option value="circle">원</option></select></label>
    <label class="tg" id="mvSizeL" hidden>크기 <input type="range" id="mvSize" min="40" max="200" step="10" value="120" style="width:90px"> <b id="mvSizeV" class="mono">120m</b></label>
    <label class="tg" id="mvRotL" hidden>회전 <input type="range" id="mvRot" min="-45" max="45" step="1" value="0" style="width:80px"> <b id="mvRotV" class="mono">0°</b></label>
@@ -725,7 +727,7 @@ function boxPart(w,d,yb,yt,mat,edge,floorMat,floorStart){const g=new THREE.Group
  const pts=[];for(let y=(floorStart??yb)+FH;y<yt-0.01;y+=FH){if(y<=yb+0.01)continue;const a=[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];for(let i=0;i<4;i++){const p=a[i],q=a[(i+1)%4];pts.push(new THREE.Vector3(p[0],y,p[1]),new THREE.Vector3(q[0],y,q[1]));}}
  if(pts.length)g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),floorMat));return g;}
 // terrain-dependent scene parts
-let groundM=null,cntG=null,roadsG=null,greensG=null,treesG=null,ctxG=null,decoG=null,LBASE=null;
+let groundM=null,cntG=null,roadsG=null,greensG=null,treesG=null,ctxG=null,decoG=null,LBASE=null,spG=null,spNow=null;
 const ctxMat=new THREE.MeshLambertMaterial({color:0xfafafa}),treeMat=new THREE.MeshLambertMaterial({color:0x9fb8a0});ctxMat.userData.keep=treeMat.userData.keep=true;
 function drape(r,yoff,col){const w=r.x1-r.x0,d=r.z1-r.z0;const geo=new THREE.PlaneGeometry(w,d,Math.max(1,Math.ceil(w/2)),Math.max(1,Math.ceil(d/2)));geo.rotateX(-Math.PI/2);geo.translate((r.x0+r.x1)/2,0,(r.z0+r.z1)/2);
  const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,G(p.getX(i),p.getZ(i))+yoff);geo.computeVertexNormals();
@@ -751,7 +753,7 @@ function buildTerrain(){[groundM,cntG,roadsG,greensG,treesG,ctxG].forEach(drop);
  greensG=new THREE.Group();if(SITE){}else GREENS.forEach(r=>greensG.add(drape(r,0.05,MS.green)));S.add(greensG);
  treesG=treeGroup(TREES);treesG.visible=$('#treeT').checked;S.add(treesG);
  ctxG=new THREE.Group();if(SITE)CTXP.forEach(c=>{const gs=c.poly.map(q=>G(q[0],q[1])),avg=gs.reduce((a,b)=>a+b,0)/gs.length;ctxG.add(prismPart(c.poly,Math.min(...gs)-0.05,avg+c.h,ctxMat,EDGE,FLOOR));});else CTXP.forEach(c=>{const cs=[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]].map(q=>G(q[0],q[1]));const avg=cs.reduce((a,b)=>a+b)/4,mn=Math.min(...cs);
-  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();buildElev();buildDeco();}
+  const g=boxPart(c.x1-c.x0,c.z1-c.z0,mn-0.05,avg+c.h,ctxMat,EDGE,FLOOR,avg);g.position.set((c.x0+c.x1)/2,0,(c.z0+c.z1)/2);ctxG.add(g);});ctxG.children.forEach((g,i)=>g.traverse(o=>{o.userData.ci=i;}));ctxG.visible=$('#ctxT').checked;S.add(ctxG);if(SITE&&PHOTO&&PHOTO.site===SITE.id)prepRoofs();buildPhoto3D();buildElev();buildDeco();if(typeof buildSunPath==='function'&&$('#spT').checked)setTimeout(buildSunPath,0);}
 
 // ---------- 조경 일러스트 나무: 캔버스로 그린 나무(옆모습 2장 교차 + 위에서 본 수관 1장) ----------
 const ILLT=(()=>{let cache=null;return()=>{if(cache)return cache;const G3=[['#6f9a5c','#8db474','#a9c98c'],['#5d8a55','#7da86a','#9cc184'],['#86ad6a','#a3c486','#bfd8a2']];
@@ -1255,7 +1257,7 @@ $('#edgeT').onchange=syncEdgeLabels;$('#cntT').onchange=e=>{if(cntG)cntG.visible
 let decl=-23.44;const LAT=37.5*Math.PI/180;
 function sunVec(){const d=decl*Math.PI/180,H=(+$('#hour').value-12)*15*Math.PI/180;
  const E=-Math.cos(d)*Math.sin(H),N=Math.cos(LAT)*Math.sin(d)-Math.sin(LAT)*Math.cos(d)*Math.cos(H),U=Math.sin(LAT)*Math.sin(d)+Math.cos(LAT)*Math.cos(d)*Math.cos(H);return{x:E,y:U,z:-N};}
-function updSun(){const v=sunVec();sun.position.set(v.x*150,Math.max(v.y,0.02)*150,v.z*150);sun.intensity=v.y>0?2.3:0;
+function updSun(){const v=sunVec();sun.position.set(v.x*150,Math.max(v.y,0.02)*150,v.z*150);sun.intensity=v.y>0?(typeof MS!=='undefined'&&MS.sun!=null?MS.sun:2.3):0;if(spG)spCur();
  const h=+$('#hour').value;$('#hourV').textContent=`${String(Math.floor(h)).padStart(2,'0')}:${String(Math.round((h%1)*60)).padStart(2,'0')}`;if(curPane==='vdiag')drawDiag();}
 $('#hour').oninput=updSun;
 $$('#season button').forEach(b=>b.onclick=()=>{$$('#season button').forEach(x=>x.classList.remove('on'));b.classList.add('on');decl=+b.dataset.d;updSun();});
@@ -2933,14 +2935,39 @@ function cropApply(){drop(cropG);cropG=null;const P=curPane==='vmodel'?cropPoly(
  const bs=new THREE.Shape(P.map(q=>new THREE.Vector2(q[0],-q[1])));const bg=new THREE.ShapeGeometry(bs);bg.rotateX(-Math.PI/2);bg.translate(0,yb,0);cropG.add(new THREE.Mesh(bg,new THREE.MeshLambertMaterial({color:0x6e665c,side:THREE.DoubleSide,clippingPlanes:[]})));
  S.add(cropG);}
 function cropUI(){$('#mvCrop').value=CROP.shape;$('#mvSize').value=CROP.size;$('#mvSizeV').textContent=CROP.size+'m';$('#mvRot').value=CROP.rot;$('#mvRotV').textContent=CROP.rot+'°';$('#mvSizeL').hidden=!CROP.shape;$('#mvRotL').hidden=CROP.shape!=='rect';}
-const cropSave=()=>{try{localStorage.setItem('bujilab.crop',JSON.stringify(CROP));}catch(e){}cropUI();cropApply();};
+const cropSave=()=>{try{localStorage.setItem('bujilab.crop',JSON.stringify(CROP));}catch(e){}cropUI();cropApply();if($('#spT').checked)buildSunPath();};
 $('#mvCrop').onchange=e=>{CROP.shape=e.target.value;cropSave();};$('#mvSize').oninput=e=>{CROP.size=+e.target.value;cropSave();};$('#mvRot').oninput=e=>{CROP.rot=+e.target.value;cropSave();};
 $('#mvObj').onclick=()=>document.querySelector('[data-xp=obj]').click();$('#mvDxf').onclick=()=>document.querySelector('[data-xp=dxf3]').click();
 cropUI();
 
+
+// ---------- 3D 태양 궤적: 하지·춘추분·동지 궤적, 시각 표시, 방위 링, 지금 태양 ----------
+function spLabel(t,col,sz){const c=document.createElement('canvas');const g=c.getContext('2d');g.font='600 44px "IBM Plex Sans KR",sans-serif';const w=Math.ceil(g.measureText(t).width)+28;c.width=w;c.height=64;g.font='600 44px "IBM Plex Sans KR",sans-serif';
+ g.fillStyle='rgba(255,255,255,.88)';g.fillRect(0,4,w,56);g.fillStyle=col;g.textBaseline='middle';g.fillText(t,14,33);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,depthTest:false,transparent:true}));sp.scale.set(sz*w/64,sz,1);sp.renderOrder=5;return sp;}
+function spRadius(){const c=CROP&&CROP.shape&&curPane==='vmodel'?Math.min(CROP.size,SITE?196:146)/2-3:1e9;return Math.min(SITE?70:55,c);}
+function buildSunPath(){drop(spG);spG=null;spNow=null;if(!$('#spT').checked)return;spG=new THREE.Group();const c=centroidOf(plot),cy=G(c[0],c[1])+0.3,R0=spRadius();const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+ const at=(dg,h)=>{const v=sunVecAt(dg,h);return v.y<0?null:V3(c[0]+v.x*R0,cy+v.y*R0,c[1]+v.z*R0);};
+ // 방위 링 + 15° 눈금 + 동서남북
+ const rp=[];for(let i=0;i<=96;i++){const a=i/96*6.2832;rp.push(V3(c[0]+Math.sin(a)*R0,cy,c[1]-Math.cos(a)*R0));}spG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(rp),new THREE.LineBasicMaterial({color:0x5f6672})));
+ const tk=[];for(let d=0;d<360;d+=15){const a=d*Math.PI/180,L=d%90?1.6:3.2;tk.push(V3(c[0]+Math.sin(a)*R0,cy,c[1]-Math.cos(a)*R0),V3(c[0]+Math.sin(a)*(R0-L),cy,c[1]-Math.cos(a)*(R0-L)));}spG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tk),new THREE.LineBasicMaterial({color:0x5f6672})));
+ [['N',0],['E',90],['S',180],['W',270]].forEach(([t,d])=>{const a=d*Math.PI/180,l=spLabel(t,t==='N'?'#c8372d':'#16181d',4);l.position.set(c[0]+Math.sin(a)*(R0+4),cy+1,c[1]-Math.cos(a)*(R0+4));spG.add(l);});
+ // 궤적 3개 + 시각 점선(같은 시각끼리) + 시각 숫자
+ const D=[[23.44,'하지',0xe0533d,'#e0533d'],[0,'춘·추분',0xd99a2b,'#b97f16'],[-23.44,'동지',0x2f6fd1,'#2f6fd1']];
+ D.forEach(([dg,nm,cl,cs])=>{const pts=[];for(let h=3;h<=21;h+=0.08){const p=at(dg,h);if(p)pts.push(p);}if(pts.length<2)return;spG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:cl})));
+  const dots=[];for(let h=5;h<=19;h++){const p=at(dg,h);if(!p)continue;dots.push(p);}const dg2=new THREE.BufferGeometry().setFromPoints(dots);spG.add(new THREE.Points(dg2,new THREE.PointsMaterial({color:cl,size:1.3,sizeAttenuation:true})));
+  const top=at(dg,12);if(top){const l=spLabel(nm,cs,3.6);l.position.copy(top).add(V3(0,3,0));spG.add(l);}
+  if(dg!==0)[9,12,15].forEach(h=>{const p=at(dg,h);if(!p)return;const l=spLabel(h+'시',cs,2.6);l.position.copy(p).add(V3(0,dg>0?2:-2.4,0));spG.add(l);});});
+ const hl=[];for(let h=6;h<=18;h++){const a=at(23.44,h),b=at(0,h),d=at(-23.44,h);if(a&&b)hl.push(a,b);if(b&&d)hl.push(b,d);}if(hl.length){const L=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(hl),new THREE.LineDashedMaterial({color:0x9aa1aa,dashSize:1.2,gapSize:0.9}));L.computeLineDistances();spG.add(L);}
+ S.add(spG);spCur();}
+function spCur(){if(!spG)return;if(spNow){spG.remove(spNow);spNow.traverse(o=>{if(o.geometry)o.geometry.dispose();});}const c=centroidOf(plot),cy=G(c[0],c[1])+0.3,R0=spRadius(),v=sunVec();if(v.y<=0){spNow=null;return;}
+ spNow=new THREE.Group();const p=new THREE.Vector3(c[0]+v.x*R0,cy+v.y*R0,c[1]+v.z*R0);const m=new THREE.Mesh(new THREE.SphereGeometry(1.4,16,12),new THREE.MeshBasicMaterial({color:0xffb020}));m.position.copy(p);spNow.add(m);
+ const L=new THREE.Line(new THREE.BufferGeometry().setFromPoints([p,new THREE.Vector3(c[0],cy,c[1])]),new THREE.LineDashedMaterial({color:0xffb020,dashSize:1.5,gapSize:1}));L.computeLineDistances();spNow.add(L);spG.add(spNow);}
+$('#spT').onchange=()=>{$('#mvSp').checked=$('#spT').checked;buildSunPath();};$('#mvSp').onchange=()=>{$('#spT').checked=$('#mvSp').checked;buildSunPath();};
+
 // ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
 let mvStyle='draw',mvPrev='base',mvSpinOn=false;
-function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();setTimeout(cropApply,0);}
+function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
 function mvLeave(){ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;}
 function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.'):'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
 $$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel')setMatStyle(mvStyle,true);});
