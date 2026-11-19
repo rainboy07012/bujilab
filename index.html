@@ -819,23 +819,29 @@ function illusTrees(T){const M3=ILLT();const buck=[[],[],[]];let q=31;const r=()
 let elevG=null;
 function buildElev(){drop(elevG);elevG=null;const E=SITE&&SITE.elev;if(!E||!E.length)return;elevG=new THREE.Group();const pos=[],lp=[];const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
  const ends=E.flatMap(e=>[e.pts[0],e.pts[e.pts.length-1]]);const shared=p=>ends.filter(q=>Math.hypot(q[0]-p[0],q[1]-p[1])<4).length>1;
- const quad=(a,b,c,d)=>pos.push(...a,...b,...c,...a,...c,...d);
- E.forEach(e=>{const P=e.pts;const S=[0];for(let i=1;i<P.length;i++)S.push(S[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=S[S.length-1];if(L<3)return;
-  const top=e.t==='003'?3.2:8.3,th=1.8,hw=e.w/2;const r0=shared(P[0])?0:Math.min(45,L*0.45),r1=shared(P[P.length-1])?0:Math.min(45,L*0.45);
+ const quad=(a,b,c,d)=>pos.push(...a,...b,...c,...a,...c,...d);const WQ=(SITE&&SITE.waters)||[],wetAt=(x,z)=>WQ.some(q=>pip(x,z,q)),lampP=[];
+ E.forEach(e=>{const P=e.pts;e.deck=[];const S=[0];for(let i=1;i<P.length;i++)S.push(S[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=S[S.length-1];if(L<3)return;
+  let wn=0;for(let i=0;i<P.length-1;i++)for(let k=0;k<4;k++){const t=k/4;if(wetAt(P[i][0]+(P[i+1][0]-P[i][0])*t,P[i][1]+(P[i+1][1]-P[i][1])*t))wn++;}const wet=e.t==='003'&&wn>0;const top=wet?11:e.t==='003'?3.2:8.3,th=wet?2.4:1.8,hw=e.w/2;const r0=shared(P[0])?0:Math.min(45,L*0.45),r1=shared(P[P.length-1])?0:Math.min(45,L*0.45);
   const H=u=>{let k=1;if(r0&&u<r0)k=u/r0;if(r1&&u>L-r1)k=Math.min(k,(L-u)/r1);return Math.max(0.15,k*top);};
   const at=u=>{let i=1;while(i<S.length-1&&S[i]<u)i++;const t=(u-S[i-1])/Math.max(1e-6,S[i]-S[i-1]);const a=P[i-1],b=P[i];const dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1;return{x:a[0]+dx*t,z:a[1]+dz*t,nx:-dz/l,nz:dx/l};};
   const n=Math.max(2,Math.ceil(L/2));let prev=null;
   for(let k=0;k<=n;k++){const u=L*k/n,o=at(u),gy=G(o.x,o.z),yt=gy+H(u),yb=Math.max(gy,yt-th);const l=[o.x+o.nx*hw,o.z+o.nz*hw],r=[o.x-o.nx*hw,o.z-o.nz*hw];const cur={lt:[l[0],yt,l[1]],rt:[r[0],yt,r[1]],lb:[l[0],yb,l[1]],rb:[r[0],yb,r[1]],lp:[l[0],yt+1.1,l[1]],rp:[r[0],yt+1.1,r[1]]};
+   e.deck.push([o.x,yt,o.z]);if(MS.win&&k%10===5){lampP.push(V3(l[0],yt+5,l[1]),V3(r[0],yt+5,r[1]));lp.push(V3(l[0],yt,l[1]),V3(l[0],yt+5,l[1]),V3(r[0],yt,r[1]),V3(r[0],yt+5,r[1]));}
    if(prev){quad(prev.lt,cur.lt,cur.rt,prev.rt);quad(prev.rb,cur.rb,cur.lb,prev.lb);quad(prev.lb,cur.lb,cur.lt,prev.lt);quad(prev.rt,cur.rt,cur.rb,prev.rb);quad(prev.lt,cur.lt,cur.lp,prev.lp);quad(prev.rp,cur.rp,cur.rt,prev.rt);
     [['lt','lt'],['rt','rt'],['lb','lb'],['rb','rb'],['lp','lp'],['rp','rp']].forEach(([a])=>lp.push(V3(...prev[a]),V3(...cur[a])));}
    prev=cur;}
+  // 트러스(물 위 교량): 6m 간격 워렌 트러스, 양옆
+  if(wet){const TH=4.2,pn=6,rib=(A,B,w)=>{const dx=B[0]-A[0],dy=B[1]-A[1],dz=B[2]-A[2],l=Math.hypot(dx,dy,dz)||1;const ux=-dy/l*0,uy=w,uz=0;quad(A,B,[B[0],B[1]+uy,B[2]],[A[0],A[1]+uy,A[2]]);lp.push(V3(...A),V3(...B));};
+   [1,-1].forEach(sd=>{let pb=null,pt=null,idx=0;for(let u=r0+2;u<=L-r1-2;u+=pn){const o=at(u),yt=G(o.x,o.z)+H(u),ex=o.x+o.nx*hw*sd,ez=o.z+o.nz*hw*sd;const b=[ex,yt,ez],t=[ex,yt+TH,ez];
+    if(pb){rib([pt[0],pt[1]-0.5,pt[2]],[t[0],t[1]-0.5,t[2]],0.5);if(idx%2)rib(pb,[t[0],t[1]-0.4,t[2]],0.4);else rib([pt[0],pt[1]-0.4,pt[2]],b,0.4);}
+    rib([b[0],b[1],b[2]],[t[0],t[1]-0.4,t[2]],0.25);pb=b;pt=t;idx++;}});}
   // 교각: 데크가 4.5m 넘게 뜬 곳만
   for(let u=11;u<L-6;u+=22){if(H(u)<4.5)continue;const o=at(u),gy=G(o.x,o.z),yb=gy+H(u)-th;const cols=e.w>9?[-hw*0.5,hw*0.5]:[0];
    cols.forEach(off=>{const cx=o.x+o.nx*off,cz=o.z+o.nz*off,s=0.8;const c4=[[cx-s,cz-s],[cx+s,cz-s],[cx+s,cz+s],[cx-s,cz+s]];for(let i=0;i<4;i++){const a=c4[i],b=c4[(i+1)%4];quad([a[0],gy,a[1]],[b[0],gy,b[1]],[b[0],yb-0.9,b[1]],[a[0],yb-0.9,a[1]]);lp.push(V3(a[0],gy,a[1]),V3(a[0],yb-0.9,a[1]));}});
    const tx=o.nz,tz=-o.nx,cw=hw*0.9,cd=1.2;const cap=[[o.x+o.nx*cw+tx*cd,o.z+o.nz*cw+tz*cd],[o.x-o.nx*cw+tx*cd,o.z-o.nz*cw+tz*cd],[o.x-o.nx*cw-tx*cd,o.z-o.nz*cw-tz*cd],[o.x+o.nx*cw-tx*cd,o.z+o.nz*cw-tz*cd]];
    for(let i=0;i<4;i++){const a=cap[i],b=cap[(i+1)%4];quad([a[0],yb-0.9,a[1]],[b[0],yb-0.9,b[1]],[b[0],yb,b[1]],[a[0],yb,a[1]]);lp.push(V3(a[0],yb-0.9,a[1]),V3(b[0],yb-0.9,b[1]));}}});
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:MS.ctx,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;elevG.add(m);
- if(lp.length)elevG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),EDGE));elevG.visible=$('#ctxT').checked;S.add(elevG);}
+ if(lp.length)elevG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),EDGE));if(lampP.length)elevG.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(lampP),new THREE.PointsMaterial({color:0xffe2a8,size:1,sizeAttenuation:true,toneMapped:false})));elevG.visible=$('#ctxT').checked;S.add(elevG);}
 $('#ctxT').addEventListener('change',e=>{if(elevG)elevG.visible=e.target.checked;});
 
 // ---------- 항공사진 (브이월드 WMTS Satellite, 웹메르카토르 z19 타일을 대지 중심 ±80m로 맞춰 붙임) ----------
@@ -3199,20 +3205,24 @@ function buildLife(){lifeDrop();if(!MS.pix)return;let sd=31;const rnd=()=>{sd=(s
   const outR=(x,z)=>!RP.some(r=>pip(x,z,r))&&!CTXP.some(c=>pip(x,z,c.poly||[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]))&&!pip(x,z,plot);seg(-1.3,rnd()<.5,walks,outR);seg(0.7,rnd()<.5,walks,inR);}});
  const g=new THREE.Group();g.name='life';const box=(w,h,d,y)=>{const ge=new THREE.BoxGeometry(w,h,d);ge.translate(0,y,0);return ge;};
  const CARC=[0xe8453c,0x2f6fe0,0xffffff,0xf2c230,0x2c2f36,0x3fae6a,0xf28b2f];
- const nc=Math.min(70,lanes.length*3),np=Math.min(160,walks.length*4);
+ const EL=(SITE&&SITE.elev||[]).filter(e=>e.deck&&e.deck.length>2);const ne=Math.min(40,EL.length*8);
+ const nc=Math.min(70,lanes.length*3)+ne,np=Math.min(160,walks.length*4);
  const body=new THREE.InstancedMesh(box(1.8,0.9,4.2,0.75),new THREE.MeshLambertMaterial(),Math.max(1,nc)),cab=new THREE.InstancedMesh(box(1.6,0.7,2.1,1.55),new THREE.MeshLambertMaterial({color:0xdfeaf2}),Math.max(1,nc));
  const ppl=new THREE.InstancedMesh(box(0.55,1.7,0.45,0.85),new THREE.MeshLambertMaterial(),Math.max(1,np));
  [body,cab,ppl].forEach(m=>{m.castShadow=true;m.frustumCulled=false;m.count=0;g.add(m);});
  const ag=[],col=new THREE.Color();
  for(let i=0;i<nc&&lanes.length;i++){const k=Math.floor(rnd()*lanes.length);ag.push({m:0,p:lanes[k],t:rnd(),v:5+rnd()*5,i});body.setColorAt(i,col.setHex(CARC[i%CARC.length]));}
+ for(let j=0;j<ne;j++){const e=EL[j%EL.length],D=e.deck,dir=j%2?1:-1,pl=dir>0?D:[...D].reverse(),S=[0];for(let k=1;k<pl.length;k++)S.push(S[k-1]+Math.hypot(pl[k][0]-pl[k-1][0],pl[k][2]-pl[k-1][2]));const i=Math.min(70,lanes.length*3)+j;ag.push({m:0,pl,S,L:S[S.length-1],off:(e.w||8)*0.22*(rnd()<.5?1:2)/1.5,t:rnd(),v:9+rnd()*6,i});body.setColorAt(i,col.setHex(CARC[i%CARC.length]));}
  const PPC=[0xe84a5f,0x3b6fd8,0xf5c242,0x41a46b,0x8a5cc2,0xff8a3d,0x2c2f36];
  for(let i=0;i<np&&walks.length;i++){const k=Math.floor(rnd()*walks.length);ag.push({m:1,p:walks[k],t:rnd(),v:1+rnd()*0.7,i,ph:rnd()*6});ppl.setColorAt(i,col.setHex(PPC[i%PPC.length]));}
- body.count=cab.count=Math.min(nc,lanes.length?nc:0);ppl.count=walks.length?np:0;
+ body.count=cab.count=nc;ppl.count=walks.length?np:0;
  [body,ppl].forEach(m=>{if(m.instanceColor)m.instanceColor.needsUpdate=true;});
  S.add(g);LIFE={g,body,cab,ppl,ag,t0:performance.now()};lifeTick(true);}
 const _lm=new THREE.Matrix4(),_lq=new THREE.Quaternion(),_lp=new THREE.Vector3(),_ls=new THREE.Vector3(1,1,1),_ly=new THREE.Vector3(0,1,0);
 function lifeTick(force){if(!LIFE)return;const now=performance.now(),dt=Math.min(0.1,(now-LIFE.t0)/1000);LIFE.t0=now;if(!force&&curPane!=='vmodel')return;
- for(const a of LIFE.ag){const[ax,az,bx,bz]=a.p,L=Math.hypot(bx-ax,bz-az)||1;a.t+=a.v*dt/L;if(a.t>1)a.t-=1;const x=ax+(bx-ax)*a.t,z=az+(bz-az)*a.t;
+ for(const a of LIFE.ag){if(a.pl){a.t+=a.v*dt/a.L;if(a.t>1)a.t-=1;const u=a.t*a.L;let k=1;while(k<a.S.length-1&&a.S[k]<u)k++;const A=a.pl[k-1],B=a.pl[k],f=(u-a.S[k-1])/Math.max(1e-6,a.S[k]-a.S[k-1]),dx=B[0]-A[0],dz=B[2]-A[2],l=Math.hypot(dx,dz)||1;
+   _lq.setFromAxisAngle(_ly,Math.atan2(dx,dz));_lp.set(A[0]+dx*f+dz/l*a.off,A[1]+(B[1]-A[1])*f,A[2]+dz*f-dx/l*a.off);_lm.compose(_lp,_lq,_ls);LIFE.body.setMatrixAt(a.i,_lm);LIFE.cab.setMatrixAt(a.i,_lm);continue;}
+  const[ax,az,bx,bz]=a.p,L=Math.hypot(bx-ax,bz-az)||1;a.t+=a.v*dt/L;if(a.t>1)a.t-=1;const x=ax+(bx-ax)*a.t,z=az+(bz-az)*a.t;
   _lq.setFromAxisAngle(_ly,Math.atan2(bx-ax,bz-az));const bob=a.m?Math.abs(Math.sin(now/170+a.ph))*0.12:0;_lp.set(x,G(x,z)+bob,z);_lm.compose(_lp,_lq,_ls);
   if(a.m){LIFE.ppl.setMatrixAt(a.i,_lm);}else{LIFE.body.setMatrixAt(a.i,_lm);LIFE.cab.setMatrixAt(a.i,_lm);}}
  LIFE.body.instanceMatrix.needsUpdate=LIFE.cab.instanceMatrix.needsUpdate=LIFE.ppl.instanceMatrix.needsUpdate=true;}
@@ -3266,7 +3276,7 @@ function buildDeco(){drop(decoG);decoG=null;if(!MS.line&&!MS.illus)return;decoG=
  // ---- 거리 모델링(데이터에서 자동): 가로수·가로등·차·옥상 설비 ----
  const tp=[],dp=[],lamps=[];let sd=97;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
  const RP=roadPolys(),BP=CTXP.map(c=>c.poly||[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]),inAny=(L,x,z)=>L.some(q=>pip(x,z,q)),PL=plot;
- const blocked=(x,z,pad)=>inAny(RP,x,z)||BP.some(q=>pip(x,z,q)||[[pad,0],[-pad,0],[0,pad],[0,-pad]].some(([a,b])=>pip(x+a,z+b,q)))||pip(x,z,PL)||Math.hypot(x,z)>(SITE?150:72);
+ const blocked=(x,z,pad)=>inAny(RP,x,z)||BP.some(q=>pip(x,z,q)||[[pad,0],[-pad,0],[0,pad],[0,-pad]].some(([a,b])=>pip(x+a,z+b,q)))||pip(x,z,PL)||Math.hypot(x,z)>(SITE?150:72)||(SITE&&(SITE.waters||[]).some(q=>pip(x,z,q)));
  // 가로수·가로등: 도로 경계를 따라 바깥(보도) 쪽에
  const ST=[];RP.forEach(q=>{for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<6)continue;const tx=(b[0]-a[0])/L,tz=(b[1]-a[1])/L;let nx=tz,nz=-tx;const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;if(pip(mx+nx*0.5,mz+nz*0.5,q)){nx=-nx;nz=-nz;}
   for(let u=4+rnd()*3;u<L-3;u+=7.5+rnd()*2){const x=a[0]+tx*u+nx*1.6,z=a[1]+tz*u+nz*1.6;if(ST.length<700&&!blocked(x,z,1.2)&&!ST.some(t=>Math.abs(t[0]-x)<4&&Math.abs(t[1]-z)<4))ST.push([x,z,1.5+rnd()*0.8]);}
