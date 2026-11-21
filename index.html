@@ -64,7 +64,7 @@ select,.btn{font:inherit;border:1px solid var(--line);border-radius:2px;padding:
 .rfgrid:empty::before{content:'사례 사진이나 스케치를 올려 모아 두세요. 캡션(건물명·건축가·메모)을 달 수 있고, A3 한 장으로 뽑을 수 있습니다.';color:var(--mut);font-size:12.5px}
 #vmodel canvas{display:block}#vmodel .dtool{z-index:2}
 .flcard{position:absolute;right:12px;top:96px;z-index:3;width:252px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:2px;box-shadow:0 6px 20px rgba(0,0,0,.14);padding:12px 14px 14px;font-size:12.5px;line-height:1.5}.flcard h4{margin:0;font-size:15px;font-weight:600;display:flex;align-items:baseline;justify-content:space-between;gap:8px}.flcard h4 small{font-size:12px;font-weight:400;color:var(--mut)}.flcard canvas{display:block;width:100%;margin:10px 0 8px;background:#fafbfc;border:1px solid var(--line)}.flcard table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.flcard td{padding:2px 0}.flcard td:last-child{text-align:right}.flcard td i{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:1px}.flcard .flnav{display:flex;gap:6px;margin-top:10px}.flcard .flnav .btn{flex:1}.flcard .flsum{color:var(--mut);margin-top:4px}
-.pxcard{position:absolute;left:12px;bottom:12px;z-index:3;background:#fffdf6;color:#16181d;border:2px solid #16181d;box-shadow:4px 4px 0 #16181d;padding:9px 12px 10px;font-size:12.5px;line-height:1.55;min-width:180px;max-width:280px}.pxcard b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}.pxcard dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.pxcard dt{color:#6a6f78}.pxcard dd{margin:0}.pxcard i{display:inline-block;width:9px;height:9px;margin-right:5px;vertical-align:0;border:1px solid #16181d}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
+.pxcard{position:absolute;left:12px;bottom:12px;z-index:3;background:#fffdf6;color:#16181d;border:2px solid #16181d;box-shadow:4px 4px 0 #16181d;padding:9px 12px 10px;font-size:12.5px;line-height:1.55;min-width:180px;max-width:280px}.pxcard b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}.pxcard dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.pxcard dt{color:#6a6f78}.pxcard dd{margin:0}.pxshop{list-style:none;margin:6px 0 0;padding:6px 0 0;border-top:1px dashed #b9b2a2;max-height:150px;overflow:auto}.pxshop li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pxshop small{color:#6a6f78}.pxcard i{display:inline-block;width:9px;height:9px;margin-right:5px;vertical-align:0;border:1px solid #16181d}#vmodel .note{background:rgba(255,255,255,.85);padding:3px 8px;font-size:12px}#vmodel .dtool .tg,#vmodel .dtool .btn{background:rgba(255,255,255,.92);color:#16181d;padding:3px 8px;border-radius:2px}
 #v3d{background:var(--hair)}
 #v3d canvas{display:block}
 #v3d.plot canvas,#v3d.measure canvas{cursor:crosshair}
@@ -403,7 +403,7 @@ html.thm-anim,html.thm-anim *{transition:background-color 200ms ease,border-colo
  <div class="pane" id="vmodel"><div class="pxcard" id="pxCard" hidden role="status" aria-live="polite"></div><div class="flcard" id="flCard" hidden role="region" aria-label="층 정보"></div>
   <div class="dtool">
    <div class="seg" id="mvStyle"><button data-s="draw" class="on">선화</button><button data-s="land">조경 일러스트</button><button data-s="night">야경</button><button data-s="pixel" title="도트 그래픽으로 그린 동네 디오라마 · 차와 사람이 움직이고, 건물을 누르면 정보가 뜹니다">픽셀 동네</button></div>
-   <label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
+   <label class="tg" title="소상공인시장진흥공단 상가정보로 1층 가게 간판을 실제 위치에 붙입니다"><input type="checkbox" id="mvShop" checked>간판</label><label class="tg"><input type="checkbox" id="mvSpin">천천히 돌기</label>
    <label class="tg"><input type="checkbox" id="mvSp">태양 궤적</label>
    <label class="tg" title="지형·도로와 물·녹지·주변 건물·계획 매스를 층층이 띄워 보여 줍니다"><input type="checkbox" id="mvExp">레이어 분해</label>
    <label class="tg">영역 <select id="mvCrop" aria-label="영역 자르기"><option value="">전체</option><option value="rect">사각형</option><option value="circle">원</option></select></label>
@@ -2876,6 +2876,7 @@ $$('[data-xp]').forEach(b=>b.onclick=async()=>{const k=b.dataset.xp;const base=`
 // 브이월드는 CORS를 허용하지 않아 JSONP(callback)로 호출한다. domain = 키 발급 때 등록한 서비스 URL.
 // ▼▼ 배포 설정: 웹에 올릴 때 여기만 채우면 학생은 키 없이 바로 씁니다 ▼▼
 const BUJILAB_CONFIG={vworldKey:'C3875079-4B38-45DE-A5D3-D2D9018D93A2',vworldDomain:'https://rainboy07012.github.io'};// vworldDomain을 비우면 지금 주소(location.origin)를 씀
+const DATA_KEY='92d408434bc7bcecae29f99b17069dbdf23b0803447037ccba31556484cf907e';// 공공데이터포털 일반 인증키(하루 호출 상한 있음)
 // ▲▲ 배포 설정 ▲▲
 const VWK='bujilab.vworld';let VW={key:'',domain:''};try{VW={...VW,...JSON.parse(localStorage.getItem(VWK)||'{}')};}catch(e){}
 const VW_SHARED=!!BUJILAB_CONFIG.vworldKey;if(VW_SHARED&&!VW.key){VW={key:BUJILAB_CONFIG.vworldKey,domain:BUJILAB_CONFIG.vworldDomain||(location.protocol.startsWith('http')?location.origin:'')};}
@@ -3189,8 +3190,8 @@ txUI();rfRender();
 
 // ---------- 모델 뷰: 같은 장면을 선화·야경으로, 거리까지 모델링해서 따로 봄 ----------
 let mvStyle='draw',mvPrev='base',mvSpinOn=false;
-function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();pixApply();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
-function mvLeave(){expClear();pixClear();if(FLS){FLS=null;$('#flCard').hidden=true;}$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;R.setPixelRatio(PR0);R.domElement.style.imageRendering='';resize();}
+function mvEnter(){mvPrev=$('#matSel').value||'base';const el=$('#vmodel');el.prepend(R.domElement);host=el;setMatStyle(mvStyle,true);mvInfoUpd();pixApply();buildShops();loadShops();setTimeout(()=>{cropApply();if($('#spT').checked)buildSunPath();},0);}
+function mvLeave(){expClear();pixClear();if(shopG){S.remove(shopG);shopG=null;}if(FLS){FLS=null;$('#flCard').hidden=true;}$('#mvExp').checked=false;ctr.autoRotate=false;$('#v3d').prepend(R.domElement);host=$('#v3d');setMatStyle(mvPrev,true);R.clippingPlanes=[];drop(cropG);cropG=null;R.setPixelRatio(PR0);R.domElement.style.imageRendering='';resize();}
 // ---------- 픽셀 동네: 저해상도 렌더 + 용도 색 + 움직이는 차·사람 + 건물 카드 ----------
 const PXU=[0xf6c453,0xf08a4b,0xe0566a,0x5d8fe0,0xb9a6d8],PXM={},PR0=Math.min(devicePixelRatio,2);
 function pixMat(c){const k=c.u!=null&&PXU[c.u]!=null?c.u:(c.fl>=5?2:Math.abs(Math.round((c.x0||0)*7+(c.z0||0)*3))%3);return PXM[k]||(PXM[k]=new THREE.MeshLambertMaterial({color:PXU[k]}));}
@@ -3235,7 +3236,39 @@ function pixPickAt(e){setPt(e);const h=ctxG&&ray.intersectObjects(ctxG.children,
  const card=$('#pxCard');card.innerHTML='';const nm=document.createElement('b');nm.textContent=c.nm||(SITE?'이름 없는 건물':'가상 주변 건물');const dl=document.createElement('dl');
  const row=(k,v,sw)=>{const t=document.createElement('dt');t.textContent=k;const d=document.createElement('dd');if(sw!=null){const i=document.createElement('i');i.style.background='#'+PXU[sw].toString(16).padStart(6,'0');d.append(i);}d.append(v);dl.append(t,d);};
  const ui=c.u!=null&&BUSE[c.u]?c.u:null;row('용도',ui!=null?BUSE[ui][0]:'정보 없음',ui);if(c.fl)row('층수',c.fl+'층');row('높이',f1(c.h)+'m');if(c.yr)row('사용승인',c.yr+'년');row('위치',`대지에서 ${dir}쪽 ${Math.round(dd)}m`);
- card.append(nm,dl);card.hidden=false;}
+ const SL=shopsByBld().get(h.object.userData.ci)||[];if(SL.length){const u=[...new Map(SL.map(o=>[o.nm,o])).values()].sort((a,b)=>a.fl-b.fl);row('가게',`${u.length}곳`);const ul=document.createElement('ul');ul.className='pxshop';u.slice(0,7).forEach(o=>{const li=document.createElement('li');const i=document.createElement('i');i.style.background=shopCol(o.c1);li.append(i,`${o.fl}층 ${o.nm}`);const sm=document.createElement('small');sm.textContent=' '+(o.c2||o.c1);li.append(sm);ul.append(li);});if(u.length>7){const li=document.createElement('li');li.textContent=`외 ${u.length-7}곳`;ul.append(li);}card.append(nm,dl,ul);}else card.append(nm,dl);card.hidden=false;}
+// ---------- 상가 간판: 공공데이터포털 상가(상권)정보 → 건물별로 묶어 1층 벽에 간판 ----------
+const SHOPS={};let shopBusy=false,shopG=null;
+const SHOPC={'음식':'#d8443a','소매':'#2f62d0','생활서비스':'#2f9a5e','교육':'#7d55bd','숙박':'#e4822b','보건의료':'#13918f','부동산':'#8a6d3b','과학·기술':'#4b5563','시설관리·임대':'#6b7280','수리·개인':'#3f7f9a','예술·스포츠':'#c0447a'};
+const shopCol=c=>{for(const k in SHOPC)if(String(c||'').startsWith(k.slice(0,2)))return SHOPC[k];return '#4b5563';};
+async function loadShops(){if(!SITE||!SITE.origin||!DATA_KEY||SHOPS[SITE.id]||shopBusy)return;shopBusy=true;const sid=SITE.id,[lon,lat]=SITE.origin;
+ try{const all=[];for(let pg=1;pg<=3;pg++){const u=`https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInRadius?serviceKey=${encodeURIComponent(DATA_KEY)}&radius=200&cx=${lon}&cy=${lat}&type=json&numOfRows=1000&pageNo=${pg}`;
+   const r=await fetch(u);const t=await r.text();let j;try{j=JSON.parse(t);}catch(e){throw new Error(/SERVICE_KEY|등록되지 않은/.test(t)?'키가 아직 활성화되지 않았습니다(신청 후 1시간쯤 걸릴 수 있습니다).':'상가정보 응답을 읽지 못했습니다.');}
+   const b=j.body||(j.response&&j.response.body)||{};const it=b.items||[];const arr=Array.isArray(it)?it:(it.item?[].concat(it.item):[]);all.push(...arr);if(arr.length<1000)break;}
+  const P=mkProj(lon,lat);SHOPS[sid]={list:all.map(x=>{const q=P([+x.lon,+x.lat]);return{nm:String(x.bizesNm||'').trim(),br:String(x.brchNm||'').trim(),c1:String(x.indsLclsNm||''),c2:String(x.indsSclsNm||x.indsMclsNm||''),fl:parseInt(x.flrNo)||1,x:q[0],z:q[1]};}).filter(o=>o.nm)};}
+ catch(e){SHOPS[sid]={err:e.message&&!/Failed to fetch|NetworkError|Load failed/.test(e.message)?e.message:'상가정보 서버가 브라우저 호출을 막았습니다.',list:[]};}
+ finally{shopBusy=false;}
+ if(SITE&&SITE.id===sid&&curPane==='vmodel'){buildShops();mvInfoUpd();}}
+function shopsByBld(){const S0=SITE&&SHOPS[SITE.id];if(!S0||!S0.list.length)return new Map();const M=new Map();
+ S0.list.forEach(o=>{let ci=CTXP.findIndex(c=>c.poly&&pip(o.x,o.z,c.poly));if(ci<0){let bd=6;CTXP.forEach((c,i)=>{if(!c.poly)return;const b=bbox(c.poly);const d=Math.hypot(Math.max(b.x0-o.x,0,o.x-b.x1),Math.max(b.z0-o.z,0,o.z-b.z1));if(d<bd){bd=d;ci=i;}});}if(ci<0)return;if(!M.has(ci))M.set(ci,[]);M.get(ci).push(o);});return M;}
+function signTex(txt,bg){const c=document.createElement('canvas');const fs=40,pad=18;const x=c.getContext('2d');x.font=`600 ${fs}px "IBM Plex Sans KR",sans-serif`;const w=Math.min(620,Math.ceil(x.measureText(txt).width)+pad*2);c.width=w;c.height=64;
+ x.fillStyle=bg;x.fillRect(0,0,w,64);x.fillStyle='rgba(255,255,255,.22)';x.fillRect(0,0,w,4);x.font=`600 ${fs}px "IBM Plex Sans KR",sans-serif`;x.fillStyle='#fff';x.textBaseline='middle';x.fillText(txt,pad,34,w-pad*2);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return{t,ar:w/64};}
+function buildShops(){if(shopG){S.remove(shopG);shopG.traverse(o=>{if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}if(o.geometry)o.geometry.dispose();});shopG=null;}
+ if(curPane!=='vmodel'||!$('#mvShop').checked||!SITE)return;const M=shopsByBld();if(!M.size)return;shopG=new THREE.Group();shopG.name='shops';let n=0;const RP=roadPolys();
+ M.forEach((L,ci)=>{const c=CTXP[ci],P=c.poly;if(!P||n>=120)return;const gs=P.map(q=>G(q[0],q[1])),y0=gs.reduce((a,b)=>a+b,0)/gs.length;const nf=Math.max(1,Math.round(c.h/FH));
+  // 길 쪽 벽: 바깥 법선 방향 2m가 도로 안이면 가산점
+  const E=[];for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(l<2.2)continue;const tx=(b[0]-a[0])/l,tz=(b[1]-a[1])/l;let nx=tz,nz=-tx;const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;if(pip(mx+nx*0.3,mz+nz*0.3,P)){nx=-nx;nz=-nz;}const road=RP.some(q=>pip(mx+nx*3,mz+nz*3,q));E.push({a,tx,tz,nx,nz,l,road,used:0});}
+  if(!E.length)return;E.sort((p,q)=>(q.road-p.road)||(q.l-p.l));
+  const seen=new Set();L.filter(o=>o.fl<=Math.min(2,nf)).forEach(o=>{if(n>=120)return;const k=o.nm;if(seen.has(k))return;seen.add(k);
+   // 가게 위치에서 가장 가까운 길 쪽 벽
+   let e=null,bd=1e9;E.forEach(w=>{const t=Math.max(0,Math.min(w.l,(o.x-w.a[0])*w.tx+(o.z-w.a[1])*w.tz));const d=Math.hypot(w.a[0]+w.tx*t-o.x,w.a[1]+w.tz*t-o.z)-(w.road?4:0);if(d<bd){bd=d;e=w;}});if(!e)return;
+   const fs=Math.max(0,Math.min(nf-1,o.fl-1));const {t:tex,ar}=signTex(o.nm,shopCol(o.c1));const h=0.85,w=Math.min(e.l-0.4,h*ar,7.5);
+   e.cur=e.cur||[0,0,0];let row=fs;while(row<Math.min(nf,2)&&e.cur[row]+w+0.3>e.l)row++;if(row>=Math.min(nf,2)||w<1.2){tex.dispose();return;}
+   const along=e.cur[row]+0.3+w/2;e.cur[row]+=w+0.3;
+   const cx=e.a[0]+e.tx*along+e.nx*0.12,cz=e.a[1]+e.tz*along+e.nz*0.12,cy=y0+row*FH+2.35;
+   const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,toneMapped:false}));m.position.set(cx,cy,cz);m.rotation.y=Math.atan2(e.nx,e.nz);m.userData.shop=o;shopG.add(m);n++;});});
+ S.add(shopG);}
+$('#mvShop').onchange=()=>buildShops();
 // ---------- 층 클릭: 그 층만 따서 평면을 보여 주고 카메라를 옮김 ----------
 var FLY=null,FLS=null;
 function flyTo(tg,ps,ms){FLY={t0:performance.now(),d:ms||650,a:[ctr.target.clone(),cam.position.clone()],b:[tg,ps]};}
@@ -3262,10 +3295,10 @@ function flCard(){if(!FLS)return;const{ms,f}=FLS,card=$('#flCard'),L=layoutFloor
  const nav=document.createElement('div');nav.className='flnav';const bt=(tx,fn,dis)=>{const b=document.createElement('button');b.className='btn sm';b.textContent=tx;b.disabled=!!dis;b.onclick=fn;nav.append(b);};
  bt('아래층',()=>flSet(ms,f-1),f<=1);bt('위층',()=>flSet(ms,f+1),f>=ms.floors);bt('전체 보기',flOff);
  card.append(h,cv,t,su,nav);card.hidden=false;}
-function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.'):'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
-$$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();pixClear();setMatStyle(mvStyle,true);if(ex)expBuild();pixApply();if(mvStyle==='pixel'&&!CROP.shape){CROP.shape='circle';cropSave();}}});
+function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;const sh=SITE&&SHOPS[SITE.id];const st=!SITE?'':shopBusy&&!sh?' · 간판 불러오는 중…':sh?(sh.err?' · 간판: '+sh.err:` · 가게 ${sh.list.length}곳 간판`):'';$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.')+st:'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';}
+$$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();pixClear();setMatStyle(mvStyle,true);if(ex)expBuild();pixApply();buildShops();if(mvStyle==='pixel'&&!CROP.shape){CROP.shape='circle';cropSave();}}});
 $('#mvSpin').onchange=e=>{ctr.autoRotate=e.target.checked;ctr.autoRotateSpeed=0.6;};
-window.__mv={cam,ctr,get life(){return LIFE;},get masses(){return masses;},massLevel:m=>massLevel(m),FH};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
+window.__mv={cam,ctr,get life(){return LIFE;},get shops(){return shopG;},get masses(){return masses;},massLevel:m=>massLevel(m),FH};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
 
 // ---------- 선화·야경 표현: 선 색·빛·배경, 나무 선, 켜진 창 ----------
 function styleLights(){const hemi=S.children.find(o=>o.isHemisphereLight);if(!LBASE)LBASE={h:hemi?hemi.intensity:1.35,hc:hemi?hemi.color.getHex():0xffffff,s:sun.intensity};
