@@ -820,7 +820,7 @@ function illusTrees(T){const M3=ILLT();const buck=[[],[],[]];let q=31;const r=()
 
 // 고가 구조: 데크(두께 1.8m, 하부 6.5m) + 난간 + 22m마다 교각·코핑, 다른 고가 구간과 이어지지 않는 끝은 45m에 걸쳐 지면으로 내려옴
 let elevG=null;
-function buildElev(){drop(elevG);elevG=null;const E=SITE&&SITE.elev;if(!E||!E.length)return;elevG=new THREE.Group();const pos=[],lp=[];const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
+function buildElev(){drop(elevG);elevG=null;const E=SITE?elevAll():null;if(!E||!E.length)return;elevG=new THREE.Group();const pos=[],lp=[];const V3=(a,b,c)=>new THREE.Vector3(a,b,c);
  const ends=E.flatMap(e=>[e.pts[0],e.pts[e.pts.length-1]]);const shared=p=>ends.filter(q=>Math.hypot(q[0]-p[0],q[1]-p[1])<4).length>1;
  const quad=(a,b,c,d)=>pos.push(...a,...b,...c,...a,...c,...d);const WQ=(SITE&&SITE.waters)||[],wetAt=(x,z)=>WQ.some(q=>pip(x,z,q)),lampP=[];
  E.forEach(e=>{const P=e.pts;e.deck=[];const S=[0];for(let i=1;i<P.length;i++)S.push(S[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=S[S.length-1];if(L<3)return;
@@ -2896,6 +2896,9 @@ async function vwSearch(query){for(const category of ['parcel','road']){const r=
 async function vwData(data,geomFilter,size=1000){const r=vwOk(await vwJsonp('data',{service:'data',request:'GetFeature',version:'2.0',data,geomFilter,geometry:'true',attribute:'true',crs:'EPSG:4326',size:String(size),page:'1'}));
  return r&&r.result&&r.result.featureCollection?r.result.featureCollection.features||[]:[];}
 // 좌표: 경위도 → 대지 중심 기준 m (동=+x, 북=-z)
+function parseElev(links,P){const elev=[];links.forEach(f=>{const pp=f.properties||{};const g=k=>{const kk=Object.keys(pp).find(x=>x.toLowerCase()===k);return kk?String(pp[kk]).trim():'';};const rt=g('road_type'),rk=g('road_rank');if(rt!=='001'&&rt!=='003')return;const G0=f.geometry;if(!G0)return;
+ const Ls=G0.type==='LineString'?[G0.coordinates]:G0.type==='MultiLineString'?G0.coordinates:[];Ls.forEach(L=>{const q=L.map(P).filter((v,i,a)=>!i||Math.hypot(v[0]-a[i-1][0],v[1]-a[i-1][1])>0.3);if(q.length>=2)elev.push({pts:q,t:rt,rk,nm:g('road_name'),w:rk==='101'||rk==='102'?10:rk==='103'||rk==='104'?8:6.5});});});return elev;}
+const elevAll=()=>{const A=(SITE&&SITE.elev)||[];if(!FAR||!FAR.elev||!FAR.elev.length)return A;const k=e=>e.pts.map(p=>Math.round(p[0]/3)+','+Math.round(p[1]/3)).join('|');const seen=new Set(A.map(k));return[...A,...FAR.elev.filter(e=>!seen.has(k(e)))];};
 function mkProj(lon0,lat0){const kx=111320*Math.cos(lat0*Math.PI/180),kz=110574;return([lon,lat])=>[Math.round((lon-lon0)*kx*100)/100,Math.round(-(lat-lat0)*kz*100)/100];}
 function rings(geom){if(!geom)return[];const polys=geom.type==='Polygon'?[geom.coordinates]:geom.type==='MultiPolygon'?geom.coordinates:[];return polys.map(pg=>pg[0]).filter(Boolean);}
 function cleanRing(r){const o=[];r.forEach(p=>{const q=o[o.length-1];if(!q||Math.hypot(p[0]-q[0],p[1]-q[1])>0.05)o.push(p);});if(o.length>1&&Math.hypot(o[0][0]-o[o.length-1][0],o[0][1]-o[o.length-1][1])<0.05)o.pop();
@@ -3031,18 +3034,18 @@ $('#treeT').onchange=e=>{if(treesG)treesG.visible=e.target.checked&&!MS.line;};
 async function vwDataPaged(data,box,maxPages=3){const all=[];for(let pg=1;pg<=maxPages;pg++){let r=null;try{r=vwOk(await vwJsonp('data',{service:'data',request:'GetFeature',version:'2.0',data,geomFilter:box,geometry:'true',attribute:'true',crs:'EPSG:4326',size:'1000',page:String(pg)}));}catch(e){if(pg===1&&!all.length)throw e;break;}
   const f=r&&r.result&&r.result.featureCollection?r.result.featureCollection.features||[]:[];all.push(...f);if(f.length<1000)break;}return all;}
 async function loadFar(Rh){if(!SITE||!SITE.origin){toast('넓은 주변 범위는 실제 주소로 불러온 대지에서 쓸 수 있습니다.');$('#farSel').value='0';return;}
- if(!Rh){FAR=null;buildFar();toast('주변 범위를 160m로 되돌렸습니다.');return;}
+ if(!Rh){FAR=null;buildFar();buildElev();toast('주변 범위를 160m로 되돌렸습니다.');return;}
  const [lon0,lat0]=SITE.origin,kx=111320*Math.cos(lat0*Math.PI/180),kz=110574,P=mkProj(lon0,lat0),sid=SITE.id;toast(`주변 ${Rh*2}m 범위의 건물을 불러오는 중…`);
  const n=Rh>200?4:3,tile=2*Rh/n,boxes=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x0=-Rh+i*tile,z0=-Rh+j*tile;if(x0>=-80&&x0+tile<=80&&z0>=-80&&z0+tile<=80)continue;
   boxes.push(`BOX(${lon0+x0/kx},${lat0-(z0+tile)/kz},${lon0+(x0+tile)/kx},${lat0-z0/kz})`);}
- let feats=[],lotsF=[];try{const res=[],rl=[];for(let i=0;i<boxes.length;i+=4){res.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwDataPaged('LT_C_SPBD',b).catch(()=>[]))));rl.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwDataPaged('LP_PA_CBND_BUBUN',b).catch(()=>[]))));}feats=res.flat();lotsF=rl.flat();}catch(e){feats=[];}
+ let feats=[],lotsF=[];const lk2=[];try{const res=[],rl=[];for(let i=0;i<boxes.length;i+=4){res.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwDataPaged('LT_C_SPBD',b).catch(()=>[]))));rl.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwDataPaged('LP_PA_CBND_BUBUN',b).catch(()=>[]))));lk2.push(...await Promise.all(boxes.slice(i,i+4).map(b=>vwData('LT_L_MOCTLINK',b).catch(()=>[]))));}feats=res.flat();lotsF=rl.flat();}catch(e){feats=[];}
  if(!SITE||SITE.id!==sid)return;
  const key=q=>{const c=ringC(q);return Math.round(c[0])+','+Math.round(c[1]);};const seen=new Set(SITE.ctx.map(c=>key(c.poly)));const plotL=plot;const out=[];
  feats.forEach(f=>{const fl=Math.max(1,parseInt((f.properties||{}).gro_flo_co)||1);rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length<3||polyArea(q)<=4)return;const c=ringC(q);
   if(Math.abs(c[0])>Rh||Math.abs(c[1])>Rh)return;const k=key(q);if(seen.has(k))return;if(Math.abs(c[0])<=80&&Math.abs(c[1])<=80&&pip(c[0],c[1],plotL))return;seen.add(k);out.push({poly:q,h:fl*FH,fl});});});
  if(!out.length&&!feats.length){toast('넓은 범위 건물을 받지 못했습니다. 잠시 뒤 다시 고르세요.');$('#farSel').value='0';return;}
  const fr=[],fg=[],fw=[],lk=new Set();lotsF.forEach(f=>{const p=f.properties||{};const j=String(p.jibun||'');const last=j.trim().slice(-1);if(!'도공천구유'.includes(last)||!last)return;const id=p.pnu||j;if(lk.has(id))return;lk.add(id);rings(f.geometry).forEach(r=>{const q=cleanRing(r.map(P));if(q.length<3)return;const c=ringC(q);if(Math.abs(c[0])<=80&&Math.abs(c[1])<=80)return;(last==='도'?fr:last==='공'?fg:fw).push(q);});});
- FAR={R:Rh,ctx:out,roads:fr,greens:fg,waters:fw};buildFar();if(curPane==='vmodel'){setMatStyle(mvStyle,true);buildShops();loadShops();}toast(`주변 ${Rh*2}m 범위에 건물 ${out.length}동을 더했습니다. 3D 보기와 3D 내보내기에 들어갑니다.`);}
+ FAR={R:Rh,ctx:out,roads:fr,greens:fg,waters:fw,elev:parseElev(lk2.flat(),P)};buildFar();buildElev();if(typeof mvInfoUpd==='function')mvInfoUpd();if(curPane==='vmodel'){setMatStyle(mvStyle,true);buildShops();loadShops();}toast(`주변 ${Rh*2}m 범위에 건물 ${out.length}동을 더했습니다. 3D 보기와 3D 내보내기에 들어갑니다.`);}
 function buildFar(){drop(farG);farG=null;if(!FAR||!FAR.ctx.length){if(cam.far<1001){}return;}
  const pos=[],ln=[];const tri=(a,b,c)=>pos.push(...a,...b,...c);
  FAR.ctx.forEach(o=>{const P=o.poly,gs=P.map(q=>G(q[0],q[1])),y0=Math.min(...gs)-0.05,y1=gs.reduce((a,b)=>a+b,0)/gs.length+o.h;
@@ -3214,7 +3217,7 @@ function buildLife(){lifeDrop();if(!MS.pix&&!MS.fac)return;let sd=31;const rnd=(
   const outR=(x,z)=>!RP.some(r=>pip(x,z,r))&&!ctxAll().some(c=>pip(x,z,c.poly||[[c.x0,c.z0],[c.x1,c.z0],[c.x1,c.z1],[c.x0,c.z1]]))&&!pip(x,z,plot);seg(-1.3,rnd()<.5,walks,outR);seg(0.7,rnd()<.5,walks,inR);}});
  const g=new THREE.Group();g.name='life';const box=(w,h,d,y)=>{const ge=new THREE.BoxGeometry(w,h,d);ge.translate(0,y,0);return ge;};
  const CARC=[0xe8453c,0x2f6fe0,0xffffff,0xf2c230,0x2c2f36,0x3fae6a,0xf28b2f];
- const EL=(SITE&&SITE.elev||[]).filter(e=>e.deck&&e.deck.length>2);const ne=Math.min(40,EL.length*8);
+ const EL=(SITE?elevAll():[]).filter(e=>e.deck&&e.deck.length>2);const ne=Math.min(40,EL.length*8);
  const cap=farR()?2.2:1;const nc=Math.min(Math.round(70*cap),lanes.length*3)+ne,np=Math.min(Math.round(160*cap),walks.length*4);
  const body=new THREE.InstancedMesh(box(1.8,0.9,4.2,0.75),new THREE.MeshLambertMaterial(),Math.max(1,nc)),cab=new THREE.InstancedMesh(box(1.6,0.7,2.1,1.55),new THREE.MeshLambertMaterial({color:0xdfeaf2}),Math.max(1,nc));
  const ppl=new THREE.InstancedMesh(box(0.55,1.7,0.45,0.85),new THREE.MeshLambertMaterial(),Math.max(1,np));
@@ -3357,7 +3360,7 @@ function flCard(){if(!FLS)return;const{ms,f}=FLS,card=$('#flCard'),L=layoutFloor
  const nav=document.createElement('div');nav.className='flnav';const bt=(tx,fn,dis)=>{const b=document.createElement('button');b.className='btn sm';b.textContent=tx;b.disabled=!!dis;b.onclick=fn;nav.append(b);};
  bt('아래층',()=>flSet(ms,f-1),f<=1);bt('위층',()=>flSet(ms,f+1),f>=ms.floors);bt('전체 보기',flOff);
  card.append(h,cv,t,su,nav);card.hidden=false;}
-function mvInfoUpd(){const n=(SITE&&SITE.elev||[]).length;const sh=SITE&&SHOPS[SITE.id];const st=!SITE?'':shopBusy&&!sh?' · 간판 불러오는 중…':sh?(sh.err?' · 간판: '+sh.err:` · 가게 ${sh.list.length}곳 간판`):'';const bm=!SITE?'':brBusy?' · 건축물대장 불러오는 중…':SITE._brMsg&&MS.fac?' · '+SITE._brMsg:'';$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.')+st:'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';if(SITE)$('#mvInfo').textContent+=bm;}
+function mvInfoUpd(){const n=SITE?elevAll().length:0;const sh=SITE&&SHOPS[SITE.id];const st=!SITE?'':shopBusy&&!sh?' · 간판 불러오는 중…':sh?(sh.err?' · 간판: '+sh.err:` · 가게 ${sh.list.length}곳 간판`):'';const bm=!SITE?'':brBusy?' · 건축물대장 불러오는 중…':SITE._brMsg&&MS.fac?' · '+SITE._brMsg:'';$('#mvInfo').textContent=SITE?(n?`고가차도·교량 ${n}구간을 표준노드링크에서 불러와 모델링했습니다.`:'이 주변 표준노드링크에는 고가차도·교량이 없습니다.')+st:'가상 대지 · 실제 주소를 불러오면 주변 거리를 모델링합니다.';if(SITE)$('#mvInfo').textContent+=bm;}
 $$('#mvStyle button').forEach(b=>b.onclick=()=>{mvStyle=b.dataset.s;$$('#mvStyle button').forEach(x=>x.classList.toggle('on',x===b));if(curPane==='vmodel'){const ex=!!expG;expClear();pixClear();setMatStyle(mvStyle,true);if(ex)expBuild();pixApply();buildShops();}});
 $('#mvSpin').onchange=e=>{ctr.autoRotate=e.target.checked;ctr.autoRotateSpeed=0.6;};
 window.__mv={cam,ctr,get life(){return LIFE;},get shops(){return shopG;},get masses(){return masses;},massLevel:m=>massLevel(m),FH};$('#mvPng').onclick=async()=>{renderMain();let cv=R.domElement;if(mvStyle==='pixel'){const k=4,o=document.createElement('canvas');o.width=cv.width*k;o.height=cv.height*k;const x=o.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(cv,0,0,o.width,o.height);cv=o;}offer(`bujilab_model_${mvStyle}_${stamp()}.png`,await canvasBlob(cv));};
